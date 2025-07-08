@@ -1,19 +1,24 @@
 "use client";
-import { supabase } from "@/lib/supabase";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+import { Role } from "@/constants/enums";
 
-export enum Role {
-  TALENT = "talent",
-  EMPLOYER = "employer",
-}
 
 export default function LoginPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    if (!role) return alert("Please select a role");
+    if (!role) {
+      setErrorMsg("Please select a role");
+      return;
+    }
+    setErrorMsg(null);
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -24,36 +29,38 @@ export default function LoginPage() {
         redirectTo: `${location.origin}/auth/callback?role=${role}`,
       },
     });
+
     if (error) console.error("Login error:", error.message);
   };
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen gap-4 p-4">
-      <h1 className="text-2xl font-bold">Login to Ftn Find</h1>
+    <main className="flex flex-col items-center justify-center min-h-screen gap-6 bg-slate-50 px-4">
+      <h1 className="text-3xl font-bold text-center">Login to Ftn Find</h1>
       <div className="flex gap-4">
-        <button
-          className={`px-4 py-2 border rounded ${
-            role === Role.TALENT ? "bg-blue-500 text-white" : ""
-          }`}
+              <Button
+                  className="cursor-pointer"
+          variant={role === Role.TALENT ? "default" : "outline"}
           onClick={() => setRole(Role.TALENT)}
         >
           🎓 I'm a Talent
-        </button>
-        <button
-          className={`px-4 py-2 border rounded ${
-            role === Role.EMPLOYER ? "bg-green-500 text-white" : ""
-          }`}
+        </Button>
+              <Button
+                  className="cursor-pointer"
+          variant={role === Role.EMPLOYER ? "default" : "outline"}
           onClick={() => setRole(Role.EMPLOYER)}
         >
           🏢 I'm an Employer
-        </button>
+        </Button>
       </div>
-      <button
+      {errorMsg && <div className="text-red-600 font-medium">{errorMsg}</div>}
+
+      <Button
         onClick={handleLogin}
-        className="mt-4 px-6 py-2 bg-black text-white rounded"
+        className="bg-black text-white hover:bg-gray-800 cursor-pointer"
+        size="lg"
       >
         Sign in with Google
-      </button>
+      </Button>
     </main>
   );
 }
