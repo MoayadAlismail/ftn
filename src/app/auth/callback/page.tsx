@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Role } from '@/constants/enums';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -29,10 +30,12 @@ export default function AuthCallback() {
       }
 
       // Redirect based on role
-      if (role === 'talent') {
-        router.replace('/onboarding');
+      if (role === Role.TALENT) {
+        router.replace('/talent/onboarding');
+      } else if (role === Role.EMPLOYER) {
+        router.replace('/employer/dashboard');
       } else {
-        router.replace('/dashboard');
+        router.replace('/');
       }
     };
 
