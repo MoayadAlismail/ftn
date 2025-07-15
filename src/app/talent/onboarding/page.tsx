@@ -12,8 +12,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectContent,
+  SelectContent
 } from "@/components/ui/select";
+import { getEmbeddingsFromApi } from "@/lib/embedding";
+import { extractResumeText } from "@/lib/extract-resume"; // Assuming you have a function to extract text from PDF resumes
 
 type Profile = {
   full_name: string;
@@ -26,7 +28,7 @@ export default function OnboardingPage() {
   const [profile, setProfile] = useState<Profile>({
     full_name: "",
     bio: "",
-    education: "",
+    education: ""
     // available: true,
   });
 
@@ -77,7 +79,7 @@ export default function OnboardingPage() {
     const { data: resumeUpload, error: uploadError } = await supabase.storage
       .from("resumes")
       .upload(`resume-${userId}.pdf`, resumeFile, {
-        upsert: true,
+        upsert: true
       });
 
     if (uploadError) {
@@ -85,13 +87,27 @@ export default function OnboardingPage() {
       return;
     }
 
+    console.log("Process block started");
+    const resumeText = await extractResumeText(resumeFile);
+    console.log("Process block halfway done. finished extracting and now embedding");
+    const allText = [resumeText!, skills, profile.bio, profile.education].join(" ");
+    console.log("All text for embedding:", allText);
+    const embedding = await getEmbeddingsFromApi(allText);
+    console.log("Embedding fetched:", embedding);
+    console.log("Process block finished");
+    
+
     const newTalent = {
       user_id: userId,
       ...profile,
       email,
       skills: skills.split(",").map((skill) => skill.trim()),
       resume_url: resumeUpload.path,
+      embedding
     };
+
+
+
 
     const { error } = await supabase.from("talents").insert([newTalent]);
 
