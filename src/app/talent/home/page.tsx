@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // ShadCN Button
+import { Button } from "@/components/ui/button";
 
 export default function TalentHomePage() {
   const [talent, setTalent] = useState<any>(null);
@@ -32,7 +32,7 @@ export default function TalentHomePage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/"); // redirect to landing page or login
+    router.push("/"); 
   };
 
   if (loading) return <p className="p-6">Loading your profile...</p>;

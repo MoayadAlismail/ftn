@@ -16,12 +16,10 @@ export default function NewPromptPage() {
     if (!prompt.trim()) return;
 
     setLoading(true);
-
-    // 1. Get current user
+    
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
 
-    // 3. Call Gemini API to match
     const response = await fetch("/api/match", {
       method: "POST",
       body: JSON.stringify(prompt)
@@ -34,8 +32,6 @@ export default function NewPromptPage() {
     setLoading(false);
   };
 
-  // The problem is that useEffect runs after every render (no dependency array), causing infinite fetching and printing.
-  // Fix: Add an empty dependency array so it only runs once on mount.
   useEffect(() => {
     const fetchMatches = async () => {
       setLoading(true);
@@ -66,7 +62,6 @@ export default function NewPromptPage() {
         {loading ? "Matching..." : "Run AI Match"}
       </Button>
 
-      {/* Show results if a prompt has been submitted and matches exist */}
       {matches && matches.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Matching Talents</h2>
@@ -98,13 +93,11 @@ export default function NewPromptPage() {
                     Similarity: {(talent.similarity * 100).toFixed(2)}%
                   </div>
                 )}
-                {/* Add more fields as needed */}
               </li>
             ))}
           </ul>
         </div>
       )}
-      {/* Optionally, show a message if no matches */}
       {matches && matches.length === 0 && (
         <div className="mt-8 text-center text-gray-500">
           No matching talents found for this prompt.

@@ -11,7 +11,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/"); // redirect to landing page
+    router.push("/");
   };
 
   return (

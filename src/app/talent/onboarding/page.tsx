@@ -15,7 +15,7 @@ import {
   SelectContent
 } from "@/components/ui/select";
 import { getEmbeddingsFromApi } from "@/lib/embedding";
-import { extractResumeText } from "@/lib/extract-resume"; // Assuming you have a function to extract text from PDF resumes
+import { extractResumeText } from "@/lib/extract-resume"; 
 
 type Profile = {
   full_name: string;
@@ -29,7 +29,6 @@ export default function OnboardingPage() {
     full_name: "",
     bio: "",
     education: ""
-    // available: true,
   });
 
   const [email, setEmail] = useState("");
@@ -75,7 +74,6 @@ export default function OnboardingPage() {
     const user = await supabase.auth.getUser();
     const userId = user.data.user?.id;
 
-    // Upload resume (Supabase Storage or Cloudinary)
     const { data: resumeUpload, error: uploadError } = await supabase.storage
       .from("resumes")
       .upload(`resume-${userId}.pdf`, resumeFile, {

@@ -9,7 +9,6 @@ export async function getEmbeddingsFromApi(text: string): Promise<number[] | nul
   });
 
   if (!response.ok) {
-    // Optionally handle error here
     console.error("Failed to fetch embeddings:", await response.json(), "status::", response.statusText);
     return null;
   }

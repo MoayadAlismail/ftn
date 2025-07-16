@@ -33,8 +33,6 @@ export default function EmployerDashboard() {
           ✨ Create New Prompt
         </Button>
       </div>
-
-      {/* Future: list of past prompts */}
     </main>
   );
 }
