@@ -19,8 +19,7 @@ export default function AuthCallback() {
         console.error('Auth error:', error);
         return;
       }
-
-      // Optional: Store role in user metadata (once only)
+      
       const { user } = data.session;
       const hasRole = user.user_metadata?.role;
       if (!hasRole && role) {
