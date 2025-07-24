@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Role } from '@/constants/enums';
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { Role } from "@/constants/enums";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -11,15 +11,15 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleRedirect = async () => {
-      const role = searchParams.get('role');
+      const role = searchParams.get("role");
 
       const { data, error } = await supabase.auth.getSession();
 
       if (error || !data.session) {
-        console.error('Auth error:', error);
+        console.error("Auth error:", error);
         return;
       }
-      
+
       const { user } = data.session;
       const hasRole = user.user_metadata?.role;
       if (!hasRole && role) {
@@ -28,14 +28,19 @@ export default function AuthCallback() {
         });
       }
 
-      // Redirect based on role
+      // // Redirect based on role
       if (role === Role.TALENT) {
-        router.replace('/talent/onboarding');
+        // router.replace('/talent/onboarding');
+        router.replace("/?step=3");
       } else if (role === Role.EMPLOYER) {
-        router.replace('/employer/dashboard');
+        // router.replace('/employer/dashboard');
+        router.replace("/employer/onboarding");
       } else {
-        router.replace('/');
+        router.replace("/");
       }
+
+      // After successful authentication, redirect to a route and pass props via query params
+      // For example, redirect to /talent/onboarding with a prop (e.g., fromAuthCallback=true)
     };
 
     handleRedirect();
