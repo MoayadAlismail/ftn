@@ -3,15 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  CirclePlus,
   Search,
   WandSparkles,
   Briefcase,
   Mail,
-  Globe2,
   Users2,
   Loader2,
   User,
@@ -58,7 +56,7 @@ export default function EmployerDashboardHome() {
     setShowResults(true);
     if (!prompt.trim()) return;
 
-    const { data: userData } = await supabase.auth.getUser();
+    // const { data: userData } = await supabase.auth.getUser();
     // const userId = userData.user?.id;
 
     const response = await fetch("/api/match", {
