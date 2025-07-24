@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function EmployerLayout({ children }: { children: ReactNode }) {
+export default function TalentLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -17,7 +17,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between px-6 py-4 border-b shadow-sm bg-white">
-        <h1 className="text-lg font-semibold">🏢 Employer Dashboard</h1>
+        <h1 className="text-lg font-semibold">� Talent Dashboard</h1>
         <Button variant="outline" onClick={handleLogout}>
           Logout
         </Button>
