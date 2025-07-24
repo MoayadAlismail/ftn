@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Role } from "@/constants/enums";
 
-export default function AuthCallback() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -38,9 +39,6 @@ export default function AuthCallback() {
       } else {
         router.replace("/");
       }
-
-      // After successful authentication, redirect to a route and pass props via query params
-      // For example, redirect to /talent/onboarding with a prop (e.g., fromAuthCallback=true)
     };
 
     handleRedirect();
@@ -50,5 +48,17 @@ export default function AuthCallback() {
     <main className="min-h-screen flex items-center justify-center">
       <p className="text-sm text-gray-500">Signing you in...</p>
     </main>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-gray-500">Loading...</p>
+      </main>
+    }>
+      <CallbackContent />
+    </Suspense>
   );
 }
