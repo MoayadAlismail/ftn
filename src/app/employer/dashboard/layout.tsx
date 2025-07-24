@@ -9,7 +9,6 @@ import { Bookmark, Building2, CreditCard, Settings } from "lucide-react";
 
 export default function EmployerLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
