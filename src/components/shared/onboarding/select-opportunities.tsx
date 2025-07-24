@@ -10,7 +10,7 @@ import {
     Trophy,
     LucideIcon,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 type Opportunity = "full-time" | "internships" | "bootcamps" | "hackathons";
 

@@ -67,6 +67,11 @@ export default function EmployerSignup() {
             const { data: userData, error: userError } = await supabase.auth.getUser();
             const userId = userData?.user?.id;
 
+            if (userError || !userId) {
+                alert("User not authenticated. Please log in.");
+                return;
+            }
+
             // Prepare employer data
             const employerData = {
                 user_id: userId,
@@ -129,7 +134,7 @@ export default function EmployerSignup() {
                         Welcome to Ftn
                     </h2>
                     <p className="mt-1 text-sm text-gray-600">
-                        Let's set up your company profile to start finding talent.
+                        Let&apos;s set up your company profile to start finding talent.
                     </p>
                 </div>
 
