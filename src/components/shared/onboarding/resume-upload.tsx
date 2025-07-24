@@ -54,25 +54,24 @@ export default function ResumeUpload({
           className="px-6 py-2 text-primary-foreground font-medium cursor-pointer"
           onClick={() => router.push("/employer/login")}
         >
-          Employer Login &rarr;
+دخول أصحاب العمل &larr;
         </Button>
       </div>
       <div className="min-h-screen flex flex-col items-center justify-center relative">
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Your Dream Career <br />
-            <span className="text-blue-600">Starts Here</span>
+            مسيرتك المهنية المثالية <br />
+            <span className="text-primary">تبدأ من هنا</span>
           </h1>
           <p className="mt-4 text-gray-600 max-w-xl mx-auto">
-            Upload your resume and let our AI match you with the perfect
-            opportunities
+            ارفع سيرتك الذاتية ودع الذكاء الاصطناعي يجد لك الفرص المثالية
             <br />
-            tailored to your skills and aspirations.
+           المناسبة لمهاراتك وطموحاتك.
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col items-center">
           <div
-            className="border-2 border-dashed border-blue-200 rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition hover:border-blue-400"
+            className="border-2 border-dashed border-primary/20 rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition hover:border-primary/40"
             onClick={handleCardClick}
           >
             <div className="flex flex-col items-center mb-4">
@@ -108,10 +107,10 @@ export default function ResumeUpload({
                 </AnimatePresence>
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-1">
-                Upload Your Resume
+                ارفع سيرتك الذاتية
               </h2>
               <p className="text-gray-500 text-center mb-2">
-                Drag and drop your PDF resume here, or click to browse
+                اسحب وأسقط ملف السيرة الذاتية هنا، أو انقر للتصفح
               </p>
               {uploadStatus !== "success" && (
                 <>
@@ -127,7 +126,7 @@ export default function ResumeUpload({
                     className="mt-2 px-6 py-2 text-base font-medium cursor-pointer"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    Choose File &rarr;
+اختر ملف &larr;
                   </Button>
                 </>
               )}
@@ -137,16 +136,16 @@ export default function ResumeUpload({
                   className="mt-2 px-6 py-2 text-base font-medium cursor-pointer"
                   onClick={next}
                 >
-                  Next &rarr;
+التالي &larr;
                 </Button>
               )}
               <p className="text-xs text-gray-400 mt-2">
-                Supported format: PDF (max 10MB)
+تنسيق مدعوم: PDF (حد أقصى 10 ميجابايت)
               </p>
               {resumeFile && (
                 <div>
                   <span className="text-xs text-center mx-auto text-green-600 mt-1">
-                    Selected:{" "}
+تم اختيار:{" "}
                     {resumeFile.name.length > 50
                       ? resumeFile.name.slice(0, 47) + "... "
                       : resumeFile.name}
@@ -157,11 +156,11 @@ export default function ResumeUpload({
           </div>
         </div>
         <div className="absolute bottom-4 left-0 w-full flex justify-center text-xs text-gray-400">
-          Trusted by students from&nbsp;
-          <span className="text-gray-400 font-semibold">Harvard</span>,&nbsp;
-          <span className="text-gray-400 font-semibold">Stanford</span>,&nbsp;
+موثوق من قبل طلاب&nbsp;
+          <span className="text-gray-400 font-semibold">هارفارد</span>,&nbsp;
+          <span className="text-gray-400 font-semibold">ستانفورد</span>,&nbsp;
           <span className="text-gray-400 font-semibold">MIT</span>,&nbsp;
-          <span className="text-gray-400 font-semibold">Berkeley</span>
+          <span className="text-gray-400 font-semibold">بيركلي</span>
         </div>
       </div>
     </div>

@@ -26,16 +26,16 @@ const handleLogin = async () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-primary/5">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-        <div className="bg-blue-100 rounded-full p-3 mb-4">
+        <div className="bg-primary/10 rounded-full p-3 mb-4">
           <svg
             width="32"
             height="32"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            className="text-blue-500"
+            className="text-primary"
           >
             <path
               strokeLinecap="round"
@@ -46,10 +46,10 @@ const handleLogin = async () => {
           </svg>
         </div>
         <h2 className="text-2xl font-semibold mb-2 text-center">
-          Almost There!
+          أوشكنا على الانتهاء!
         </h2>
         <p className="text-gray-500 text-center mb-6">
-          Create your account to save your progress and get personalized matches
+          أنشئ حسابك لحفظ تقدمك والحصول على نتائج مخصصة
         </p>
         <Button
           variant="outline"
@@ -87,32 +87,32 @@ const handleLogin = async () => {
               </clipPath>
             </defs>
           </svg>
-          Continue with Google
+متابعة بحساب جوجل
         </Button>
         <div className="flex items-center w-full mb-3">
           <div className="flex-grow h-px bg-gray-200" />
           <span className="mx-2 text-gray-400 text-sm">
-            or continue quickly
+أو متابعة سريعة
           </span>
           <div className="flex-grow h-px bg-gray-200" />
         </div>
         <Input
           type="email"
-          placeholder="Your email address"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder="عنوان بريدك الإلكتروني"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <Button className="w-full mb-2" onClick={next}>
-          Get Started
-          <span className="ml-2">→</span>
+ابدأ الآن
+          <span className="mr-2">←</span>
         </Button>
         <p className="text-xs text-gray-400 text-center mt-2">
-          By continuing, you agree to our{" "}
+بالمتابعة، أنت توافق على{" "}
           <a href="#" className="underline">
-            Terms of Service
+            شروط الخدمة
           </a>{" "}
-          and{" "}
+          و{" "}
           <a href="#" className="underline">
-            Privacy Policy
+            سياسة الخصوصية
           </a>
         </p>
       </div>

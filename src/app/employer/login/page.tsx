@@ -36,16 +36,16 @@ export default function EmployerLogin() {
           variants={variants}
           transition={{ duration: 0.3 }}
         >
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50">
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-primary/5">
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-              <div className="bg-blue-100 rounded-full p-3 mb-4">
+                              <div className="bg-primary/10 rounded-full p-3 mb-4">
                 <svg
                   width="32"
                   height="32"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  className="text-blue-500"
+                  className="text-primary"
                 >
                   <path
                     strokeLinecap="round"
@@ -106,12 +106,12 @@ export default function EmployerLogin() {
               <Input
                 type="email"
                 placeholder="Your email address"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
               <Input
                 type="password"
                 placeholder="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
               <Button className="cursor-pointer w-full mb-2" onClick={() => alert("Login functionality not implemented yet")}>
                 Get Started
