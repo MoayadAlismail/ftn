@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { Bookmark, BookMarked, Briefcase, Building2, CreditCard, Settings } from "lucide-react";
+import { Bookmark, Building2, CreditCard, Settings } from "lucide-react";
 
 export default function EmployerLayout({ children }: { children: ReactNode }) {
   const router = useRouter();

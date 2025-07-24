@@ -13,7 +13,6 @@ interface AboutYourselfProps {
   workStylePreference: string[];
   industryPreference: string[];
   locationPreference: string;
-  next: () => void;
   prev: () => void;
 }
 
@@ -24,7 +23,6 @@ export default function AboutYourself({
   industryPreference,
   locationPreference,
   setBio,
-  next,
   prev,
 }: AboutYourselfProps) {
   const minCharacters = 10;

@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
-import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 

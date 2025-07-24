@@ -1,25 +1,19 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import ResumeUpload from "@/components/shared/onboarding/resume-upload";
 import TalentLogin from "@/components/shared/onboarding/talent-login";
-import { parse } from "path";
 import SelectOpportunities from "@/components/shared/onboarding/select-opportunities";
 import SelectIndustries from "@/components/shared/onboarding/select-industries";
 import LocationPreference from "@/components/shared/onboarding/location-preference";
 import AboutYourself from "@/components/shared/onboarding/about-yourself";
 // import Step3 from "@/components/onboarding/Step3";
 
-type HomePageProps = {
-  step: number;
-};
-
-export default function HomePage(props: HomePageProps) {
+export default function HomePage() {
   const searchParams = useSearchParams();
-  let stepParam: string = searchParams.get("step") as string;
+  const stepParam: string = searchParams.get("step") as string;
   let stepParamInt: number | null = null;
   if (stepParam) {
     console.warn(
@@ -56,15 +50,41 @@ export default function HomePage(props: HomePageProps) {
       case 3:
         return (
           <SelectOpportunities
-            {...{ setResumeFile, workStylePreference, setWorkStylePreference, next, prev }}
+            {...{
+              setResumeFile,
+              workStylePreference,
+              setWorkStylePreference,
+              next,
+              prev,
+            }}
           />
         );
       case 4:
-        return <SelectIndustries {...{ industryPreference, setIndustryPreference, next, prev }} />;
+        return (
+          <SelectIndustries
+            {...{ industryPreference, setIndustryPreference, next, prev }}
+          />
+        );
       case 5:
-        return <LocationPreference {...{ locationPreference, setLocationPreference, next, prev }} />;
+        return (
+          <LocationPreference
+            {...{ locationPreference, setLocationPreference, next, prev }}
+          />
+        );
       case 6:
-        return <AboutYourself {...{ bio, setBio, resumeFile, workStylePreference, industryPreference, locationPreference, next, prev }} />;
+        return (
+          <AboutYourself
+            {...{
+              bio,
+              setBio,
+              resumeFile,
+              workStylePreference,
+              industryPreference,
+              locationPreference,
+              prev,
+            }}
+          />
+        );
     }
   };
 
