@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import ResumeUpload from "@/components/shared/onboarding/resume-upload";
@@ -11,7 +11,7 @@ import LocationPreference from "@/components/shared/onboarding/location-preferen
 import AboutYourself from "@/components/shared/onboarding/about-yourself";
 // import Step3 from "@/components/onboarding/Step3";
 
-export default function HomePage() {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const stepParam: string = searchParams.get("step") as string;
   let stepParamInt: number | null = null;
@@ -103,5 +103,17 @@ export default function HomePage() {
         </motion.div>
       </AnimatePresence>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }
