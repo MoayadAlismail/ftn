@@ -1,72 +1,87 @@
-'use client';
+"use client";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
-export default function HomePage() {
+import ResumeUpload from "@/components/shared/onboarding/resume-upload";
+import TalentLogin from "@/components/shared/onboarding/talent-login";
+import { parse } from "path";
+import SelectOpportunities from "@/components/shared/onboarding/select-opportunities";
+import SelectIndustries from "@/components/shared/onboarding/select-industries";
+import LocationPreference from "@/components/shared/onboarding/location-preference";
+import AboutYourself from "@/components/shared/onboarding/about-yourself";
+// import Step3 from "@/components/onboarding/Step3";
+
+type HomePageProps = {
+  step: number;
+};
+
+export default function HomePage(props: HomePageProps) {
+  const searchParams = useSearchParams();
+  let stepParam: string = searchParams.get("step") as string;
+  let stepParamInt: number | null = null;
+  if (stepParam) {
+    console.warn(
+      "The 'step' prop is deprecated. Use the 'step' state instead."
+    );
+    console.log(typeof stepParam, stepParam);
+    stepParamInt = parseInt(stepParam as string, 10);
+  } else {
+    console.warn("The 'step' prop is not provided. Defaulting to step 1.");
+  }
+
+  const [step, setStep] = useState(stepParamInt ? stepParamInt : 1);
+  const [bio, setBio] = useState("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [locationPreference, setLocationPreference] = useState("");
+  const [industryPreference, setIndustryPreference] = useState<string[]>([]);
+  const [workStylePreference, setWorkStylePreference] = useState<string[]>([]);
+
+  const next = () => setStep((s) => Math.min(s + 1, 6));
+  const prev = () => setStep((s) => Math.max(s - 1, 1));
+
+  const variants = {
+    initial: { opacity: 0, x: 100 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -100 },
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <ResumeUpload {...{ resumeFile, setResumeFile, next }} />;
+      case 2:
+        return <TalentLogin {...{ next }} />;
+      case 3:
+        return (
+          <SelectOpportunities
+            {...{ setResumeFile, workStylePreference, setWorkStylePreference, next, prev }}
+          />
+        );
+      case 4:
+        return <SelectIndustries {...{ industryPreference, setIndustryPreference, next, prev }} />;
+      case 5:
+        return <LocationPreference {...{ locationPreference, setLocationPreference, next, prev }} />;
+      case 6:
+        return <AboutYourself {...{ bio, setBio, resumeFile, workStylePreference, industryPreference, locationPreference, next, prev }} />;
+    }
+  };
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between px-4 py-10 bg-slate-50 text-slate-900">
-      {/* HERO */}
-      <section className="text-center max-w-xl">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          Ftn Find — AI-powered talent discovery
-        </h1>
-        <p className="text-lg text-slate-600 mb-6">
-          Smartly match early talents with the right opportunities using AI.
-        </p>
-        <Link href="/auth/login">
-          <Button className="cursor-pointer" size="lg">Get Started</Button>
-        </Link>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="mt-20 text-center">
-        <h2 className="text-2xl font-semibold mb-6">How it works</h2>
-        <div className="grid md:grid-cols-3 gap-8 text-left">
-          {[
-            {
-              title: "1. Describe your ideal candidate",
-              desc: "Employers input a prompt describing who they’re looking for.",
-            },
-            {
-              title: "2. Let AI do the matching",
-              desc: "Ftn Find runs intelligent matchmaking using Gemini API.",
-            },
-            {
-              title: "3. Invite promising talents",
-              desc: "Review matches and send invites directly to candidates.",
-            },
-          ].map((step, i) => (
-            <div key={i} className="p-4 rounded-lg border bg-white shadow-sm">
-              <h3 className="font-bold text-lg mb-2">{step.title}</h3>
-              <p className="text-sm text-slate-600">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* WHO IT’S FOR */}
-      <section className="mt-20 text-center">
-        <h2 className="text-2xl font-semibold mb-6">Who is it for?</h2>
-        <div className="flex flex-col md:flex-row gap-6 justify-center">
-          <div className="border bg-white p-6 rounded-lg shadow-sm max-w-sm">
-            <h3 className="text-xl font-bold mb-2">🎓 Talents</h3>
-            <p className="text-slate-600 text-sm">
-              Create your profile once, and get discovered by top employers.
-            </p>
-          </div>
-          <div className="border bg-white p-6 rounded-lg shadow-sm max-w-sm">
-            <h3 className="text-xl font-bold mb-2">🏢 Employers</h3>
-            <p className="text-slate-600 text-sm">
-              Describe your ideal hire — and let AI do the matchmaking.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="mt-24 text-sm text-slate-500">
-        © {new Date().getFullYear()} Ftn Find. All rights reserved.
-      </footer>
+    <main className="min-h-screen flex flex-col items-center justify-between bg-slate-50 text-slate-900">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={variants}
+          transition={{ duration: 0.3 }}
+        >
+          {renderStep()}
+        </motion.div>
+      </AnimatePresence>
     </main>
   );
 }
