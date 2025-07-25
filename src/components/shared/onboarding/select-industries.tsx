@@ -6,20 +6,20 @@ import { cn } from "@/lib/utils";
 import { BriefcaseIcon } from "lucide-react";
 
 const INDUSTRIES = [
-  "التكنولوجيا",
-  "المالية",
-  "الرعاية الصحية",
-  "التسويق",
-  "التصميم",
-  "الاستشارات",
-  "التعليم",
-  "غير ربحية",
-  "الإعلام",
-  "التجارة",
-  "التصنيع",
-  "العقارات",
-  "الطاقة",
-  "النقل",
+  "Technology",
+  "Finance",
+  "Healthcare",
+  "Marketing",
+  "Design",
+  "Consulting",
+  "Education",
+  "Non-profit",
+  "Media",
+  "Retail",
+  "Manufacturing",
+  "Real Estate",
+  "Energy",
+  "Transportation",
 ] as const;
 
 type Industry = (typeof INDUSTRIES)[number];
@@ -52,12 +52,12 @@ export default function SelectIndustries({
       {/* Progress Indicator */}
       <div className="mb-3">
         <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-          <span>الخطوة 2 من 4</span>
-          <span>{Math.round((2 / 4) * 100)}% مكتمل</span>
+          <span>Step 2 of 4</span>
+          <span>{Math.round((2 / 4) * 100)}% Complete</span>
         </div>
         <div className="w-full h-2 bg-gray-100 rounded-full">
           <div
-            className="h-full bg-primary rounded-full transition-all"
+            className="h-full bg-blue-600 rounded-full transition-all"
             style={{ width: "50%" }}
           />
         </div>
@@ -66,13 +66,13 @@ export default function SelectIndustries({
       {/* Header */}
       <div className="text-center mb-6">
         <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
-          <BriefcaseIcon className="w-6 h-6 text-primary" />
+          <BriefcaseIcon className="w-6 h-6 text-blue-600" />
         </div>
         <h2 className="text-2xl font-semibold mb-1">
-          ما هي أهم 3 صناعات تستهدفها؟
+          What are your top 3 target industries?
         </h2>
         <p className="text-gray-600">
-          تم اختيار: {industryPreference.length}/{MAX_SELECTIONS}
+          Selected: {industryPreference.length}/{MAX_SELECTIONS}
         </p>
       </div>
 
@@ -86,9 +86,9 @@ export default function SelectIndustries({
               onClick={() => toggleIndustry(industry)}
               className={cn(
                 "py-3 px-4 rounded-lg border text-center transition-all text-sm",
-                "hover:border-primary/20 hover:bg-primary/5",
+                "hover:border-blue-200 hover:bg-blue-50",
                 isSelected
-                  ? "border-primary bg-primary/5 text-primary"
+                  ? "border-blue-500 bg-blue-50 text-blue-700"
                   : "border-gray-200 text-gray-700",
                 industryPreference.length >= MAX_SELECTIONS && !isSelected
                   ? "opacity-50 cursor-not-allowed"
@@ -104,14 +104,14 @@ export default function SelectIndustries({
       {/* Navigation */}
       <div className="flex justify-between">
         <Button className="cursor-pointer" variant="outline" onClick={prev}>
-          السابق
+          Back
         </Button>
               <Button
             className="cursor-pointer"
           onClick={next}
           disabled={industryPreference.length !== MAX_SELECTIONS}
         >
-          التالي &larr;
+          Next &rarr;
         </Button>
       </div>
     </Card>

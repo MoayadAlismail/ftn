@@ -29,22 +29,22 @@ const OPPORTUNITIES: {
 }[] = [
         {
             id: "full-time",
-            label: "وظائف بدوام كامل",
+            label: "Full-time Jobs",
             icon: Briefcase,
         },
         {
             id: "internships",
-            label: "تدريب عملي",
+            label: "Internships",
             icon: GraduationCap,
         },
         {
             id: "bootcamps",
-            label: "معسكرات تطوير",
+            label: "Bootcamps",
             icon: Trophy,
         },
         {
             id: "hackathons",
-            label: "هاكاثون",
+            label: "Hackathons",
             icon: Target,
         },
     ];
@@ -91,8 +91,8 @@ export default function SelectOpportunities({
                     {/* Progress indicator */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                        <span>الخطوة 1 من 4</span>
-            <span>25% مكتمل</span>
+                            <span>Step 1 of 4</span>
+                            <span>25% Complete</span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-secondary">
                             <div className="h-full w-1/4 rounded-full bg-primary" />
@@ -101,11 +101,11 @@ export default function SelectOpportunities({
 
                     {/* Content */}
                     <div className="space-y-3 text-center">
-                        <Target size={40} className="mx-auto text-primary" />
+                        <Target size={40} className="mx-auto text-blue-600" />
                         <h1 className="text-2xl font-bold">
-                            ما هي الفرص التي تبحث عنها؟
+                            What opportunities are you looking for?
                         </h1>
-                        <p className="text-muted-foreground">اختر كل ما ينطبق</p>
+                        <p className="text-muted-foreground">Select all that apply</p>
                     </div>
 
                     {/* Opportunities grid */}
@@ -119,8 +119,8 @@ export default function SelectOpportunities({
                             <ToggleGroupItem
                                 key={id}
                                 value={id}
-                                                className={`!rounded-xl ${id === "full-time" ? "!pl-6" : ""
-                    } flex flex-row items-center pr-20 justify-center gap-3 py-8 border-2 border-gray-200 hover:border-primary hover:bg-primary/10 data-[state=on]:border-primary data-[state=on]:bg-primary/10`}
+                                className={`!rounded-xl ${id === "full-time" ? "!pl-6" : ""
+                                    } flex flex-row items-center pr-20 justify-center gap-3 py-8 border-2 border-gray-200 hover:border-blue-700 hover:bg-primary/10 data-[state=on]:border-blue-700 data-[state=on]:bg-primary/10`}
                             >
                                 <Icon
                                     size={20}
@@ -138,10 +138,10 @@ export default function SelectOpportunities({
                             className="cursor-pointer"
                             type="button"
                             variant="outline" onClick={prev}>
-السابق
+                            Back
                         </Button>
                         <Button className="cursor-pointer" disabled={workStylePreference.length === 0} onClick={next}>
-التالي &larr;
+                            Next &rarr;
                         </Button>
                     </div>
                 </div>

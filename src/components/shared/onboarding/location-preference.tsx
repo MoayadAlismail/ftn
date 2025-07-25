@@ -29,25 +29,25 @@ export default function LocationPreference({
       <Card className="w-full max-w-6xl p-8 space-y-6">
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-            <span>الخطوة 3 من 4</span>
-            <span>{Math.round((3 / 4) * 100)}% مكتمل</span>
+            <span>Step 3 of 4</span>
+            <span>{Math.round((3 / 4) * 100)}% Complete</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
-              className="h-full bg-primary rounded-full transition-all"
+              className="h-full bg-blue-600 rounded-full transition-all"
               style={{ width: "75%" }}
             />
           </div>
         </div>
         <div className="space-y-2 text-center">
           <div className="flex justify-center mb-6">
-            <MapPin className="w-12 h-12 text-primary" />
+            <MapPin className="w-12 h-12 text-blue-600" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            أين تود أن تعمل؟
+            Where would you like to work?
           </h1>
           <p className="text-sm text-muted-foreground">
-            أدخل الموقع المفضل لديك
+            Enter your preferred location
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export default function LocationPreference({
             <div className="w-full max-w-5xl mx-auto">
               <Input
                 type="text"
-                placeholder="مثال: الرياض، السعودية أو عن بُعد"
+                placeholder="e.g., San Francisco, CA or Remote"
                 value={locationPreference}
                 onChange={(e) => setLocationPreference(e.target.value)}
                 className="w-xl py-6 text-lg px-6"
@@ -72,10 +72,10 @@ export default function LocationPreference({
               onClick={prev}
               className="w-32 cursor-pointer"
             >
-السابق
+              Back
             </Button>
             <Button className="cursor-pointer w-32" type="submit">
-التالي &larr;
+              Next &rarr;
             </Button>
           </div>
         </form>

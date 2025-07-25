@@ -43,11 +43,11 @@ export default function AboutYourself({
         {/* Progress indicator */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-gray-600">
-            <span>الخطوة 4 من 4</span>
-            <span>100% مكتمل</span>
+            <span>Step 4 of 4</span>
+            <span>100% Complete</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full w-full bg-primary rounded-full" />
+            <div className="h-full w-full bg-blue-600 rounded-full" />
           </div>
         </div>
 
@@ -55,10 +55,10 @@ export default function AboutYourself({
         <div className="space-y-5 text-center">
           {/* Icon */}
           <div className="space-y-2 flex flex-col items-center justify-center">
-            <User size={40} className="text-primary" />
-            <h1 className="text-2xl font-semibold">أخبرنا عن نفسك</h1>
+            <User size={40} className="text-blue-600" />
+            <h1 className="text-2xl font-semibold">Tell us about yourself</h1>
             <p className="text-gray-600">
-              اكتب نبذة مختصرة لمساعدتنا في إيجاد مطابقات أفضل لك
+              Write a brief bio to help us match you better
             </p>
           </div>
 
@@ -66,11 +66,11 @@ export default function AboutYourself({
             <Textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="أنا طالب علوم حاسب شغوف بالذكاء الاصطناعي والتعلم الآلي. أستمتع ببناء مشاريع تحل مشاكل حقيقية..."
+              placeholder="I'm a computer science student passionate about AI and machine learning. I enjoy building projects that solve real-world problems..."
               className="w-xl h-32"
             />
-            <p className="text-sm text-gray-600 text-right">
-              {bio.length} حرف (الحد الأدنى {minCharacters})
+            <p className="text-sm text-gray-600 text-left">
+              {bio.length} characters (minimum {minCharacters})
             </p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function AboutYourself({
         {/* Navigation */}
         <div className="flex justify-between pt-4">
           <Button className="cursor-pointer" variant="outline" onClick={prev}>
-            السابق
+            Back
           </Button>
           <Button
             className="cursor-pointer flex items-center gap-2"
@@ -86,7 +86,7 @@ export default function AboutYourself({
             disabled={bio.length < minCharacters || isCompleting}
           >
             {isCompleting && (<Loader2 className="h-4 w-4 animate-spin" />)}
-            إكمال الإعداد &larr;
+            Complete Setup &rarr;
           </Button>
         </div>
       </Card>
