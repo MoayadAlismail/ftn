@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/lib/supabase";
 import { Loader2, User } from "lucide-react";
 import { useState } from "react";
 
@@ -28,13 +29,28 @@ export default function AboutYourself({
   const minCharacters = 10;
   const [isCompleting, setIsCompleting] = useState(false);
 
-  const handleCompleteSetup = () => {
+  const handleCompleteSetup = async () => {
     setIsCompleting(true);
     console.log("Bio:", bio);
     console.log("Resume File:", resumeFile);
     console.log("Work Style Preference:", workStylePreference);
     console.log("Industry Preference:", industryPreference);
     console.log("Location Preference:", locationPreference);
+    const user = await supabase.auth.getUser();
+    const user_id = user.data.user?.id;
+    const { data: resumeUpload, error: uploadError } = await supabase.storage
+      .from("resumes")
+      .upload(`resume-${user_id}.pdf`, resumeFile!, {
+        upsert: true
+      });
+    const { data, error } = await supabase.from("users").insert({ id: user_id, bio: bio, work_style_preference: workStylePreference, industry_preference: industryPreference, location_preference: locationPreference, resume_file: resumeFile });
+    if (error) {
+      console.error("Error inserting user:", error);
+    } else {
+      console.log("User inserted:", data);
+    }
+
+    setIsCompleting(false);
   };
 
   return (
