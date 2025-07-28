@@ -1,15 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 interface TalentLoginProps {
   next: () => void;
 }
 
 export default function TalentLogin({ next }: TalentLoginProps) {
-
-const handleLogin = async () => {
-
+  const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -23,7 +21,6 @@ const handleLogin = async () => {
 
     if (error) console.error("Login error:", error.message);
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50">

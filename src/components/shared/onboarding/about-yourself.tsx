@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { Loader2, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface AboutYourselfProps {
@@ -28,6 +29,7 @@ export default function AboutYourself({
 }: AboutYourselfProps) {
   const minCharacters = 10;
   const [isCompleting, setIsCompleting] = useState(false);
+  const router = useRouter();
 
   const handleCompleteSetup = async () => {
     setIsCompleting(true);
@@ -38,19 +40,29 @@ export default function AboutYourself({
     console.log("Location Preference:", locationPreference);
     const user = await supabase.auth.getUser();
     const user_id = user.data.user?.id;
-    const { data: resumeUpload, error: uploadError } = await supabase.storage
+    const { data: resumeUpload } = await supabase.storage
       .from("resumes")
       .upload(`resume-${user_id}.pdf`, resumeFile!, {
-        upsert: true
+        upsert: true,
       });
-    const { data, error } = await supabase.from("users").insert({ id: user_id, bio: bio, work_style_preference: workStylePreference, industry_preference: industryPreference, location_preference: locationPreference, resume_file: resumeFile });
+    const { data, error } = await supabase.from("talents").insert({
+      id: user_id,
+      user_id: user_id,
+      email: user.data.user?.email || "sample@email.com",
+      full_name: user.data.user?.user_metadata.name || "John Doe",
+      bio: bio,
+      work_style_pref: workStylePreference,
+      industry_pref: industryPreference,
+      location_pref: locationPreference,
+      resume_url: resumeUpload?.path,
+    });
     if (error) {
       console.error("Error inserting user:", error);
     } else {
       console.log("User inserted:", data);
     }
-
     setIsCompleting(false);
+    router.push("/talent/match-making");
   };
 
   return (
@@ -101,7 +113,7 @@ export default function AboutYourself({
             onClick={handleCompleteSetup}
             disabled={bio.length < minCharacters || isCompleting}
           >
-            {isCompleting && (<Loader2 className="h-4 w-4 animate-spin" />)}
+            {isCompleting && <Loader2 className="h-4 w-4 animate-spin" />}
             Complete Setup &rarr;
           </Button>
         </div>
