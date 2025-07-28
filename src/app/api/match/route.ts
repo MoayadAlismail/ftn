@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EnvVars } from "@/env";
 import { GoogleGenAI } from "@google/genai";
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase/client";
 
 
 

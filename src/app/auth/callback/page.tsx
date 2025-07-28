@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { Role } from "@/constants/enums";
 
 function CallbackContent() {

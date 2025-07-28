@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { variants } from "@/constants/constants";
@@ -19,7 +18,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import PostOpp from "./components/post-opp";
-// import { supabase } from "@/lib/supabase";
+// import { supabase } from "@/lib/supabase/client";
 
 const suggestions = [
   "Software engineer intern with Python and React skills",
@@ -68,9 +67,9 @@ export default function EmployerDashboardHome() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl">
+    <div className="container flex flex-col gap-2 mx-auto max-w-5xl">
       <Tabs defaultValue="find" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="flex flex-row mb-3 items-center justify-center rounded-none">
+        <TabsList className="min-w-full flex flex-row mb-3 items-center justify-center rounded-none">
           <TabsTrigger
             value="find"
             className="text-sm rounded-none cursor-pointer"
@@ -86,8 +85,8 @@ export default function EmployerDashboardHome() {
         </TabsList>
 
         <div className="relative">
-          <AnimatePresence mode="wait">
-            {activeTab === "find" && (
+          {activeTab === "find" && (
+            <AnimatePresence mode="wait">
               <motion.div
                 key="find"
                 initial="initial"
@@ -145,120 +144,121 @@ export default function EmployerDashboardHome() {
                     </Button>
                   </div>
                 </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <AnimatePresence mode="wait">
-            {showResults && (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold">Matching Talents</h3>
-                  <span className="text-sm text-gray-500">
-                    {matches.length} matches found
-                  </span>
-                </div>
+                {showResults && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4"
+                  >
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-lg font-semibold">
+                        Matching Talents
+                      </h3>
+                      <span className="text-sm text-gray-500">
+                        {matches.length} matches found
+                      </span>
+                    </div>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="grid gap-4"
-                >
-                  {matches.map((talent, index) => (
                     <motion.div
-                      key={talent.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        delay: index * 0.1,
-                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="grid gap-4"
                     >
-                      <Card className="p-6 hover:shadow-md transition-shadow">
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-3">
-                              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                <User className="h-6 w-6 text-primary" />
+                      {matches.map((talent, index) => (
+                        <motion.div
+                          key={talent.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: index * 0.1,
+                          }}
+                        >
+                          <Card className="p-6 hover:shadow-md transition-shadow">
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <User className="h-6 w-6 text-primary" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-lg font-semibold">
+                                      {talent.name}
+                                    </h4>
+                                    <div className="flex items-center text-gray-500 text-sm">
+                                      <Mail className="w-4 h-4 mr-1" />
+                                      <span>{talent.email}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button variant="outline" size="sm">
+                                  View Profile
+                                </Button>
                               </div>
-                              <div>
-                                <h4 className="text-lg font-semibold">
-                                  {talent.name}
-                                </h4>
-                                <div className="flex items-center text-gray-500 text-sm">
-                                  <Mail className="w-4 h-4 mr-1" />
-                                  <span>{talent.email}</span>
+
+                              <div className="flex gap-2 bg-gray-50/50 p-3 rounded-md">
+                                <FileText className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                                <p className="text-gray-600 text-sm">
+                                  {talent.bio}
+                                </p>
+                              </div>
+
+                              <div className="space-y-3">
+                                <div className="flex items-start gap-2">
+                                  <Briefcase className="w-4 h-4 text-gray-400 mt-1" />
+                                  <div>
+                                    <div className="text-xs font-medium text-gray-500 mb-1">
+                                      Industry Preferences
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {talent.industry_pref.map((pref, i) => (
+                                        <span
+                                          key={i}
+                                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                                        >
+                                          {pref}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-start gap-2">
+                                  <Users2 className="w-4 h-4 text-gray-400 mt-1" />
+                                  <div>
+                                    <div className="text-xs font-medium text-gray-500 mb-1">
+                                      Work Style
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {talent.work_style_pref.map((pref, i) => (
+                                        <span
+                                          key={i}
+                                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
+                                        >
+                                          {pref}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
-                              View Profile
-                            </Button>
-                          </div>
-
-                          <div className="flex gap-2 bg-gray-50/50 p-3 rounded-md">
-                            <FileText className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
-                            <p className="text-gray-600 text-sm">
-                              {talent.bio}
-                            </p>
-                          </div>
-
-                          <div className="space-y-3">
-                            <div className="flex items-start gap-2">
-                              <Briefcase className="w-4 h-4 text-gray-400 mt-1" />
-                              <div>
-                                <div className="text-xs font-medium text-gray-500 mb-1">
-                                  Industry Preferences
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {talent.industry_pref.map((pref, i) => (
-                                    <span
-                                      key={i}
-                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                                    >
-                                      {pref}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-start gap-2">
-                              <Users2 className="w-4 h-4 text-gray-400 mt-1" />
-                              <div>
-                                <div className="text-xs font-medium text-gray-500 mb-1">
-                                  Work Style
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {talent.work_style_pref.map((pref, i) => (
-                                    <span
-                                      key={i}
-                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
-                                    >
-                                      {pref}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
+                          </Card>
+                        </motion.div>
+                      ))}
                     </motion.div>
-                  ))}
-                </motion.div>
+                  </motion.div>
+                </AnimatePresence>
+              )}
               </motion.div>
-            )}
-          </AnimatePresence>
-
+            </AnimatePresence>
+          )}
           <AnimatePresence mode="wait">
             {activeTab === "post" && (
               <motion.div

@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { CirclePlus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,10 +18,10 @@ const workStyles = [
   "Full Time",
   "Internships",
   "Bootcamps",
-  "Hackathons"
+  "Hackathons",
 ] as const;
 
-type WorkStyle = typeof workStyles[number];
+type WorkStyle = (typeof workStyles)[number];
 
 interface OpportunityFormData {
   title: string;
@@ -34,25 +40,28 @@ const initialFormData: OpportunityFormData = {
   location: "",
   industry: "",
   description: "",
-  skills: ""
+  skills: "",
 };
 
 export default function PostOpp() {
-  const [formData, setFormData] = useState<OpportunityFormData>(initialFormData);
+  const [formData, setFormData] =
+    useState<OpportunityFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleWorkStyleChange = (value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      workstyle: value as WorkStyle
+      workstyle: value as WorkStyle,
     }));
   };
 
@@ -60,7 +69,12 @@ export default function PostOpp() {
     try {
       setIsSubmitting(true);
       // TODO: Validate form data
-      if (!formData.title || !formData.company_name || !formData.workstyle || !formData.location) {
+      if (
+        !formData.title ||
+        !formData.company_name ||
+        !formData.workstyle ||
+        !formData.location
+      ) {
         throw new Error("Please fill in all required fields");
       }
 
@@ -69,8 +83,10 @@ export default function PostOpp() {
       const user = await supabase.auth.getUser();
       const user_id = user.data.user?.id;
       const dataToInsert = { ...formData, user_id: user_id };
-      dataToInsert.skills = dataToInsert.skills[0].split(",").map(skill => skill.trim());
-      console.log('full form data', dataToInsert);
+      dataToInsert.skills = dataToInsert.skills[0]
+        .split(",")
+        .map((skill) => skill.trim());
+      console.log("full form data", dataToInsert);
 
       // To get the inserted row(s) back, use `.select()` after `.insert()`
       const { data, error } = await supabase
@@ -86,19 +102,22 @@ export default function PostOpp() {
       console.log("Data inserted:", data);
       // setFormData(initialFormData);
 
-      console.log('formData', formData);
+      console.log("formData", formData);
       setIsSubmitting(false);
 
-      const text = await Promise.all([
-        formData.title,
-        formData.company_name,
-        formData.workstyle,
-        formData.location,
-        formData.industry,
-        formData.description,
-        Array.isArray(formData.skills) ? formData.skills.join(", ") : formData.skills
-      ].filter(Boolean).join(" "));
-      console.log('text', text);
+      const text = await Promise.all(
+        [
+          formData.title,
+          formData.company_name,
+          formData.workstyle,
+          formData.location,
+          formData.industry,
+          formData.description,
+          formData.skills
+        ]
+          .join("")
+      );
+      console.log("text", text);
       const response = await fetch("/api/get-embedding", {
         method: "POST",
         headers: {
@@ -106,13 +125,21 @@ export default function PostOpp() {
         },
         body: JSON.stringify(text),
       });
-      console.log('response', response);
+      console.log("response", response);
       if (!response.ok) {
-        console.error("Failed to fetch embeddings:", await response.json(), "status::", response.statusText);
+        console.error(
+          "Failed to fetch embeddings:",
+          await response.json(),
+          "status::",
+          response.statusText
+        );
         return null;
       }
       const embedding = await response.json();
-      const { error: updateError } = await supabase.from("opportunities").update({ embedding: embedding.embeddings[0].values }).eq("id", data.id);
+      const { error: updateError } = await supabase
+        .from("opportunities")
+        .update({ embedding: embedding.embeddings[0].values })
+        .eq("id", data.id);
       if (updateError) {
         console.error("Error updating embedding:", updateError);
       }
@@ -209,7 +236,9 @@ export default function PostOpp() {
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
-          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+          {isSubmitting ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : null}
           Post Opportunity
         </Button>
       </div>

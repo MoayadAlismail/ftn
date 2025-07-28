@@ -4,7 +4,7 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { Bookmark, Building2, CreditCard, Settings } from "lucide-react";
 
 export default function EmployerLayout({ children }: { children: ReactNode }) {
@@ -18,7 +18,12 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col overflow-scroll font-sans">
       <header className="flex items-center justify-between px-6 py-4 border-b shadow-sm bg-white">
-        <h1 className="text-xl flex flex-row font-bold items-center"><span><Building2 size={35} className="text-primary mr-2" /></span> Ftn Dashboard</h1>
+        <h1 className="text-xl flex flex-row font-bold items-center">
+          <span>
+            <Building2 size={35} className="text-primary mr-2" />
+          </span>{" "}
+          Ftn Dashboard
+        </h1>
         <div>
           <span className="inline-flex items-center space-x-4 mr-5 text-gray-500">
             <span className="flex items-center space-x-1 cursor-pointer">
