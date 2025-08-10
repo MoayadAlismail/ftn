@@ -22,28 +22,51 @@ export default function ResumeUpload({
   const [uploadStatus, setUploadStatus] = useState<
     "idle" | "uploading" | "success"
   >("idle");
+  const [isDragging, setIsDragging] = useState(false);
+
+  const processSelectedFile = (file: File | null) => {
+    setResumeFile(file);
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      if (event.target && typeof event.target.result === "string") {
+        localStorage.setItem("resumeFileBase64", event.target.result);
+        localStorage.setItem("resumeFileName", file.name);
+      }
+    };
+    reader.readAsDataURL(file);
+    setUploadStatus("success");
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setResumeFile(e.target.files?.[0] || null);
-    // Save the resume file to localStorage as a base64 string for retrieval after login
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        if (event.target && typeof event.target.result === "string") {
-          // Save base64 string to localStorage
-          localStorage.setItem("resumeFileBase64", event.target.result);
-          // Optionally, save the file name for later use
-          localStorage.setItem("resumeFileName", file.name);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-    setUploadStatus("success");
+    const file = e.target.files?.[0] || null;
+    processSelectedFile(file);
+    // Allow selecting the same file again later
+    e.target.value = "";
   };
 
   const handleCardClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+    processSelectedFile(file);
   };
 
   return (
@@ -52,9 +75,9 @@ export default function ResumeUpload({
         <Button
           type="button"
           className="px-6 py-2 text-primary-foreground font-medium cursor-pointer"
-          onClick={() => router.push("/employer/login")}
+          onClick={() => { router.replace("/auth/employer/login"); console.log("button login clicked") }}
         >
-          Employer Login &rarr;
+          Recruiter Login &rarr;
         </Button>
       </div>
       <div className="min-h-screen flex flex-col items-center justify-center relative">
@@ -72,15 +95,20 @@ export default function ResumeUpload({
         </div>
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col items-center">
           <div
-            className="border-2 border-dashed border-blue-200 rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition hover:border-blue-400"
+            className={`border-2 border-dashed rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition ${isDragging ? "border-blue-500 bg-blue-50" : "border-blue-200 hover:border-blue-400"
+              }`}
             onClick={handleCardClick}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
             <div className="flex flex-col items-center mb-4">
               <div
-                className="rounded-full p-4 shadow-md mb-4"
+                className="rounded-full p-4 shadow-md mb-4 bg-"
                 style={{
                   backgroundColor:
-                    uploadStatus === "success" ? "#22c55e" : "#2563eb",
+                    uploadStatus === "success" ? "#22c55e" : "#944ADB",
                 }}
               >
                 <AnimatePresence mode="wait" initial={false}>
@@ -102,7 +130,7 @@ export default function ResumeUpload({
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Check className="text-white w-8 h-8" />
+                      <Check color="white" className="text-white w-8 h-8" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -124,8 +152,7 @@ export default function ResumeUpload({
                   />
                   <Button
                     type="button"
-                    className="mt-2 px-6 py-2 text-base font-medium cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
+                    className="mt-2 px-6 py-2 text-white font-medium cursor-pointer bg-purple-600"
                   >
                     Choose File &rarr;
                   </Button>

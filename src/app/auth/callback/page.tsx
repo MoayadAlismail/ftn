@@ -22,12 +22,15 @@ function CallbackContent() {
       }
 
       const { user } = data.session;
+      console.log(user);
       const hasRole = user.user_metadata?.role;
-      if (!hasRole && role) {
-        await supabase.auth.updateUser({
-          data: { role },
-        });
-      }
+
+      await supabase.auth.updateUser({
+        data: { role },
+      });
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      console.log(userData);
 
       // // Redirect based on role
       if (role === Role.TALENT) {

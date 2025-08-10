@@ -89,7 +89,7 @@ function HomePageContent() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between bg-slate-50 text-slate-900">
+    <main className="min-h-screen flex flex-col items-center justify-between">
       <AnimatePresence mode="wait">
         <motion.div
           key={step}

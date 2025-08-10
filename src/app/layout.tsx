@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Sora } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from '@vercel/analytics/next';
+import { AuthProvider } from "@/contexts/AuthContext";
+import { LoadingProvider } from "@/contexts/LoadingContext";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -28,9 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${sora.variable} antialiased font-sans`}
       >
-        {children}
+        <LoadingProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </LoadingProvider>
         <Analytics />
         <Toaster />
       </body>

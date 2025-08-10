@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Crown, MapPin, Building2, ChevronRight } from "lucide-react";
+import { MapPin, Building2, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Opportunity {
     id: string;
@@ -55,6 +59,33 @@ const LoadingSkeleton = () => (
 );
 
 export default function OppMatchResults({ opportunities = [], isLoading = false }: OppMatchResultsProps) {
+    const { user } = useAuth();
+    const [applyingId, setApplyingId] = useState<string | null>(null);
+    const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
+
+    const handleApply = async (opportunityId: string) => {
+        if (!user?.id) {
+            toast.error("You must be signed in to apply.");
+            return;
+        }
+        try {
+            setApplyingId(opportunityId);
+            const { error } = await supabase
+                .from("interests")
+                .insert([{ user_id: user.id, opp_id: opportunityId }]);
+            if (error) {
+                toast.error(error.message || "Failed to apply.");
+                return;
+            }
+            setAppliedIds((prev) => new Set(prev).add(opportunityId));
+            toast.success("Applied successfully");
+        } catch (e) {
+            toast.error("Something went wrong. Please try again.");
+        } finally {
+            setApplyingId(null);
+        }
+    };
+
     if (isLoading) {
         return <LoadingSkeleton />;
     }
@@ -87,9 +118,6 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                     {opportunities.map((opp) => (
                         <motion.div key={opp.id} variants={itemVariants}>
                             <Card className="p-6 relative overflow-hidden">
-                                {(true) && (
-                                    <div className="absolute top-0 right-0 bg-gradient-to-l from-yellow-500/20 to-transparent w-full h-full pointer-events-none" />
-                                )}
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-4 flex-1">
                                         <div className="flex items-center gap-2">
@@ -132,20 +160,19 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
 
                                     <div className="ml-4">
                                         <Button
-                                            variant={(true) ? "secondary" : "default"}
-                                            className="flex items-center gap-2"
-                                            disabled={(true)}
+                                            onClick={() => handleApply(opp.id)}
+                                            disabled={applyingId === opp.id || appliedIds.has(opp.id)}
+                                            className="flex items-center gap-2 cursor-pointer"
                                         >
-                                            {(true) ? (
+                                            {applyingId === opp.id ? (
                                                 <>
-                                                    <Crown className="w-4 h-4" />
-                                                    Premium
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    Applying...
                                                 </>
+                                            ) : appliedIds.has(opp.id) ? (
+                                                <>Applied</>
                                             ) : (
-                                                <>
-                                                    View Details
-                                                    <ChevronRight className="w-4 h-4" />
-                                                </>
+                                                <>Apply</>
                                             )}
                                         </Button>
                                     </div>
@@ -154,30 +181,6 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                         </motion.div>
                     ))}
                 </div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-8"
-                >
-                    <Card className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <Crown className="w-5 h-5 text-yellow-600" />
-                                    <h3 className="text-xl font-semibold">Unlock All Premium Matches</h3>
-                                </div>
-                                <p className="text-gray-600">
-                                    Get expert coaching to maximize your chances with these amazing opportunities
-                                </p>
-                            </div>
-                            <Button className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white hover:from-yellow-700 hover:to-orange-700">
-                                Upgrade Now
-                            </Button>
-                        </div>
-                    </Card>
-                </motion.div>
             </motion.div>
         </div>
     );

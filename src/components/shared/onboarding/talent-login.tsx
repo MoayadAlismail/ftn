@@ -8,6 +8,21 @@ interface TalentLoginProps {
 
 export default function TalentLogin({ next }: TalentLoginProps) {
   const handleLogin = async () => {
+    // Check if user is already logged in
+    const { data: sessionData } = await supabase.auth.getSession();
+
+    if (sessionData.session) {
+      // If already logged in, update role if needed and redirect
+      const currentRole = sessionData.session.user.user_metadata?.role;
+      if (currentRole !== "talent") {
+        await supabase.auth.updateUser({
+          data: { role: "talent" },
+        });
+      }
+      next();
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -23,9 +38,9 @@ export default function TalentLogin({ next }: TalentLoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-        <div className="bg-blue-100 rounded-full p-3 mb-4">
+        <div className=" rounded-full p-3 mb-4">
           <svg
             width="32"
             height="32"
@@ -50,7 +65,7 @@ export default function TalentLogin({ next }: TalentLoginProps) {
         </p>
         <Button
           variant="outline"
-          className="w-full flex items-center justify-center gap-2 mb-3 border-gray-300 cursor-pointer"
+          className="w-full flex bg-primary items-center justify-center gap-2 mb-3 border-gray-300 cursor-pointer"
           onClick={handleLogin}
         >
           <svg
@@ -98,7 +113,7 @@ export default function TalentLogin({ next }: TalentLoginProps) {
           placeholder="Your email address"
           className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
         />
-        <Button className="w-full mb-2" onClick={next}>
+        <Button className="w-full mb-2 cursor-pointer" onClick={next}>
           Get Started
           <span className="ml-2">→</span>
         </Button>

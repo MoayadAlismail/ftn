@@ -83,9 +83,7 @@ export default function PostOpp() {
       const user = await supabase.auth.getUser();
       const user_id = user.data.user?.id;
       const dataToInsert = { ...formData, user_id: user_id };
-      dataToInsert.skills = dataToInsert.skills[0]
-        .split(",")
-        .map((skill) => skill.trim());
+      dataToInsert.skills = (dataToInsert.skills as string).split(",").map((skill) => skill.trim());
       console.log("full form data", dataToInsert);
 
       // To get the inserted row(s) back, use `.select()` after `.insert()`
