@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
   console.log('pathname=============', pathname);
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/auth/callback', '/auth/employer/login']
+  const publicRoutes = ['/', '/auth/callback', '/auth/employer/login', '/auth/talent/login']
   if (publicRoutes.some(route => pathname === route)) {
     console.log('public route');
     return NextResponse.next()
@@ -48,7 +48,8 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public (public files)
      * - auth/callback (auth callback route)
+     * Also skip any path that looks like a file (e.g., .svg, .png, .css, .js)
      */
-    '/((?!_next/static|_next/image|favicon.ico|public|auth/callback).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public|auth/callback|.*\\..*).*)',
   ],
 }

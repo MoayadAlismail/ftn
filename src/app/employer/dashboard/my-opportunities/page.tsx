@@ -118,7 +118,7 @@ export default function MyOpportunitiesPage() {
     };
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="space-y-6 max-w-5xl mx-auto relative">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -127,10 +127,7 @@ export default function MyOpportunitiesPage() {
                         Manage and track your job postings
                     </p>
                 </div>
-                <Button onClick={() => router.push("/employer/dashboard/home?activeTab=post")} className="flex items-center gap-2 cursor-pointer">
-                    <Plus size={16} />
-                    Post New Opportunity
-                </Button>
+                <div className="hidden sm:block" />
             </div>
 
             {/* Opportunities List */}
@@ -163,6 +160,15 @@ export default function MyOpportunitiesPage() {
                         ))
                     ))}
             </div>
+
+            {/* Floating (+) button to post new opportunity */}
+            <Button
+                aria-label="Post a new opportunity"
+                className="!fixed top-24 right-8 z-40 w-12 h-12 rounded-full shadow-xl bg-primary hover:bg-primary/90"
+                onClick={() => router.push("/employer/dashboard/home?activeTab=post")}
+            >
+                <Plus size={18} />
+            </Button>
 
             {isApplicantsOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -202,7 +208,7 @@ export default function MyOpportunitiesPage() {
                                                             <span key={i} className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">{i}</span>
                                                         ))}
                                                         {talent.location_pref && (
-                                                            <span className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">{talent.location_pref}</span>
+                                                            <span className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary">{talent.location_pref}</span>
                                                         )}
                                                     </div>
                                                 </div>

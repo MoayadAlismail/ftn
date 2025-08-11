@@ -3,9 +3,9 @@
 
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Bookmark, Building2, CreditCard, LayoutDashboard, Settings, TableOfContents, Users } from "lucide-react";
+import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users } from "lucide-react";
 
 interface NavigationItem {
   id: string;
@@ -16,11 +16,12 @@ interface NavigationItem {
 
 export default function EmployerLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const navigationItems: NavigationItem[] = [
     {
       id: "dashboard",
-      label: "Dashboard",
+      label: "Home",
       icon: LayoutDashboard,
       href: "/employer/dashboard/home"
     },
@@ -34,13 +35,13 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
       id: "candidates",
       label: "Saved Candidates",
       icon: Users,
-      href: "/employer/home/candidates"
+      href: "/employer/dashboard/saved-candidates"
     },
     {
       id: "billing",
       label: "Billing",
       icon: CreditCard,
-      href: "/employer/home/billing"
+      href: "/employer/dashboard/billing"
     },
     {
       id: "settings",
@@ -63,44 +64,48 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col overflow-scroll font-sans">
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b shadow-sm bg-white">
-        <h1 className="text-xl flex flex-row font-bold items-center">
-          <span>
-            <img
-              src="/logo.svg"
-              alt="Dashboard Logo"
-              className="w-8 h-8 mr-2 object-contain"
-            />
-          </span>
-          Ftn Dashboard
-        </h1>
-        <div>
-          <span className="inline-flex items-center space-x-4 mr-5 text-gray-500">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur border-b border-gray-200">
+        <div className="mx-auto max-w-6xl px-4 md:px-6 py-3 flex items-center justify-between">
+          <button
+            className="flex items-center gap-2 text-lg font-semibold text-gray-900"
+            onClick={() => router.push("/")}
+          >
+            <img src="/logo.svg" alt="Ftn" className="w-7 h-7 object-contain" />
+            <span>Ftn</span>
+          </button>
+
+          <nav className="hidden md:flex items-center gap-2">
             {navigationItems.map((item) => {
-              const IconComponent = item.icon;
+              const isActive = item.href && pathname?.startsWith(item.href);
               return (
-                <span
+                <button
                   key={item.id}
-                  className="flex items-center space-x-1 cursor-pointer hover:text-primary transition-colors"
                   onClick={() => handleNavigationClick(item.href)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? "text-gray-900 bg-gray-100"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
                 >
-                  <IconComponent size={15} />
-                  <span className="text-sm">{item.label}</span>
-                </span>
+                  {item.label}
+                </button>
               );
             })}
-          </span>
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 p-6 bg-gray-50 mt-18">{children}</main>
+      <main className="flex-1 p-6 bg-gray-50 mt-20">{children}</main>
     </div>
   );
 }

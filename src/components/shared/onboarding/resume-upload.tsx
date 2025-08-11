@@ -84,7 +84,7 @@ export default function ResumeUpload({
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
             Your Dream Career <br />
-            <span className="text-blue-600">Starts Here</span>
+            <span className="text-primary">Starts Here</span>
           </h1>
           <p className="mt-4 text-gray-600 max-w-xl mx-auto">
             Upload your resume and let our AI match you with the perfect
@@ -95,8 +95,8 @@ export default function ResumeUpload({
         </div>
         <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md flex flex-col items-center">
           <div
-            className={`border-2 border-dashed rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition ${isDragging ? "border-blue-500 bg-blue-50" : "border-blue-200 hover:border-blue-400"
-              }`}
+            className={`border-2 border-dashed rounded-lg flex flex-col items-center justify-center w-full py-8 cursor-pointer transition ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
+              `}
             onClick={handleCardClick}
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
@@ -152,7 +152,7 @@ export default function ResumeUpload({
                   />
                   <Button
                     type="button"
-                    className="mt-2 px-6 py-2 text-white font-medium cursor-pointer bg-purple-600"
+                    className="mt-2 px-6 py-2 text-white font-medium cursor-pointer bg-primary"
                   >
                     Choose File &rarr;
                   </Button>

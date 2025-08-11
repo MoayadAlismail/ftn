@@ -37,7 +37,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
             <div className="relative">
                 {/* Background glow effect */}
                     {/* <motion.div
-                        className={cn("absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full", sizeClasses[size])}
+                        className={cn("absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full", sizeClasses[size])}
                         animate={{ scale: [0, 1.5], opacity: [0.8, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: [0, 0, 0.2, 1] as any }}
                     /> */}
@@ -96,7 +96,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
                     }}
                 />
                 <motion.div
-                    className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-blue-400 rounded-full"
+                    className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-primary rounded-full"
                     animate={{
                         scale: [0, 1, 0],
                         opacity: [0, 1, 0],

@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import HeroSection from "@/components/hero-section";
 import ResumeUpload from "@/components/shared/onboarding/resume-upload";
 import TalentLogin from "@/components/shared/onboarding/talent-login";
 import SelectOpportunities from "@/components/shared/onboarding/select-opportunities";
@@ -25,12 +26,37 @@ function HomePageContent() {
     console.warn("The 'step' prop is not provided. Defaulting to step 1.");
   }
 
+  const [showOnboarding, setShowOnboarding] = useState(stepParamInt ? true : false);
   const [step, setStep] = useState(stepParamInt ? stepParamInt : 1);
   const [bio, setBio] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [locationPreference, setLocationPreference] = useState("");
   const [industryPreference, setIndustryPreference] = useState<string[]>([]);
   const [workStylePreference, setWorkStylePreference] = useState<string[]>([]);
+
+  const handleGetStarted = (skipResumeUpload = false) => {
+    setShowOnboarding(true);
+    setStep(skipResumeUpload ? 2 : 1); // Skip to step 2 (TalentLogin) if resume already uploaded
+    
+    // If skipping resume upload, load the file from localStorage
+    if (skipResumeUpload) {
+      const storedResumeData = localStorage.getItem("resumeFileBase64");
+      const storedFileName = localStorage.getItem("resumeFileName");
+      
+      if (storedResumeData && storedFileName) {
+        // Convert base64 back to file
+        const base64Response = storedResumeData.split(',')[1];
+        const binaryString = window.atob(base64Response);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const file = new File([blob], storedFileName, { type: 'application/pdf' });
+        setResumeFile(file);
+      }
+    }
+  };
 
   const next = () => setStep((s) => Math.min(s + 1, 6));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
@@ -87,6 +113,10 @@ function HomePageContent() {
         );
     }
   };
+
+  if (!showOnboarding) {
+    return <HeroSection onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-between">

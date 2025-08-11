@@ -8,6 +8,7 @@ import { MapPin, Building2, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import OpportunityDetailModal from "@/components/opportunity-detail-modal";
 
 interface Opportunity {
     id: string;
@@ -43,7 +44,7 @@ const itemVariants = {
 };
 
 const SkillTag = ({ skill }: { skill: string }) => (
-    <span className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-full">
+    <span className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full">
         {skill}
     </span>
 );
@@ -62,6 +63,8 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
     const { user } = useAuth();
     const [applyingId, setApplyingId] = useState<string | null>(null);
     const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
+    const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleApply = async (opportunityId: string) => {
         if (!user?.id) {
@@ -84,6 +87,16 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
         } finally {
             setApplyingId(null);
         }
+    };
+
+    const handleViewDetails = (opportunity: Opportunity) => {
+        setSelectedOpportunity(opportunity);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedOpportunity(null);
     };
 
     if (isLoading) {
@@ -117,19 +130,22 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {opportunities.map((opp) => (
                         <motion.div key={opp.id} variants={itemVariants}>
-                            <Card className="p-6 relative overflow-hidden">
+                            <Card 
+                                className="p-6 relative overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30"
+                                onClick={() => handleViewDetails(opp)}
+                            >
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-4 flex-1">
                                         <div className="flex items-center gap-2">
                                             <h2 className="text-xl font-semibold">{opp.title}</h2>
-                                            <span className={`px-3 py-1 text-sm rounded-full ${opp.similarity >= 95
+                                             <span className={`px-3 py-1 text-sm rounded-full ${opp.similarity >= 95
                                                 ? "bg-green-100 text-green-700"
-                                                : "bg-blue-100 text-blue-700"
+                                                : "bg-primary/15 text-primary"
                                                 }`}>
                                                 {opp.similarity}% Match
                                             </span>
                                             {opp.workstyle && (
-                                                <span className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-full">
+                                                 <span className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full">
                                                     {opp.workstyle}
                                                 </span>
                                             )}
@@ -160,7 +176,10 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
 
                                     <div className="ml-4">
                                         <Button
-                                            onClick={() => handleApply(opp.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleApply(opp.id);
+                                            }}
                                             disabled={applyingId === opp.id || appliedIds.has(opp.id)}
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
@@ -182,6 +201,16 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                     ))}
                 </div>
             </motion.div>
+
+            {/* Opportunity Detail Modal */}
+            <OpportunityDetailModal
+                opportunity={selectedOpportunity}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onApply={handleApply}
+                isApplying={applyingId === selectedOpportunity?.id}
+                hasApplied={selectedOpportunity ? appliedIds.has(selectedOpportunity.id) : false}
+            />
         </div>
     );
 }
