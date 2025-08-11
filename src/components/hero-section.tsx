@@ -7,6 +7,7 @@ import { Upload, Briefcase, GraduationCap, Trophy, Target, Check } from "lucide-
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import OpportunitiesSection from "./opportunities-section";
+import { ShineBorder } from "@/components/magicui/shine-border";
 
 const FloatingCard = ({ 
   children, 
@@ -138,17 +139,18 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
       {/* Hero Section */}
       <div className="min-h-screen relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary/3 to-transparent rounded-full" />
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-64 h-64 sm:w-96 sm:h-96 bg-primary/8 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/3 to-transparent rounded-full" />
       </div>
 
       {/* Top navigation */}
-      <div className="absolute top-6 left-6 z-50 pointer-events-auto">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 pointer-events-auto">
         <Button
           variant="outline"
-          className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto"
+          size="sm"
+          className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -160,14 +162,21 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             }
           }}
         >
-          Recruiter Login →
+          <span className="hidden sm:inline">
+            Recruiter? Login here{" "}
+            <span aria-label="diagonal arrow" role="img" className="inline-block align-middle">
+              ↗
+            </span>
+          </span>
+          <span className="sm:hidden">Recruiter </span>
         </Button>
       </div>
 
       {/* Student Login Button */}
-      <div className="absolute top-6 right-6 z-50 pointer-events-auto">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 pointer-events-auto">
         <Button
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto"
+          size="sm"
+          className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -179,19 +188,20 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             }
           }}
         >
-          Student Login →
+          <span className="hidden sm:inline">Login</span>
+          <span className="sm:hidden">Student</span>
         </Button>
       </div>
 
-      {/* Floating opportunity cards */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Floating opportunity cards - Hidden on mobile for cleaner design */}
+      <div className="absolute inset-0 pointer-events-none hidden lg:block">
         {/* Top left */}
         <OpportunityCard
           icon={Briefcase}
           title="Senior Software Engineer"
           company="TechCorp Inc."
           match="95% Match"
-          className="absolute top-32 left-16"
+          className="absolute top-32 left-16 xl:left-20"
           delay={0.2}
         />
         
@@ -201,7 +211,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           title="Data Science Internship"
           company="AI Startup"
           match="89% Match"
-          className="absolute top-40 right-20"
+          className="absolute top-40 right-20 xl:right-24"
           delay={0.4}
         />
         
@@ -211,7 +221,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           title="Product Design Bootcamp"
           company="Design Academy"
           match="92% Match"
-          className="absolute bottom-40 left-20"
+          className="absolute bottom-40 left-20 xl:left-24"
           delay={0.6}
         />
         
@@ -221,13 +231,13 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           title="Blockchain Hackathon"
           company="CryptoLabs"
           match="87% Match"
-          className="absolute bottom-32 right-16"
+          className="absolute bottom-32 right-16 xl:right-20"
           delay={0.8}
         />
 
-        {/* Additional smaller cards for atmosphere */}
+        {/* Additional smaller cards for atmosphere - Only on larger screens */}
         <FloatingCard 
-          className="absolute top-60 left-1/4 w-48 opacity-60"
+          className="absolute top-60 left-1/4 w-48 opacity-60 hidden xl:block"
           delay={1.0}
         >
           <div className="flex items-center gap-2">
@@ -240,7 +250,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
         </FloatingCard>
 
         <FloatingCard 
-          className="absolute bottom-60 right-1/4 w-48 opacity-60"
+          className="absolute bottom-60 right-1/4 w-48 opacity-60 hidden xl:block"
           delay={1.2}
         >
           <div className="flex items-center gap-2">
@@ -259,16 +269,18 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center max-w-4xl mx-auto mb-12"
+          className="text-center max-w-4xl mx-auto mb-8 sm:mb-12"
         >
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-4">
             Finally, career opportunities
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             <span className="text-primary">that deserve you.</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
             Easily apply to jobs, internships, bootcamps, hackathons
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             that match your interests.
           </p>
         </motion.div>
@@ -335,20 +347,36 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           </svg>
 
           <div 
-            className={`bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-dashed transition-all duration-300 cursor-pointer ${
+            className={`relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-dashed transition-all duration-300 cursor-pointer ${
               isDragging 
                 ? "border-primary bg-primary/5 scale-105" 
                 : uploadStatus === "success"
                 ? "border-green-400 bg-green-50/50"
                 : "border-white/30 hover:border-primary/50"
-            } p-8 text-center min-w-[400px]`}
+            } p-6 sm:p-8 text-center w-full max-w-md sm:max-w-lg mx-4`}
             onClick={handleCardClick}
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            {/* Shine Border Effect */}
+            <ShineBorder
+              className="absolute inset-0 rounded-2xl"
+              borderWidth={2}
+              duration={8}
+              shineColor={
+                isDragging 
+                  ? ["#944ADB", "#A855F7", "#944ADB"] 
+                  : uploadStatus === "success"
+                  ? ["#10B981", "#34D399", "#10B981"]
+                  : ["#E5E7EB", "#9CA3AF", "#E5E7EB"]
+              }
+            />
+            
+            {/* Upload Content - positioned above shine border */}
+            <div className="relative z-10">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
               <AnimatePresence mode="wait" initial={false}>
                 {uploadStatus !== "success" ? (
                   <motion.div
@@ -358,7 +386,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Upload size={32} className="text-primary" />
+                    <Upload size={24} className="text-primary sm:w-8 sm:h-8" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -367,19 +395,19 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-green-500 rounded-full w-16 h-16 flex items-center justify-center"
+                    className="bg-green-500 rounded-full w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center"
                   >
-                    <Check size={32} className="text-white" />
+                    <Check size={24} className="text-white sm:w-8 sm:h-8" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
             
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
               {uploadStatus === "success" ? "Resume Uploaded!" : "Upload your resume"}
             </h2>
             
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2">
               {uploadStatus === "success" 
                 ? "Ready to find your perfect matches" 
                 : isDragging 
@@ -389,10 +417,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             </p>
 
             {resumeFile && uploadStatus === "success" && (
-              <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                <span className="text-sm text-green-700 font-medium">
-                  📄 {resumeFile.name.length > 40 
-                    ? resumeFile.name.slice(0, 37) + "..." 
+              <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200">
+                <span className="text-xs sm:text-sm text-green-700 font-medium">
+                  📄 {resumeFile.name.length > 30 
+                    ? resumeFile.name.slice(0, 27) + "..." 
                     : resumeFile.name}
                 </span>
               </div>
@@ -407,10 +435,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             />
 
             {uploadStatus !== "success" ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Button 
-                  size="lg" 
-                  className="px-8 py-3 text-lg font-medium"
+                  size="default"
+                  className="px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-medium w-full sm:w-auto"
                   onClick={handleCardClick}
                 >
                   Choose File →
@@ -421,13 +449,14 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
               </div>
             ) : (
               <Button 
-                size="lg" 
-                className="px-8 py-3 text-lg font-medium"
+                size="default"
+                className="px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-medium w-full sm:w-auto"
                 onClick={handleContinue}
               >
                 Continue →
               </Button>
             )}
+            </div>
           </div>
         </motion.div>
 
@@ -436,14 +465,15 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.0 }}
-          className="mt-16 text-center"
+          className="mt-8 sm:mt-16 text-center px-4"
         >
-          <p className="text-sm text-gray-500 mb-4">Trusted by students from</p>
-          <div className="flex items-center justify-center gap-8 text-sm font-semibold text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">Trusted by students from</p>
+          <div className="flex items-center justify-center gap-3 sm:gap-6 lg:gap-8 text-xs sm:text-sm font-semibold text-gray-600 flex-wrap">
             <span>KFUPM</span>
-            <span>King Saud University</span>
-            <span>King Abdulaziz University</span>
-            {/* <span>Berkeley</span> */}
+            <span className="hidden sm:inline">King Saud University</span>
+            <span className="sm:hidden">KSU</span>
+            <span className="hidden sm:inline">King Abdulaziz University</span>
+            <span className="sm:hidden">KAU</span>
           </div>
         </motion.div>
       </div>
