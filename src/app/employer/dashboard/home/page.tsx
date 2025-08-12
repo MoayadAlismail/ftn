@@ -21,6 +21,7 @@ import {
 import PostOpp from "./components/post-opp";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import CandidateCard from "@/features/employer/dashboard/components/candidate-card";
 
 const suggestions = [
   "Software engineer intern with Python and React skills",
@@ -30,12 +31,15 @@ const suggestions = [
 
 interface Talent {
   id: any;
-  name: string;
+  name?: string;
+  full_name?: string;
   email: string;
   bio: string;
-  location_pref: string;
+  location_pref: string | string[];
   industry_pref: string[];
   work_style_pref: string[];
+  resume_url?: string;
+  created_at?: string;
 }
 
 export default function EmployerDashboardHome() {

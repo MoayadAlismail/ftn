@@ -5,6 +5,10 @@ import { supabase } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { handleOAuthLogin, getCurrentUser, getRedirectUrl } from "@/lib/auth-utils";
+import { Role } from "@/constants/enums";
+import { toast } from "sonner";
 
 const variants = {
   initial: { opacity: 0, y: 20 },
@@ -18,35 +22,25 @@ export default function EmployerLogin() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-        redirectTo: `${location.origin}/auth/callback?role=employer`,
-      },
-    });
+  const handleSocialLogin = async (provider: 'google' | 'linkedin_oidc') => {
+    setIsLoading(true);
 
-    if (error) console.error("Login error:", error.message);
-  };
+    const { success, error } = await handleOAuthLogin(
+      provider,
+      Role.EMPLOYER,
+      `${window.location.origin}/auth/callback?role=employer`
+    );
 
-  const handleLinkedInLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "linkedin_oidc",
-      options: {
-        redirectTo: `${location.origin}/auth/callback?role=employer`,
-      },
-    });
-
-    if (error) console.error("Login error:", error.message);
+    if (!success) {
+      toast.error(error || `${provider} login failed`);
+      setIsLoading(false);
+    }
+    // Success case is handled by OAuth redirect
   };
 
   const handleEmailLogin = async () => {
     if (!email || !password) {
-      alert("Please enter both email and password");
+      toast.error("Please enter both email and password");
       return;
     }
 
@@ -59,22 +53,41 @@ export default function EmployerLogin() {
 
       if (error) {
         console.error("Login error:", error.message);
-        alert("Login failed: " + error.message);
+        toast.error("Login failed: " + error.message);
         return;
       }
 
       if (data.user) {
-        // Update user role to employer
+        // Check existing role
+        const existingRole = data.user.user_metadata?.role as Role;
+
+        if (existingRole && existingRole !== Role.EMPLOYER) {
+          toast.error(
+            `This account is registered as a ${existingRole}. Please use the talent login page.`,
+            { duration: 5000 }
+          );
+          router.push("/auth/talent/login");
+          return;
+        }
+
+        // Set or confirm role
         await supabase.auth.updateUser({
-          data: { role: "employer" },
+          data: { role: Role.EMPLOYER },
         });
 
-        // Redirect to employer onboarding
-        router.push("/employer/onboarding");
+        // Get user data and redirect appropriately
+        const { user: authUser } = await getCurrentUser();
+        if (authUser) {
+          const redirectUrl = getRedirectUrl(authUser);
+          toast.success("Welcome back!");
+          router.push(redirectUrl);
+        } else {
+          router.push("/employer/onboarding");
+        }
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +97,7 @@ export default function EmployerLogin() {
     <main className="min-h-screen bg-gradient-to-br relative overflow-hidden">
       {/* Background gradient overlay */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-purple-400/20 to-pink-400/20" /> */}
-      
+
       <div className="grid lg:grid-cols-2 min-h-screen relative z-10">
         {/* Left Column - Simple Form */}
         <div className="flex flex-col justify-center px-8 py-12 lg:px-16 bg-white backdrop-blur-sm">
@@ -121,7 +134,8 @@ export default function EmployerLogin() {
                 <Button
                   variant="outline"
                   className="w-full h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
-                  onClick={handleGoogleLogin}
+                  onClick={() => handleSocialLogin('google')}
+                  disabled={isLoading}
                 >
                   <svg
                     width="18"
@@ -155,6 +169,25 @@ export default function EmployerLogin() {
                     </defs>
                   </svg>
                   Continue with Google
+                </Button>
+
+                {/* LinkedIn Login */}
+                <Button
+                  variant="outline"
+                  className="w-full h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+                  onClick={() => handleSocialLogin('linkedin_oidc')}
+                  disabled={isLoading}
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="mr-3"
+                  >
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                  Continue with LinkedIn
                 </Button>
 
                 {/* Divider */}
@@ -215,9 +248,9 @@ export default function EmployerLogin() {
                 <div className="text-center mt-6 space-y-2">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{" "}
-                    <button className="text-gray-900 underline font-medium">
+                    <Link href="/auth/employer/signup" className="text-gray-900 underline font-medium">
                       Create your account
-                    </button>
+                    </Link>
                   </p>
                 </div>
               </div>

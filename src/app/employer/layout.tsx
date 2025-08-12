@@ -1,4 +1,4 @@
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { Role } from '@/constants/enums'
 
 export default function EmployerLayout({
