@@ -34,14 +34,14 @@ export default function LocationPreference({
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all"
+              className="h-full bg-primary rounded-full transition-all"
               style={{ width: "75%" }}
             />
           </div>
         </div>
         <div className="space-y-2 text-center">
           <div className="flex justify-center mb-6">
-            <MapPin className="w-12 h-12 text-blue-600" />
+            <MapPin className="w-12 h-12 text-primary" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
             Where would you like to work?
@@ -74,9 +74,19 @@ export default function LocationPreference({
             >
               Back
             </Button>
-            <Button className="cursor-pointer w-32" type="submit">
-              Next &rarr;
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="cursor-pointer w-28"
+                onClick={next}
+              >
+                Skip for now
+              </Button>
+              <Button className="cursor-pointer w-32" type="submit">
+                Next &rarr;
+              </Button>
+            </div>
           </div>
         </form>
       </Card>

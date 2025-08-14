@@ -101,7 +101,7 @@ export default function SelectOpportunities({
 
                     {/* Content */}
                     <div className="space-y-3 text-center">
-                        <Target size={40} className="mx-auto text-blue-600" />
+                        <Target size={40} className="mx-auto text-primary" />
                         <h1 className="text-2xl font-bold">
                             What opportunities are you looking for?
                         </h1>
@@ -119,8 +119,8 @@ export default function SelectOpportunities({
                             <ToggleGroupItem
                                 key={id}
                                 value={id}
-                                className={`!rounded-xl ${id === "full-time" ? "!pl-6" : ""
-                                    } flex flex-row items-center pr-20 justify-center gap-3 py-8 border-2 border-gray-200 hover:border-blue-700 hover:bg-primary/10 data-[state=on]:border-blue-700 data-[state=on]:bg-primary/10`}
+                                className={`!rounded-xl ${id === "full-time" ? "!pl-6" : ""}
+                                     flex flex-row items-center pr-20 justify-center gap-3 py-8 border-2 border-gray-200 hover:border-primary data-[state=on]:border-primary hover:bg-primary/10 data-[state=on]:bg-primary/10`}
                             >
                                 <Icon
                                     size={20}
@@ -137,12 +137,28 @@ export default function SelectOpportunities({
                         <Button
                             className="cursor-pointer"
                             type="button"
-                            variant="outline" onClick={prev}>
+                            variant="outline"
+                            onClick={prev}
+                        >
                             Back
                         </Button>
-                        <Button className="cursor-pointer" disabled={workStylePreference.length === 0} onClick={next}>
-                            Next &rarr;
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                className="cursor-pointer"
+                                type="button"
+                                variant="ghost"
+                                onClick={next}
+                            >
+                                Skip for now
+                            </Button>
+                            <Button
+                                className="cursor-pointer"
+                                disabled={workStylePreference.length === 0}
+                                onClick={next}
+                            >
+                                Next &rarr;
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </Card>

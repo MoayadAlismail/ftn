@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -11,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Info, Loader2, User } from "lucide-react";
+import { Building2, Globe, Users, Briefcase, Loader2, User, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -124,136 +126,238 @@ export default function EmployerSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-7 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-2">
-            <Building2 size={35} className="text-primary" />
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Welcome to Ftn
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Let&apos;s set up your company profile to start finding talent.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary/5 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Your Information Section */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2 mb-4 font-bold">
-              <User />
-              <h3 className="text-lg font-medium text-gray-900">
-                Your Information
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  id="role"
-                  name="role"
-                  placeholder="Your Role (e.g. Talent Acquisition)"
-                  value={formData.role}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
+      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-4xl mx-auto"
+        >
+          {/* Header */}
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/20 rounded-2xl mb-6"
+            >
+              <Building2 size={40} className="text-primary" />
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-4xl font-bold text-gray-900 mb-4"
+            >
+              Welcome to Ftn
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              Let&apos;s set up your company profile to start finding exceptional talent.
+            </motion.p>
           </div>
 
-          {/* Company Details Section */}
-          <div className="space-y-4 pt-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <Info />
-              <h3 className="text-lg font-medium text-gray-900">
-                Company Details
-              </h3>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Personal Information Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl p-8 rounded-2xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <User size={24} className="text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-gray-900">Personal Information</h2>
+                    <p className="text-gray-600">Tell us about yourself</p>
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Input
-                  id="companyName"
-                  name="companyName"
-                  placeholder="Company Name"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <Input
-                  id="companyWebsite"
-                  name="companyWebsite"
-                  type="url"
-                  placeholder="Company Website"
-                  value={formData.companyWebsite}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <Select
-                  value={formData.companySize}
-                  onValueChange={handleSelectChange}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Company Size" />
-                  </SelectTrigger>
-                  <SelectContent className="w-full">
-                    {companySizes.map((size) => (
-                      <SelectItem key={size} value={size}>
-                        {size}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Input
-                  id="companyIndustry"
-                  name="companyIndustry"
-                  placeholder="Company Industry (e.g., SaaS)"
-                  value={formData.companyIndustry}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-sm font-medium text-gray-700">
+                      Full Name
+                    </label>
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="Enter your full name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="role" className="text-sm font-medium text-gray-700">
+                      Your Role
+                    </label>
+                    <Input
+                      id="role"
+                      name="role"
+                      placeholder="e.g., Talent Acquisition Manager"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+                      required
+                    />
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
 
-            <div>
-              <Textarea
-                id="companyDescription"
-                name="companyDescription"
-                placeholder="Brief company description"
-                className="h-28"
-                // rows={5}
-                value={formData.companyDescription}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+            {/* Company Details Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl p-8 rounded-2xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Briefcase size={24} className="text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-gray-900">Company Details</h2>
+                    <p className="text-gray-600">Share information about your organization</p>
+                  </div>
+                </div>
 
-          <Button
-            type="submit"
-            className="w-full cursor-pointer flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Complete Profile &rarr;
-          </Button>
-        </form>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="companyName" className="text-sm font-medium text-gray-700">
+                        Company Name
+                      </label>
+                      <Input
+                        id="companyName"
+                        name="companyName"
+                        placeholder="Enter company name"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="companyWebsite" className="text-sm font-medium text-gray-700">
+                        Company Website
+                      </label>
+                      <div className="relative">
+                        <Globe size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <Input
+                          id="companyWebsite"
+                          name="companyWebsite"
+                          type="url"
+                          placeholder="https://company.com"
+                          value={formData.companyWebsite}
+                          onChange={handleChange}
+                          className="h-12 pl-11 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="companySize" className="text-sm font-medium text-gray-700">
+                        Company Size
+                      </label>
+                      <div className="relative">
+                        <Users size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
+                        <Select
+                          value={formData.companySize}
+                          onValueChange={handleSelectChange}
+                        >
+                          <SelectTrigger className="h-12 pl-11 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl">
+                            <SelectValue placeholder="Select company size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {companySizes.map((size) => (
+                              <SelectItem key={size} value={size}>
+                                {size}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="companyIndustry" className="text-sm font-medium text-gray-700">
+                        Industry
+                      </label>
+                      <Input
+                        id="companyIndustry"
+                        name="companyIndustry"
+                        placeholder="e.g., Technology, Healthcare"
+                        value={formData.companyIndustry}
+                        onChange={handleChange}
+                        className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="companyDescription" className="text-sm font-medium text-gray-700">
+                      Company Description
+                    </label>
+                    <Textarea
+                      id="companyDescription"
+                      name="companyDescription"
+                      placeholder="Briefly describe your company, culture, and what makes it unique..."
+                      className="min-h-[120px] bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl resize-none"
+                      value={formData.companyDescription}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Submit Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="flex justify-center pt-4"
+            >
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-12 py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                size="lg"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    Setting up your profile...
+                  </>
+                ) : (
+                  <>
+                    Complete Profile
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </form>
+        </motion.div>
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ export default function SelectIndustries({
         </div>
         <div className="w-full h-2 bg-gray-100 rounded-full">
           <div
-            className="h-full bg-blue-600 rounded-full transition-all"
+            className="h-full bg-primary rounded-full transition-all"
             style={{ width: "50%" }}
           />
         </div>
@@ -66,7 +66,7 @@ export default function SelectIndustries({
       {/* Header */}
       <div className="text-center mb-6">
         <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
-          <BriefcaseIcon className="w-6 h-6 text-blue-600" />
+          <BriefcaseIcon className="w-6 h-6 text-primary" />
         </div>
         <h2 className="text-2xl font-semibold mb-1">
           What are your top 3 target industries?
@@ -86,9 +86,9 @@ export default function SelectIndustries({
               onClick={() => toggleIndustry(industry)}
               className={cn(
                 "py-3 px-4 rounded-lg border text-center transition-all text-sm",
-                "hover:border-blue-200 hover:bg-blue-50",
+                "hover:border-primary/40 hover:bg-primary/5",
                 isSelected
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  ? "border-primary bg-primary/10 text-primary"
                   : "border-gray-200 text-gray-700",
                 industryPreference.length >= MAX_SELECTIONS && !isSelected
                   ? "opacity-50 cursor-not-allowed"
@@ -106,13 +106,23 @@ export default function SelectIndustries({
         <Button className="cursor-pointer" variant="outline" onClick={prev}>
           Back
         </Button>
-              <Button
+        <div className="flex items-center gap-2">
+          <Button
             className="cursor-pointer"
-          onClick={next}
-          disabled={industryPreference.length !== MAX_SELECTIONS}
-        >
-          Next &rarr;
-        </Button>
+            type="button"
+            variant="ghost"
+            onClick={next}
+          >
+            Skip for now
+          </Button>
+          <Button
+            className="cursor-pointer"
+            onClick={next}
+            disabled={industryPreference.length !== MAX_SELECTIONS}
+          >
+            Next &rarr;
+          </Button>
+        </div>
       </div>
     </Card>
   );

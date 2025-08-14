@@ -75,7 +75,7 @@ export default function AboutYourself({
             <span>100% Complete</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full w-full bg-blue-600 rounded-full" />
+            <div className="h-full w-full bg-primary rounded-full" />
           </div>
         </div>
 
@@ -83,7 +83,7 @@ export default function AboutYourself({
         <div className="space-y-5 text-center">
           {/* Icon */}
           <div className="space-y-2 flex flex-col items-center justify-center">
-            <User size={40} className="text-blue-600" />
+            <User size={40} className="text-primary" />
             <h1 className="text-2xl font-semibold">Tell us about yourself</h1>
             <p className="text-gray-600">
               Write a brief bio to help us match you better
@@ -108,14 +108,25 @@ export default function AboutYourself({
           <Button className="cursor-pointer" variant="outline" onClick={prev}>
             Back
           </Button>
-          <Button
-            className="cursor-pointer flex items-center gap-2"
-            onClick={handleCompleteSetup}
-            disabled={bio.length < minCharacters || isCompleting}
-          >
-            {isCompleting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Complete Setup &rarr;
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              className="cursor-pointer"
+              type="button"
+              variant="ghost"
+              onClick={handleCompleteSetup}
+              disabled={isCompleting}
+            >
+              Skip for now
+            </Button>
+            <Button
+              className="cursor-pointer flex items-center gap-2"
+              onClick={handleCompleteSetup}
+              disabled={bio.length < minCharacters || isCompleting}
+            >
+              {isCompleting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Complete Setup &rarr;
+            </Button>
+          </div>
         </div>
       </Card>
     </div>

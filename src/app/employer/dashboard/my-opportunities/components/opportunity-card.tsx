@@ -49,7 +49,7 @@ export function OpportunityCard({
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     const typeColors: Record<string, string> = {
-        "Full-time": "bg-blue-100 text-blue-800",
+        "Full-time": "bg-primary/10 text-primary",
         "Part-time": "bg-purple-100 text-purple-800",
         "Contract": "bg-orange-100 text-orange-800",
         "Internship": "bg-pink-100 text-pink-800"
