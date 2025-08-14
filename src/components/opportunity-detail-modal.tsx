@@ -11,10 +11,7 @@ import {
   Users, 
   Calendar,
   Briefcase,
-  DollarSign,
   Globe,
-  Mail,
-  Phone,
   Loader2,
   FileText
 } from "lucide-react";
@@ -95,7 +92,7 @@ export default function OpportunityDetailModal({
         }
         
         toast.success("Applied successfully");
-      } catch (e) {
+      } catch {
         toast.error("Something went wrong. Please try again.");
       } finally {
         setIsApplyingLocal(false);

@@ -33,16 +33,16 @@ export default function EmployerLogin() {
     if (error) console.error("Login error:", error.message);
   };
 
-  const handleLinkedInLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "linkedin_oidc",
-      options: {
-        redirectTo: `${location.origin}/auth/callback?role=employer`,
-      },
-    });
+  // const handleLinkedInLogin = async () => {
+  //   const { error } = await supabase.auth.signInWithOAuth({
+  //     provider: "linkedin_oidc",
+  //     options: {
+  //       redirectTo: `${location.origin}/auth/callback?role=employer`,
+  //     },
+  //   });
 
-    if (error) console.error("Login error:", error.message);
-  };
+  //   if (error) console.error("Login error:", error.message);
+  // };
 
   const handleEmailLogin = async () => {
     if (!email || !password) {
@@ -214,7 +214,7 @@ export default function EmployerLogin() {
                 {/* Footer Links */}
                 <div className="text-center mt-6 space-y-2">
                   <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <button className="text-gray-900 underline font-medium">
                       Create your account
                     </button>

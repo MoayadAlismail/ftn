@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShineBorder } from "@/components/magicui/shine-border";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,8 +15,6 @@ import {
   Loader2,
   User,
   FileText,
-  Plus,
-  ChevronLeft,
 } from "lucide-react";
 import PostOpp from "./components/post-opp";
 import { supabase } from "@/lib/supabase/client";
@@ -29,7 +27,7 @@ const suggestions = [
 ];
 
 interface Talent {
-  id: any;
+  id: string;
   name: string;
   email: string;
   bio: string;
@@ -39,9 +37,7 @@ interface Talent {
 }
 
 export default function EmployerDashboardHome() {
-  const router = useRouter();
-
-  const [mode, setMode] = useState<"search" | "post">(() => {
+  const [mode] = useState<"search" | "post">(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const q = params.get("activeTab") || params.get("mode");
@@ -54,7 +50,7 @@ export default function EmployerDashboardHome() {
   const [showResults, setShowResults] = useState(false);
   const [matches, setMatches] = useState<Talent[]>([]);
   const [isLoading, setLoading] = useState(false);
-  const [inviteOpenId, setInviteOpenId] = useState<any | null>(null);
+  const [inviteOpenId, setInviteOpenId] = useState<string | null>(null);
   const [inviteMessages, setInviteMessages] = useState<Record<string, string>>({});
   const [invitingId, setInvitingId] = useState<string | null>(null);
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
@@ -84,8 +80,8 @@ export default function EmployerDashboardHome() {
     setLoading(false);
   };
 
-  const handleOpenInvite = (talentId: any) => {
-    setInviteOpenId((prev: any | null) => (prev === talentId ? null : talentId));
+  const handleOpenInvite = (talentId: string) => {
+    setInviteOpenId((prev: string | null) => (prev === talentId ? null : talentId));
   };
 
   const saveCandidate = async (talentId: string) => {
@@ -95,17 +91,17 @@ export default function EmployerDashboardHome() {
       if (!employerId) return;
       await supabase.from("saved_candidates").insert({ employer_id: employerId, talent_id: talentId });
       toast.success("Candidate saved");
-    } catch (e) {
+    } catch {
       toast.error("Unable to save candidate");
     }
   };
 
-  const handleInviteMessageChange = (talentId: any, message: string) => {
+  const handleInviteMessageChange = (talentId: string, message: string) => {
     const key = String(talentId);
     setInviteMessages((prev) => ({ ...prev, [key]: message }));
   };
 
-  const handleSendInvite = async (talentId: any) => {
+  const handleSendInvite = async (talentId: string) => {
     try {
       const key = String(talentId);
       const message = (inviteMessages[key] || "").trim();
@@ -130,7 +126,7 @@ export default function EmployerDashboardHome() {
       setInvitedIds((prev) => new Set(prev).add(key));
       setInviteOpenId(null);
       toast.success("Invite sent");
-    } catch (e) {
+    } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setInvitingId(null);
