@@ -18,7 +18,7 @@ const FloatingCard = ({
   children: React.ReactNode;
   className?: string;
   delay?: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}

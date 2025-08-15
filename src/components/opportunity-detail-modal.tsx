@@ -12,6 +12,10 @@ import {
   Calendar,
   Briefcase,
   Globe,
+  DollarSign,
+  Globe,
+  Mail,
+  Phone,
   Loader2,
   FileText
 } from "lucide-react";
