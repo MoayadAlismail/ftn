@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShineBorder } from "@/components/magicui/shine-border";
-import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,8 +15,6 @@ import {
   Loader2,
   User,
   FileText,
-  Plus,
-  ChevronLeft,
 } from "lucide-react";
 import PostOpp from "./components/post-opp";
 import { supabase } from "@/lib/supabase/client";
@@ -39,8 +37,7 @@ interface Talent {
 }
 
 export default function EmployerDashboardHome() {
-  const router = useRouter();
-  const [mode, setMode] = useState<"search" | "post">(() => {
+  const [mode] = useState<"search" | "post">(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const q = params.get("activeTab") || params.get("mode");
@@ -99,7 +96,7 @@ export default function EmployerDashboardHome() {
     }
   };
 
-  const handleInviteMessageChange = (talentId: any, message: string) => {
+  const handleInviteMessageChange = (talentId: string, message: string) => {
     const key = String(talentId);
     setInviteMessages((prev) => ({ ...prev, [key]: message }));
   };

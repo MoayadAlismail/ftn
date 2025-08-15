@@ -30,7 +30,7 @@ const reviews = [
   {
     name: "Emily",
     username: "@emily",
-    body: "The talent matching is incredible. It's like having a personal career advisor.",
+    body: "The talent matching is incredible. It&apos;s like having a personal career advisor.",
     img: "https://avatar.vercel.sh/emily",
   },
   {
@@ -300,7 +300,7 @@ export default function TalentLogin() {
                 {/* Footer Links */}
                 <div className="text-center mt-6 space-y-2">
                   <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <button className="text-gray-900 underline font-medium">
                       Create your account
                     </button>

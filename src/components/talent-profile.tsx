@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   User, 
   MapPin, 
-  Briefcase, 
   Mail, 
   Calendar,
   Edit2,
@@ -51,11 +49,7 @@ export default function TalentProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState<Partial<TalentProfile>>({});
 
-  useEffect(() => {
-    fetchProfile();
-  }, [user]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user?.id) return;
     
     try {
@@ -80,7 +74,11 @@ export default function TalentProfile() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -147,7 +145,7 @@ export default function TalentProfile() {
       <div className="text-center py-12">
         <User className="w-16 h-16 mx-auto mb-4 text-gray-400" />
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
-        <p className="text-gray-600">We couldn't find your profile information.</p>
+                      <p className="text-gray-600">We couldn&apos;t find your profile information.</p>
       </div>
     );
   }

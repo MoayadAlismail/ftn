@@ -133,7 +133,7 @@ export default function TalentDashboard() {
               <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-300" />
               <h4 className="text-lg font-medium text-gray-900 mb-2">No applications yet</h4>
               <p className="text-gray-600 mb-4">
-                When you apply to opportunities, they'll appear here for you to track.
+                When you apply to opportunities, they&apos;ll appear here for you to track.
               </p>
               <Button onClick={navigateToMatching}>
                 Find Opportunities
