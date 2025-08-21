@@ -1,18 +1,22 @@
 "use client";
 import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import HeroSection from "@/components/hero-section";
 import Features from "@/features/landing/Features";
 import FAQ from "@/features/landing/FAQ";
 import Testimonials from "@/features/landing/Testimonials";
 import ContactUs from "@/features/landing/ContactUs";
+import LoadingAnimation from "@/components/loadingAnimation";
 
 function LandingContent() {
+  const router = useRouter();
+  
   const handleGetStarted = (skipResumeUpload?: boolean) => {
     // Store resume upload timestamp for expiry checking
     localStorage.setItem("resumeUploadTimestamp", Date.now().toString());
 
-    // Navigate to talent signup
-    window.location.href = "/auth/talent/signup";
+    // Navigate to talent signup using Next.js router
+    router.push("/auth/talent/signup");
   };
 
   return (
@@ -28,13 +32,7 @@ function LandingContent() {
 
 export default function HomePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-50">
-          <div className="animate-pulse text-gray-500">Loading...</div>
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingAnimation size="md" />}>
       <LandingContent />
     </Suspense>
   );

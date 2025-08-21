@@ -29,7 +29,7 @@ interface CandidateProfile {
     full_name: string;
     email: string;
     bio: string;
-    location_pref: string[];
+    location_pref: string | string[];
     industry_pref: string[];
     work_style_pref: string[];
     resume_url?: string;
@@ -315,24 +315,37 @@ export default function CandidateProfileModal({
                 {/* Preferences Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Location Preferences */}
-                    {profile.location_pref && profile.location_pref.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center text-lg">
-                                    <MapPin className="h-5 w-5 mr-2" />
-                                    Location Preferences
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {profile.location_pref.map((location, index) => (
-                                        <Badge key={index} variant="outline">
-                                            {location}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
+                    {profile.location_pref && (
+                        (() => {
+                            const locationArray = Array.isArray(profile.location_pref)
+                                ? profile.location_pref
+                                : profile.location_pref
+                                ? String(profile.location_pref)
+                                    .split(",")
+                                    .map((s) => s.trim())
+                                    .filter(Boolean)
+                                : [];
+                            
+                            return locationArray.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center text-lg">
+                                            <MapPin className="h-5 w-5 mr-2" />
+                                            Location Preferences
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex flex-wrap gap-2">
+                                            {locationArray.map((location, index) => (
+                                                <Badge key={index} variant="outline">
+                                                    {location}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })()
                     )}
 
                     {/* Industry Preferences */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +55,7 @@ interface OpportunityCardProps {
     compact?: boolean;
 }
 
-export default function OpportunityCard({
+const OpportunityCard = memo(function OpportunityCard({
     opportunity,
     onSave,
     onUnsave,
@@ -66,7 +66,7 @@ export default function OpportunityCard({
     const [isSaved, setIsSaved] = useState(opportunity.isSaved || false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSaveToggle = async () => {
+    const handleSaveToggle = useCallback(async () => {
         setIsLoading(true);
         try {
             if (isSaved) {
@@ -81,32 +81,34 @@ export default function OpportunityCard({
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [isSaved, onUnsave, onSave, opportunity.id]);
 
-    const handleApply = () => {
+    const handleApply = useCallback(() => {
         onApply?.(opportunity);
-    };
+    }, [onApply, opportunity]);
 
-    const handleViewDetails = () => {
+    const handleViewDetails = useCallback(() => {
         onViewDetails?.(opportunity);
-    };
+    }, [onViewDetails, opportunity]);
 
-    const handleShare = async () => {
+    const handleShare = useCallback(async () => {
+        const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+        
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: `${opportunity.title} at ${opportunity.company}`,
                     text: opportunity.description.substring(0, 200) + '...',
-                    url: window.location.href
+                    url: currentUrl
                 });
             } catch (error) {
                 console.log('Share cancelled');
             }
         } else {
             // Fallback to clipboard
-            navigator.clipboard.writeText(window.location.href);
+            navigator.clipboard.writeText(currentUrl);
         }
-    };
+    }, [opportunity.title, opportunity.company, opportunity.description]);
 
     const formatSalary = () => {
         if (!opportunity.salaryMin && !opportunity.salaryMax) return null;
@@ -377,5 +379,7 @@ export default function OpportunityCard({
             </CardContent>
         </Card>
     );
-}
+});
+
+export default OpportunityCard;
 

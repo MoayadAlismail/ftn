@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Upload, Briefcase, GraduationCap, Trophy, Target, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import Link from "next/link";
 import OpportunitiesSection from "./opportunities-section";
 import { ShineBorder } from "@/components/magicui/shine-border";
 
@@ -148,50 +149,34 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
 
         {/* Top navigation */}
         <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 pointer-events-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              try {
-                router.push("/auth/employer/login");
-              } catch (error) {
-                console.error("Navigation error:", error);
-                window.location.href = "/auth/employer/login";
-              }
-            }}
-          >
-            <span className="hidden sm:inline">
-              Recruiter? Login here{" "}
-              <span aria-label="diagonal arrow" role="img" className="inline-block align-middle">
-                ↗
+          <Link href="/auth/employer/login" prefetch={true}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
+            >
+              <span className="hidden sm:inline">
+                Recruiter? Login here{" "}
+                <span aria-label="diagonal arrow" role="img" className="inline-block align-middle">
+                  ↗
+                </span>
               </span>
-            </span>
-            <span className="sm:hidden">Recruiter </span>
-          </Button>
+              <span className="sm:hidden">Recruiter </span>
+            </Button>
+          </Link>
         </div>
 
         {/* Student Login Button */}
         <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 pointer-events-auto">
-          <Button
-            size="sm"
-            className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              try {
-                router.push("/auth/talent/login");
-              } catch (error) {
-                console.error("Navigation error:", error);
-                window.location.href = "/auth/talent/login";
-              }
-            }}
-          >
-            <span className="hidden sm:inline">Login</span>
-            <span className="sm:hidden">Student</span>
-          </Button>
+          <Link href="/auth/talent/login" prefetch={true}>
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
+            >
+              <span className="hidden sm:inline">Login</span>
+              <span className="sm:hidden">Student</span>
+            </Button>
+          </Link>
         </div>
 
         {/* Floating opportunity cards - Hidden on mobile for cleaner design */}
@@ -349,10 +334,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
 
             <div
               className={`relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-dashed transition-all duration-300 cursor-pointer ${isDragging
-                  ? "border-primary bg-primary/5 scale-105"
-                  : uploadStatus === "success"
-                    ? "border-green-400 bg-green-50/50"
-                    : "border-white/30 hover:border-primary/50"
+                ? "border-primary bg-primary/5 scale-105"
+                : uploadStatus === "success"
+                  ? "border-green-400 bg-green-50/50"
+                  : "border-white/30 hover:border-primary/50"
                 } p-6 sm:p-8 text-center w-full max-w-md sm:max-w-lg mx-4`}
               onClick={handleCardClick}
               onDragOver={handleDragOver}

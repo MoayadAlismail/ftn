@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 import {
     Grid,
@@ -166,7 +168,55 @@ const DEFAULT_FILTERS: FilterType = {
     sortBy: "relevance"
 };
 
-export default function TalentOpportunities() {
+// Loading skeleton for opportunities page
+function OpportunitiesPageSkeleton() {
+    return (
+        <div className="space-y-6 animate-pulse">
+            {/* Header skeleton */}
+            <div className="flex justify-between items-center">
+                <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-10 bg-gray-200 rounded w-24"></div>
+            </div>
+
+            {/* Filters skeleton */}
+            <div className="bg-white p-6 rounded-lg border space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Opportunities skeleton */}
+            <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                    <div key={i} className="bg-white p-6 rounded-lg border">
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-2 flex-1">
+                                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                </div>
+                                <div className="h-8 bg-gray-200 rounded w-16"></div>
+                            </div>
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                            <div className="flex gap-2">
+                                {[...Array(3)].map((_, j) => (
+                                    <div key={j} className="h-6 bg-gray-200 rounded w-16"></div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function TalentOpportunitiesContent() {
+    const { user, authUser, isLoading, isAuthenticated } = useAuth();
+    const router = useRouter();
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [filteredOpportunities, setFilteredOpportunities] = useState<Opportunity[]>([]);
     const [filters, setFilters] = useState<FilterType>(DEFAULT_FILTERS);
@@ -174,6 +224,18 @@ export default function TalentOpportunities() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
+
+    // Show loading while auth is resolving
+    if (isLoading) {
+        return <OpportunitiesPageSkeleton />;
+    }
+
+    // Auth is handled by middleware - no need for component-level checks
+
+    // Show loading if authUser is not yet loaded
+    if (!authUser) {
+        return <OpportunitiesPageSkeleton />;
+    }
 
     // Load opportunities
     useEffect(() => {
@@ -366,12 +428,12 @@ export default function TalentOpportunities() {
 
     const handleApplyToOpportunity = (opportunity: Opportunity) => {
         // Navigate to application/payment page
-        window.location.href = `/talent/apply/${opportunity.id}`;
+        router.push(`/talent/apply/${opportunity.id}`);
     };
 
     const handleViewDetails = (opportunity: Opportunity) => {
         // Navigate to detailed opportunity view
-        window.location.href = `/talent/opportunities/${opportunity.id}`;
+        router.push(`/talent/opportunities/${opportunity.id}`);
     };
 
     const handleRefresh = async () => {
@@ -476,5 +538,13 @@ export default function TalentOpportunities() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function TalentOpportunities() {
+    return (
+        <Suspense fallback={<OpportunitiesPageSkeleton />}>
+            <TalentOpportunitiesContent />
+        </Suspense>
     );
 }

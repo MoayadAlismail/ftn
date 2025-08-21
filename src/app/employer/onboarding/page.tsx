@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Building2, Globe, Users, Briefcase, Loader2, User, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+
+// Loading skeleton for onboarding page
+function OnboardingSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl p-8 animate-pulse">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto"></div>
+            <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          </div>
+
+          {/* Form skeleton */}
+          <div className="space-y-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Button skeleton */}
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+      </Card>
+    </div>
+  );
+}
 
 const companySizes = [
   "1-10 employees",
@@ -26,9 +58,11 @@ const companySizes = [
   "1000+ employees",
 ];
 
-export default function EmployerSignup() {
+function EmployerOnboardingContent() {
+  const { user, authUser, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -39,28 +73,43 @@ export default function EmployerSignup() {
     companyDescription: "",
   });
 
+  // Auth is handled by middleware
+  
+  // Show loading while data is resolving
+  if (isLoading) {
+    return <OnboardingSkeleton />;
+  }
+
   useEffect(() => {
     const checkOnboarding = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
+      if (!user?.id) return;
 
-      if (!userId) return;
+      try {
+        const { data: existing, error } = await supabase
+          .from("employers")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      const { data: existing, error } = await supabase
-        .from("employers")
-        .select("id")
-        .eq("user_id", userId)
-        .maybeSingle();
+        console.log("Employer check:", existing, error);
 
-      console.log("Employer check:", existing, error);
-
-      if (existing) {
-        router.replace("/employer/dashboard/home"); // Already onboarded
+        if (existing) {
+          router.replace("/employer/dashboard/home"); // Already onboarded
+        }
+      } catch (error) {
+        console.error("Error checking onboarding:", error);
+      } finally {
+        setIsCheckingOnboarding(false);
       }
     };
 
     checkOnboarding();
-  }, [router]);
+  }, [user, router]);
+
+  // Show loading while checking onboarding status
+  if (isCheckingOnboarding) {
+    return <OnboardingSkeleton />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     setIsSubmitting(true);
@@ -93,7 +142,17 @@ export default function EmployerSignup() {
       if (error) {
         alert("Error creating employer profile: " + error.message);
       } else {
-        // Optionally, redirect to employer dashboard or home
+        // Update user metadata to mark as onboarded
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: { is_onboarded: true }
+        });
+
+        if (metadataError) {
+          console.error("Error updating user metadata:", metadataError);
+          // Don't fail the entire process for metadata update failure
+        }
+
+        // Redirect to employer dashboard
         router.push("/employer/dashboard/home");
       }
     } catch (err) {
@@ -360,5 +419,13 @@ export default function EmployerSignup() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function EmployerOnboarding() {
+  return (
+    <Suspense fallback={<OnboardingSkeleton />}>
+      <EmployerOnboardingContent />
+    </Suspense>
   );
 }

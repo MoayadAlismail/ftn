@@ -72,18 +72,14 @@ export default function TalentOnboarding() {
     });
 
     useEffect(() => {
-        // Check if user is authenticated
-        if (!user) {
-            router.push('/auth/talent/login');
-            return;
-        }
+        // Auth is handled by middleware - user is guaranteed to be authenticated
 
         // Check if already onboarded
         const checkOnboardingStatus = async () => {
             const { data, error } = await supabase
                 .from('talents')
                 .select('id')
-                .eq('user_id', user.id)
+                .eq('user_id', user!.id)
                 .maybeSingle();
 
             if (data && !error) {
@@ -196,6 +192,16 @@ export default function TalentOnboarding() {
                 console.error("Error inserting talent profile:", error);
                 toast.error("Failed to create profile");
                 return;
+            }
+
+            // Update user metadata to mark as onboarded
+            const { error: metadataError } = await supabase.auth.updateUser({
+                data: { is_onboarded: true }
+            });
+
+            if (metadataError) {
+                console.error("Error updating user metadata:", metadataError);
+                // Don't fail the entire process for metadata update failure
             }
 
             // Clean up localStorage

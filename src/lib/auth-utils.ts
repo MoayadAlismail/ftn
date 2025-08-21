@@ -1,6 +1,16 @@
 import { supabase } from './supabase/client';
 import { Role } from '@/constants/enums';
 
+// Utility to prevent hanging auth calls
+const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error(`Auth operation timed out after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ])
+}
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -20,6 +30,8 @@ export interface AuthResult {
  */
 async function checkOnboardingStatus(userId: string, role: Role): Promise<boolean> {
   try {
+    console.log(`Checking onboarding status for user ${userId} with role ${role}`);
+    
     if (role === Role.TALENT) {
       const { data, error } = await supabase
         .from('talents')
@@ -27,7 +39,14 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
         .eq('user_id', userId)
         .maybeSingle();
       
-      return !error && !!data;
+      if (error) {
+        console.error('Error querying talents table:', error);
+        throw error;
+      }
+      
+      const isOnboarded = !!data;
+      console.log(`Talent onboarding status: ${isOnboarded}`);
+      return isOnboarded;
     } else if (role === Role.EMPLOYER) {
       const { data, error } = await supabase
         .from('employers')
@@ -35,12 +54,21 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
         .eq('user_id', userId)
         .maybeSingle();
       
-      return !error && !!data;
+      if (error) {
+        console.error('Error querying employers table:', error);
+        throw error;
+      }
+      
+      const isOnboarded = !!data;
+      console.log(`Employer onboarding status: ${isOnboarded}`);
+      return isOnboarded;
     }
   } catch (error) {
     console.error('Error checking onboarding status:', error);
+    throw error; // Re-throw to let caller handle
   }
   
+  console.log('Unknown role, defaulting to not onboarded');
   return false;
 }
 
@@ -49,32 +77,59 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
  */
 export async function getCurrentUser(): Promise<AuthResult> {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    console.log("Getting user from Supabase auth...");
+    const { data: { user }, error } = await withTimeout(
+      supabase.auth.getUser(),
+      8000 // 8 second timeout
+    );
     
     if (error || !user) {
+      console.error("Failed to get user from auth:", error);
       return { user: null, error: error?.message || 'No user found' };
     }
+    
+    console.log("Got user from auth:", { id: user.id, email: user.email, metadata: user.user_metadata });
     
     const role = user.user_metadata?.role as Role;
     
     if (!role) {
+      console.error("User role not found in metadata");
       return { user: null, error: 'User role not found' };
     }
     
-    const isOnboarded = await checkOnboardingStatus(user.id, role);
+    console.log("Checking onboarding status for role:", role);
+    let isOnboarded = false;
+    
+    try {
+      isOnboarded = await withTimeout(
+        checkOnboardingStatus(user.id, role),
+        5000 // 5 second timeout for database check
+      );
+      console.log("Onboarding status check result:", isOnboarded);
+    } catch (onboardingError) {
+      console.error("Failed to check onboarding status:", onboardingError);
+      // Don't fail the entire function if onboarding check fails
+      // Default to false and let the user proceed
+      isOnboarded = false;
+    }
+    
+    const authUser = {
+      id: user.id,
+      email: user.email || '',
+      role,
+      isOnboarded,
+      fullName: user.user_metadata?.full_name || user.user_metadata?.name,
+      companyName: user.user_metadata?.company_name
+    };
+    
+    console.log("Successfully created auth user:", authUser);
     
     return {
-      user: {
-        id: user.id,
-        email: user.email || '',
-        role,
-        isOnboarded,
-        fullName: user.user_metadata?.full_name || user.user_metadata?.name,
-        companyName: user.user_metadata?.company_name
-      },
+      user: authUser,
       error: null
     };
   } catch (error) {
+    console.error("getCurrentUser error:", error);
     return { 
       user: null, 
       error: error instanceof Error ? error.message : 'Unknown error occurred' 
@@ -176,7 +231,10 @@ export async function checkExistingUserRole(email: string, intendedRole: Role): 
 export async function signOut(): Promise<void> {
   try {
     await supabase.auth.signOut();
-    window.location.href = '/';
+    // Let middleware handle redirect after sign out
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   } catch (error) {
     console.error('Error signing out:', error);
   }
@@ -207,6 +265,127 @@ export async function markUserAsOnboarded(role: Role): Promise<boolean> {
   } catch (error) {
     console.error('Error marking user as onboarded:', error);
     return false;
+  }
+}
+
+/**
+ * Send OTP for passwordless authentication (works for both signin and signup)
+ */
+export async function sendAuthOTP(email: string): Promise<{
+  success: boolean;
+  error?: string;
+  needsVerification?: boolean;
+}> {
+  try {
+    // Send OTP for passwordless authentication - works for both new and existing users
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true, // Allow creating new user if doesn't exist
+      }
+    });
+
+    if (otpError) {
+      return { 
+        success: false, 
+        error: otpError.message 
+      };
+    }
+
+    return { 
+      success: true, 
+      needsVerification: true 
+    };
+  } catch (error) {
+    console.error('Error sending auth OTP:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to send verification code' 
+    };
+  }
+}
+
+/**
+ * Verify OTP for authentication (works for both signin and signup)
+ */
+export async function verifyAuthOTP(email: string, otp: string, role: Role, userData?: {
+  fullName?: string;
+  companyName?: string;
+}): Promise<{
+  success: boolean;
+  error?: string;
+  user?: AuthUser;
+}> {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'email',
+    });
+
+    if (error) {
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+
+    if (data.session && data.user) {
+      // Check if user role matches expected role (for existing users)
+      const existingRole = data.user.user_metadata?.role as Role;
+      
+      if (existingRole && existingRole !== role) {
+        // Sign out if role mismatch
+        await supabase.auth.signOut();
+        return {
+          success: false,
+          error: `This account is registered as a ${existingRole}. Please use the correct login page.`
+        };
+      }
+
+      // Update user metadata with role and additional data
+      const updateData: Record<string, any> = { role };
+      
+      // Only update additional data if provided (typically for new users)
+      if (userData?.fullName) {
+        updateData.full_name = userData.fullName;
+        updateData.name = userData.fullName;
+      }
+      
+      if (userData?.companyName) {
+        updateData.company_name = userData.companyName;
+      }
+
+      await supabase.auth.updateUser({
+        data: updateData,
+      });
+
+      // Get enhanced user data
+      const { user: authUser, error: userError } = await getCurrentUser();
+      
+      if (userError || !authUser) {
+        return {
+          success: false,
+          error: userError || 'Failed to get user data'
+        };
+      }
+
+      return {
+        success: true,
+        user: authUser
+      };
+    }
+
+    return { 
+      success: false, 
+      error: 'Verification failed' 
+    };
+  } catch (error) {
+    console.error('Error verifying auth OTP:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Verification failed' 
+    };
   }
 }
 
