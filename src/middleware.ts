@@ -1,6 +1,5 @@
 import { createClient } from './lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
-import { Role } from './constants/enums'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

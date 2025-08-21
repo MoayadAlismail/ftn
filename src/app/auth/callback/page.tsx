@@ -54,6 +54,7 @@ function CallbackContent() {
       }
 
       const { user } = data.session;
+      
       console.log("Session user:", user.id, "Email:", user.email);
 
       // Check if user already has a role and it's different from intended

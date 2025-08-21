@@ -38,7 +38,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
                 <motion.div
                     className={cn("relative", sizeClasses[size])}
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 3, repeat: Infinity, ease: [0, 0, 1, 1] as any }}
+                    transition={{ duration: 3, repeat: Infinity, ease: [0, 0, 1, 1] as [number, number, number, number] }}
                 >
                     <Image
                         src="/logo.svg"
@@ -96,7 +96,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
                                     duration: 0.6,
                                     repeat: Infinity,
                                     delay: index * 0.1,
-                                    ease: [0.4, 0, 0.6, 1] as any
+                                    ease: [0.4, 0, 0.6, 1] as [number, number, number, number]
                                 }}
                             />
                         ))}

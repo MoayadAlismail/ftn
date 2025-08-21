@@ -72,9 +72,9 @@ function MyOpportunitiesPageContent() {
         }
     };
 
-    const handleCreateNew = () => {
-        console.log("Create new opportunity");
-    };
+    // const handleCreateNew = () => {
+    //     console.log("Create new opportunity");
+    // };
 
     const handleViewApplicants = async (opportunityId: string) => {
         console.log("View applicants for opportunity:", opportunityId);

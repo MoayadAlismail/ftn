@@ -19,7 +19,7 @@ const FloatingCard = ({
   children: React.ReactNode;
   className?: string;
   delay?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -47,7 +47,7 @@ const OpportunityCard = ({
   className = "",
   delay = 0
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
   title: string;
   company: string;
   match: string;

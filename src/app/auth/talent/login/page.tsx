@@ -83,7 +83,7 @@ const reviews = [
   {
     name: "Emily",
     username: "@emily",
-    body: "The talent matching is incredible. It's like having a personal career advisor.",
+    body: "The talent matching is incredible. It&apos;s like having a personal career advisor.",
     img: "https://avatar.vercel.sh/emily",
   },
   {
