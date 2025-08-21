@@ -4,8 +4,10 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users, Plus, Send } from "lucide-react";
+import Link from "next/link";
+import SignOutButton from "@/features/auth/SignOutButton";
 
 interface NavigationItem {
   id: string;
@@ -26,6 +28,12 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
       href: "/employer/dashboard/home"
     },
     {
+      id: "post-opportunity",
+      label: "Post Opportunity",
+      icon: Plus,
+      href: "/employer/dashboard/post-opportunity"
+    },
+    {
       id: "opportunities",
       label: "My Opportunities",
       icon: TableOfContents,
@@ -36,6 +44,12 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
       label: "Saved Candidates",
       icon: Users,
       href: "/employer/dashboard/saved-candidates"
+    },
+    {
+      id: "sent-invitations",
+      label: "Sent Invitations",
+      icon: Send,
+      href: "/employer/dashboard/sent-invitations"
     },
     {
       id: "billing",
@@ -51,56 +65,43 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
     }
   ];
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
-  const handleNavigationClick = (href?: string) => {
-    if (href) {
-      router.push(href);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col overflow-scroll font-sans">
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur border-b border-gray-200">
         <div className="mx-auto max-w-6xl px-4 md:px-6 py-3 flex items-center justify-between">
-          <button
-            className="flex items-center gap-2 text-lg font-semibold text-gray-900"
-            onClick={() => router.push("/")}
+          <Link 
+            href="/" 
+            prefetch={true}
+            className="flex items-center gap-2 text-lg font-semibold text-gray-900 hover:opacity-80 transition-opacity"
           >
             <img src="/logo.svg" alt="Ftn" className="w-7 h-7 object-contain" />
             <span>Ftn</span>
-          </button>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-2">
             {navigationItems.map((item) => {
               const isActive = item.href && pathname?.startsWith(item.href);
               return (
-                <button
+                <Link
                   key={item.id}
-                  onClick={() => handleNavigationClick(item.href)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "text-gray-900 bg-gray-100"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  }`}
+                  href={item.href || "#"}
+                  prefetch={true}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
+                    ? "text-gray-900 bg-gray-100"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    }`}
                 >
-                  {item.label}
-                </button>
+                  <span className="flex items-center gap-2">
+                    <item.icon size={16} />
+                    {item.label}
+                  </span>
+                </Link>
               );
             })}
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button
-              className="cursor-pointer"
-              variant="outline"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
+            <SignOutButton/>
           </div>
         </div>
       </header>

@@ -1,68 +1,312 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FTN-Find: AI-Powered Talent Matching Platform
 
-## Getting Started
+A comprehensive talent-employer matching platform built with Next.js, Supabase, and modern web technologies. FTN-Find streamlines the hiring process with AI-powered matching, advanced filtering, and integrated payment processing.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### For Talents
+- **AI-Powered Job Matching**: Get personalized job recommendations based on your profile
+- **Advanced Job Search**: Filter opportunities by location, industry, salary, work style, and more
+- **Resume Upload & Analysis**: Upload your resume for AI-powered profile enhancement
+- **Application Management**: Apply to jobs with integrated payment processing
+- **Career Consultation**: Schedule meetings with career experts after application
+- **Save Opportunities**: Bookmark interesting positions for later review
+
+### For Employers
+- **Candidate Discovery**: AI-powered search and matching for qualified candidates
+- **Profile Management**: View detailed candidate profiles and download resumes
+- **Application Tracking**: Manage incoming applications with status updates
+- **Saved Candidates**: Build talent pipelines by saving promising candidates
+- **Subscription Management**: Flexible billing with usage tracking and limits
+
+### Platform Features
+- **Multi-Role Authentication**: Separate flows for talents and employers with OAuth support
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Real-time Updates**: Live notifications and status updates
+- **Secure Payments**: Multiple payment methods with discount code support
+- **Meeting Scheduling**: Integrated Calendly for consultation booking
+
+## 🛠 Tech Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Framer Motion** - Smooth animations and transitions
+- **Shadcn/ui** - Modern, accessible UI components
+- **Lucide React** - Beautiful icon library
+
+### Backend & Database
+- **Supabase** - Backend-as-a-Service with PostgreSQL
+- **Row Level Security** - Database-level security policies
+- **Real-time Subscriptions** - Live data updates
+- **Storage** - File upload and management for resumes
+
+### Authentication
+- **Supabase Auth** - Multi-provider authentication
+- **OAuth Providers**: Google, LinkedIn, GitHub
+- **Role-based Access Control** - Talent vs Employer permissions
+- **JWT Tokens** - Secure session management
+
+### Payment Processing
+- **Stripe** (Ready for integration)
+- **STC Pay** (Saudi Arabia mobile payments)
+- **Apple Pay** (Biometric payments)
+- **Discount Code System** - Flexible promotion management
+
+### Integrations
+- **Calendly** - Meeting scheduling integration
+- **Email Services** - Notification system ready
+- **AI/ML Services** - Job matching and recommendations
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                          # Next.js App Router pages
+│   ├── auth/                     # Authentication pages
+│   │   ├── callback/             # OAuth callback handler
+│   │   ├── talent/               # Talent auth flows
+│   │   └── employer/             # Employer auth flows
+│   ├── talent/                   # Talent dashboard and features
+│   │   ├── dashboard/            # Main dashboard
+│   │   ├── opportunities/        # Job browsing and search
+│   │   ├── apply/               # Application and payment flow
+│   │   ├── match-making/        # AI matching interface
+│   │   └── onboarding/          # Profile setup
+│   ├── employer/                # Employer dashboard and features
+│   │   └── dashboard/           # Employer management interface
+│   │       ├── home/            # AI candidate search
+│   │       ├── saved-candidates/ # Saved talent profiles
+│   │       └── billing/         # Subscription management
+│   └── api/                     # API routes (future)
+├── components/                  # Shared React components
+│   ├── ui/                      # Shadcn/ui components
+│   ├── landing/                 # Landing page sections
+│   └── shared/                  # Common components
+├── features/                    # Feature-specific components
+│   ├── auth/                    # Authentication components
+│   ├── talent/                  # Talent-specific features
+│   └── employer/                # Employer-specific features
+├── lib/                         # Utility libraries
+│   ├── supabase/               # Database client and utils
+│   ├── auth-utils.ts           # Authentication helpers
+│   └── utils.ts                # General utilities
+├── contexts/                    # React Context providers
+│   ├── AuthContext.tsx         # User authentication state
+│   └── LoadingContext.tsx      # Loading state management
+├── constants/                   # Application constants
+└── types/                       # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 18+ and npm
+- Supabase account
+- Git
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ftn-find
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env.local
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Configure environment variables**
+   ```env
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-## Environment Variables
+   # OAuth Providers (Optional)
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-This project requires the following environment variables to be set:
+   # Payment Processing (Production)
+   STRIPE_PUBLISHABLE_KEY=pk_test_...
+   STRIPE_SECRET_KEY=sk_test_...
 
-```bash
-# Supabase Configuration (Required)
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url_here
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   # Calendly Integration
+   CALENDLY_API_TOKEN=your_calendly_token
+   CALENDLY_EVENT_TYPE_UUID=your_event_type_uuid
+   ```
 
-# Google OAuth (Optional)
-GOOGLE_CLIENT_ID=your_google_client_id_here
-GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+5. **Database Setup**
+   - Follow the instructions in `SUPABASE_SCHEMA_CHANGES.md`
+   - Run the SQL scripts to set up tables and functions
+   - Configure Row Level Security policies
 
-# Gemini AI (Optional)
-GEMINI_API_KEY=your_gemini_api_key_here
+6. **Authentication Setup**
+   - Follow the instructions in `SUPABASE_AUTH_SETUP.md`
+   - Configure OAuth providers in Supabase dashboard
+
+7. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+8. **Build for production**
+   ```bash
+   npm run build
+   npm start
+   ```
+
+## 📚 Documentation
+
+### Setup Guides
+- [Database Schema Setup](SUPABASE_SCHEMA_CHANGES.md) - Complete database configuration
+- [Authentication Setup](SUPABASE_AUTH_SETUP.md) - OAuth provider configuration
+- [Talent Features Setup](SUPABASE_TALENT_SETUP.md) - Phase 5 talent features
+
+### API Documentation
+- [Authentication Flow](docs/auth-flow.md) - User authentication and authorization
+- [Payment Processing](docs/payments.md) - Payment gateway integration
+- [Meeting Scheduling](docs/calendly.md) - Calendly integration guide
+
+### Development
+- [Contributing Guidelines](CONTRIBUTING.md) - How to contribute to the project
+- [Code Style Guide](docs/code-style.md) - Coding standards and best practices
+- [Testing Guide](docs/testing.md) - Testing strategies and implementation
+
+## 🔧 Configuration
+
+### Authentication Providers
+
+**Google OAuth**
+```javascript
+// Supabase Dashboard > Authentication > Providers
+Client ID: your_google_client_id
+Client Secret: your_google_client_secret
+Redirect URL: https://your-domain.com/auth/callback
 ```
 
-### Getting Supabase Credentials
+**LinkedIn OAuth**
+```javascript
+Client ID: your_linkedin_client_id
+Client Secret: your_linkedin_client_secret
+Redirect URL: https://your-domain.com/auth/callback
+```
 
-1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Create a new project or select an existing one
-3. Go to Settings > API
-4. Copy the Project URL and anon/public key
+**GitHub OAuth** (Talents only)
+```javascript
+Client ID: your_github_client_id
+Client Secret: your_github_client_secret
+Redirect URL: https://your-domain.com/auth/callback
+```
 
-## Deployment
+### Payment Configuration
 
-### Deploy on Vercel
+**Stripe**
+```javascript
+// Test mode
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+// Production
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+```
 
-### Deploy on Heroku
+**STC Pay** (Saudi Arabia)
+```javascript
+STC_PAY_MERCHANT_ID=your_merchant_id
+STC_PAY_API_KEY=your_api_key
+```
 
-1. Set the environment variables in your Heroku app settings
-2. Ensure the Node.js version is compatible (18.x recommended)
-3. Deploy using Heroku CLI or GitHub integration
+### Calendly Integration
+```javascript
+CALENDLY_API_TOKEN=your_personal_access_token
+CALENDLY_EVENT_TYPE_UUID=your_30min_consultation_uuid
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔐 Security
+
+### Authentication Security
+- JWT tokens with automatic refresh
+- Role-based access control
+- OAuth provider validation
+- Session management with secure cookies
+
+### Database Security
+- Row Level Security (RLS) enabled
+- User data isolation
+- SQL injection prevention
+- Encrypted sensitive data
+
+### Payment Security
+- PCI-compliant payment processing
+- Secure webhook validation
+- Encrypted payment references
+- Fraud detection integration
+
+## 📊 Monitoring
+
+### Performance Monitoring
+- Next.js Analytics integration
+- Database query performance tracking
+- API response time monitoring
+- Error tracking with Sentry (ready for integration)
+
+### Business Metrics
+- User registration and onboarding rates
+- Job application conversion rates
+- Payment processing success rates
+- Meeting scheduling completion rates
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel --prod
+```
+
+### Docker
+```bash
+# Build container
+docker build -t ftn-find .
+
+# Run container
+docker run -p 3000:3000 ftn-find
+```
+
+### Manual Deployment
+```bash
+# Build production bundle
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+### Code Quality
+- ESLint for code linting
+- Prettier for code formatting
+- TypeScript for type safety
+- Husky for pre-commit hooks
