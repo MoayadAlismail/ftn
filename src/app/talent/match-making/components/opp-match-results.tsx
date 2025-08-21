@@ -82,7 +82,7 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
             }
             setAppliedIds((prev) => new Set(prev).add(opportunityId));
             toast.success("Applied successfully");
-        } catch (e) {
+        } catch {
             toast.error("Something went wrong. Please try again.");
         } finally {
             setApplyingId(null);

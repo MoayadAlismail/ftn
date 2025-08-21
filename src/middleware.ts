@@ -1,6 +1,5 @@
 import { createClient } from './lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
-import { Role } from './constants/enums'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -22,9 +21,6 @@ export async function middleware(request: NextRequest) {
     // Use replace: true for smoother redirects without adding to history
     return NextResponse.redirect(new URL('/', request.url), { status: 302 })
   }
-
-  // Get user role from session
-  const userRole = user.user_metadata?.role
 
   // Role-based route protection
   // if (pathname.startsWith('/talent') && userRole !== Role.TALENT) {

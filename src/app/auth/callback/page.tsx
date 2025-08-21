@@ -23,13 +23,12 @@ function CallbackContent() {
 
       const { user } = data.session;
       console.log(user);
-      const hasRole = user.user_metadata?.role;
 
       await supabase.auth.updateUser({
         data: { role },
       });
 
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData } = await supabase.auth.getUser();
       console.log(userData);
 
       // // Redirect based on role

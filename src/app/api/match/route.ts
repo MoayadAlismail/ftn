@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EnvVars } from "@/env";
 import { GoogleGenAI } from "@google/genai";
-import { supabase } from "@/lib/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 
 
@@ -11,6 +11,15 @@ const genAI = new GoogleGenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if Supabase is properly configured
+    if (!isSupabaseConfigured()) {
+      console.warn("Supabase not configured, returning placeholder response");
+      return NextResponse.json(
+        { error: "Service temporarily unavailable" },
+        { status: 503 }
+      );
+    }
+
     console.log("🚀 Match API route hit");
     const body = await req.json();
     const prompt = body as string;
