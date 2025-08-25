@@ -81,6 +81,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
           <nav className="hidden md:flex items-center gap-2">
             {navigationItems.map((item) => {
               const isActive = item.href && pathname?.startsWith(item.href);
+              const isActive = item.href && pathname?.startsWith(item.href);
               return (
                 <Link
                   key={item.id}
