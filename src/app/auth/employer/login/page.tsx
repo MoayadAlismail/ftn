@@ -33,17 +33,6 @@ export default function EmployerLogin() {
     if (error) console.error("Login error:", error.message);
   };
 
-  const handleLinkedInLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "linkedin_oidc",
-      options: {
-        redirectTo: `${location.origin}/auth/callback?role=employer`,
-      },
-    });
-
-    if (error) console.error("Login error:", error.message);
-  };
-
   const handleEmailLogin = async () => {
     if (!email || !password) {
       alert("Please enter both email and password");
