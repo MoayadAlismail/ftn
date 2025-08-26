@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { OpportunityCard, type Opportunity } from "./components/opportunity-card";
-import { Plus, Search, X } from "lucide-react";
+import { OpportunityCard, type Opportunity } from "./opportunity-card";
+import { Plus, Search, X, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import LoadingAnimation from "@/components/loadingAnimation";
+import MyOpportunitiesPageSkeleton from "./skeleton";
+import Link from "next/link";
 
 
 
-export default function MyOpportunitiesPage() {
+function MyOpportunitiesPageContent() {
+    const { user, authUser, isLoading: authLoading, isAuthenticated } = useAuth();
     const router = useRouter();
-    const { user } = useAuth();
     const [opportunities, setOpportunities] = useState<Opportunity[]>();
     const [loading, setLoading] = useState(true);
     const [isApplicantsOpen, setIsApplicantsOpen] = useState(false);
@@ -21,6 +23,7 @@ export default function MyOpportunitiesPage() {
     const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
     const [applicants, setApplicants] = useState<Array<{ id: string; full_name: string; email: string; bio?: string; location_pref?: string; industry_pref?: string[]; work_style_pref?: string[] }>>([]);
 
+    
     useEffect(() => {
         const fetchOpportunities = async () => {
             setLoading(true);
@@ -162,13 +165,14 @@ export default function MyOpportunitiesPage() {
             </div>
 
             {/* Floating (+) button to post new opportunity */}
-            <Button
-                aria-label="Post a new opportunity"
-                className="!fixed top-24 right-8 z-40 w-12 h-12 rounded-full shadow-xl bg-primary hover:bg-primary/90"
-                onClick={() => router.push("/employer/dashboard/home?activeTab=post")}
-            >
-                <Plus size={18} />
-            </Button>
+            <Link href="/employer/dashboard/home?activeTab=post" prefetch={true}>
+                <Button
+                    aria-label="Post a new opportunity"
+                    className="!fixed top-24 right-8 z-40 w-12 h-12 rounded-full shadow-xl bg-primary hover:bg-primary/90"
+                >
+                    <Plus size={18} />
+                </Button>
+            </Link>
 
             {isApplicantsOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -230,5 +234,13 @@ export default function MyOpportunitiesPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function MyOpportunitiesPage() {
+    return (
+        <Suspense fallback={<MyOpportunitiesPageSkeleton />}>
+            <MyOpportunitiesPageContent />
+        </Suspense>
     );
 }

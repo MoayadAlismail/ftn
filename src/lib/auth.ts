@@ -32,7 +32,7 @@ export async function requireRole(role: Role) {
   if (userRole !== role) {
     // Redirect based on role
     if (userRole === Role.TALENT) {
-      redirect('/?step=3')
+      redirect('/onboarding/talent')
     } else if (userRole === Role.EMPLOYER) {
       redirect('/employer/onboarding')
     } else {

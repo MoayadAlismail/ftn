@@ -130,10 +130,12 @@ export default function MatchMakingPage() {
       {isScanning && <InProgress />}
       {/* {isMatchesLoading && </>} */}
       {showResults && (
-        <OppMatchResults
-          opportunities={oppMatches}
-          isLoading={isMatchesLoading}
-        />
+        <div className="mt-18">
+          <OppMatchResults
+            opportunities={oppMatches}
+            isLoading={isMatchesLoading}
+          />
+        </div>
       )}
     </div>
   );

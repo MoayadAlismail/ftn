@@ -35,21 +35,6 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
         <div className={cn("flex flex-col items-center justify-center space-y-4", className)}>
             {/* Main logo container */}
             <div className="relative">
-                {/* Background glow effect */}
-                    {/* <motion.div
-                        className={cn("absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full", sizeClasses[size])}
-                        animate={{ scale: [0, 1.5], opacity: [0.8, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: [0, 0, 0.2, 1] as any }}
-                    /> */}
-
-                {/* Outer ring
-                <motion.div
-                    className={cn("absolute inset-0 border-2 border-blue-400/40 rounded-full", sizeClasses[size])}
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: [0.4, 0, 0.6, 1] as any }}
-                /> */}
-
-                {/* Logo with spinning animation */}
                 <motion.div
                     className={cn("relative", sizeClasses[size])}
                     animate={{ rotate: 360 }}
@@ -66,21 +51,6 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
                     {/* Subtle overlay for better visual depth */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent rounded-full" />
                 </motion.div>
-
-                {/* Inner pulse ring */}
-                {/* <motion.div
-                    className="absolute inset-2 border border-blue-400/60 rounded-full"
-                    animate={{
-                        scale: [1, 1.1, 1],
-                        opacity: [0.4, 0.8, 0.4],
-                    }}
-                    transition={{
-                        duration: 1.8,
-                        repeat: Infinity,
-                        ease: [0.4, 0, 0.6, 1] as any,
-                        delay: 0.5
-                    }}
-                /> */}
 
                 {/* Sparkle effects */}
                 <motion.div
