@@ -150,10 +150,18 @@ function CallbackContent() {
 
       console.log(`Redirecting ${authUser.role} to ${redirectUrl} (onboarded: ${authUser.isOnboarded})`);
 
-      if (authUser.isOnboarded) {
-        toast.success("Welcome back!");
-      } else {
-        toast.success("Account created! Let's complete your profile.");
+      // Prevent duplicate toasts by using a session-based flag
+      const toastKey = `welcome_toast_${authUser.id}_${Date.now()}`;
+      const hasShownToast = sessionStorage.getItem('welcome_toast_shown');
+      
+      if (!hasShownToast) {
+        if (authUser.isOnboarded) {
+          toast.success("Welcome back!");
+        } else {
+          toast.success("Account created! Let's complete your profile.");
+        }
+        // Set flag to prevent duplicate toasts for this session
+        sessionStorage.setItem('welcome_toast_shown', toastKey);
       }
 
       console.log("Performing final redirect to:", redirectUrl);

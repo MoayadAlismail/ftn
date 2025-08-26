@@ -78,7 +78,6 @@ export default function EmployerLogin() {
 
       if (success && user) {
         const redirectUrl = getRedirectUrl(user);
-        toast.success("Welcome back!");
         router.push(redirectUrl);
       }
     } catch (err) {

@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users, Plus, Send } from "lucide-react";
+import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users } from "lucide-react";
 import Link from "next/link";
 import SignOutButton from "@/features/auth/SignOutButton";
 
@@ -28,28 +28,16 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
       href: "/employer/dashboard/home"
     },
     {
-      id: "post-opportunity",
-      label: "Post Opportunity",
-      icon: Plus,
-      href: "/employer/dashboard/post-opportunity"
-    },
-    {
       id: "opportunities",
-      label: "My Opportunities",
+      label: "Opportunities",
       icon: TableOfContents,
-      href: "/employer/dashboard/my-opportunities"
+      href: "/employer/dashboard/opportunities"
     },
     {
       id: "candidates",
-      label: "Saved Candidates",
+      label: "Candidates",
       icon: Users,
-      href: "/employer/dashboard/saved-candidates"
-    },
-    {
-      id: "sent-invitations",
-      label: "Sent Invitations",
-      icon: Send,
-      href: "/employer/dashboard/sent-invitations"
+      href: "/employer/dashboard/candidates"
     },
     {
       id: "billing",
@@ -80,7 +68,6 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
 
           <nav className="hidden md:flex items-center gap-2">
             {navigationItems.map((item) => {
-              const isActive = item.href && pathname?.startsWith(item.href);
               const isActive = item.href && pathname?.startsWith(item.href);
               return (
                 <Link

@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
   const onboardingRoutes = new Set([
     "/employer/onboarding",
-    "/talent/onboarding",
+    "/onboarding/talent",
   ]);
 
   if (publicRoutes.has(pathname)) {
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
           const isOnboarded = user.user_metadata?.is_onboarded;
           const redirectUrl = isOnboarded
             ? "/talent/dashboard"
-            : "/talent/onboarding";
+            : "/onboarding/talent";
           return NextResponse.redirect(new URL(redirectUrl, request.url));
         } else if (userRole === Role.EMPLOYER) {
           // Check if onboarded to determine exact redirect
@@ -102,7 +102,7 @@ export async function middleware(request: NextRequest) {
           const isOnboarded = user.user_metadata?.is_onboarded;
           const redirectUrl = isOnboarded
             ? "/talent/dashboard"
-            : "/talent/onboarding";
+            : "/onboarding/talent";
           return NextResponse.redirect(new URL(redirectUrl, request.url));
         } else if (userRole === Role.EMPLOYER) {
           const isOnboarded = user.user_metadata?.is_onboarded;
@@ -209,7 +209,7 @@ export async function middleware(request: NextRequest) {
         const isOnboarded = user.user_metadata?.is_onboarded;
         if (!isOnboarded) {
           return NextResponse.redirect(
-            new URL("/talent/onboarding", request.url)
+            new URL("/onboarding/talent", request.url)
           );
         }
       }

@@ -142,7 +142,7 @@ export async function getCurrentUser(): Promise<AuthResult> {
  */
 export function getRedirectUrl(user: AuthUser): string {
   if (user.role === Role.TALENT) {
-    return user.isOnboarded ? '/talent/dashboard' : '/talent/onboarding';
+    return user.isOnboarded ? '/talent/dashboard' : '/onboarding/talent';
   } else if (user.role === Role.EMPLOYER) {
     return user.isOnboarded ? '/employer/dashboard/home' : '/employer/onboarding';
   }

@@ -249,6 +249,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(null)
             setUser(null)
             setAuthUser(null)
+            // Clear welcome toast flag so user sees welcome message on next login
+            sessionStorage.removeItem('welcome_toast_shown')
             stopLoading()
             console.log("🔓 Context state cleared, redirecting to home using router");
             console.log("🔓 Sign out process completed");
