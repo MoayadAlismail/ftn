@@ -9,7 +9,7 @@ interface LocationPreferenceProps {
   locationPreference: string;
   setLocationPreference: (location: string) => void;
   next: () => void;
-  prev: () => void;
+  prev?: () => void;
 }
 
 export default function LocationPreference({
@@ -29,13 +29,13 @@ export default function LocationPreference({
       <Card className="w-full max-w-6xl p-8 space-y-6">
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-            <span>Step 3 of 4</span>
-            <span>{Math.round((3 / 4) * 100)}% Complete</span>
+            <span>Step 1 of 4</span>
+            <span>{Math.round((1 / 4) * 100)}% Complete</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
               className="h-full bg-primary rounded-full transition-all"
-              style={{ width: "75%" }}
+              style={{ width: "25%" }}
             />
           </div>
         </div>
@@ -66,14 +66,17 @@ export default function LocationPreference({
           </div>
 
           <div className="flex justify-between pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={prev}
-              className="w-32 cursor-pointer"
-            >
-              Back
-            </Button>
+            {prev && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prev}
+                className="w-32 cursor-pointer"
+              >
+                Back
+              </Button>
+            )}
+            {!prev && <div></div>}
             <div className="flex items-center gap-2">
               <Button
                 type="button"
