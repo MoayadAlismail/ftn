@@ -30,22 +30,13 @@ import type { Opportunity } from "@/features/talent/opportunities/components/opp
 const MOCK_OPPORTUNITY: Opportunity = {
     id: "1",
     title: "Senior Frontend Developer",
-    company: "TechCorp Saudi",
+    company_name: "TechCorp Saudi",
     location: "Riyadh",
-    workStyle: "Hybrid",
-    jobType: "Full-time",
-    experience: "Senior Level",
     industry: "Technology",
-    salaryMin: 15000,
-    salaryMax: 25000,
-    currency: "SAR",
-    description: "We are looking for a Senior Frontend Developer to join our dynamic team.",
-    requirements: ["5+ years of React experience", "Strong TypeScript skills"],
-    benefits: ["Health Insurance", "Annual Bonus", "Flexible Hours"],
+    workstyle: "Hybrid",
     skills: ["React", "TypeScript", "CSS", "JavaScript"],
-    companySize: "Medium (51-200)",
-    postedAt: "2024-01-15T10:00:00Z",
-    isRemote: false,
+    description: "We are looking for a Senior Frontend Developer to join our dynamic team.",
+    created_at: "2024-01-15T10:00:00Z",
     matchScore: 92
 };
 
@@ -244,7 +235,7 @@ export default function TalentApplicationPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Apply for Position</h1>
                     <p className="text-gray-600">
-                        {opportunity.title} at {opportunity.company}
+                        {opportunity.title} at {opportunity.company_name}
                     </p>
                 </div>
             </div>
@@ -493,7 +484,7 @@ export default function TalentApplicationPage() {
                                             Application Submitted Successfully!
                                         </h2>
                                         <p className="text-gray-600">
-                                            Your application has been sent to {opportunity.company}.
+                                            Your application has been sent to {opportunity.company_name}.
                                             You'll receive updates via email.
                                         </p>
                                     </div>
@@ -543,26 +534,18 @@ export default function TalentApplicationPage() {
                         <CardContent className="space-y-4">
                             <div>
                                 <h3 className="font-semibold text-lg">{opportunity.title}</h3>
-                                <p className="text-gray-600">{opportunity.company}</p>
+                                <p className="text-gray-600">{opportunity.company_name}</p>
                             </div>
 
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-sm">
                                     <MapPin className="h-4 w-4 text-gray-400" />
-                                    <span>{opportunity.location} • {opportunity.workStyle}</span>
+                                    <span>{opportunity.location} • {opportunity.workstyle}</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                     <Building2 className="h-4 w-4 text-gray-400" />
-                                    <span>{opportunity.jobType} • {opportunity.experience}</span>
+                                    <span>{opportunity.industry}</span>
                                 </div>
-                                {opportunity.salaryMin && (
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <DollarSign className="h-4 w-4 text-gray-400" />
-                                        <span>
-                                            {opportunity.currency} {opportunity.salaryMin.toLocaleString()} - {opportunity.salaryMax?.toLocaleString()}
-                                        </span>
-                                    </div>
-                                )}
                             </div>
 
                             <div className="flex flex-wrap gap-1">

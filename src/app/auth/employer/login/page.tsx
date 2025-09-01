@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { handleOAuthLogin, getCurrentUser, getRedirectUrl, sendAuthOTP, verifyAuthOTP } from "@/lib/auth-utils";
+import { handleOAuthLogin, getRedirectUrl, sendAuthOTP, verifyAuthOTP } from "@/lib/auth-utils";
 import { Role } from "@/constants/enums";
 import { toast } from "sonner";
 import { GoogleIcon, LinkedInIcon } from "@/components/ui/social-icons";
@@ -118,7 +118,7 @@ export default function EmployerLogin() {
       {/* Background gradient overlay */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-purple-400/20 to-pink-400/20" /> */}
 
-      <div className="grid lg:grid-cols-2 min-h-screen relative z-10">
+      <div className="grid min-h-screen relative z-10">
         {/* Left Column - Simple Form */}
         <div className="flex flex-col justify-center px-8 py-12 lg:px-16 bg-white backdrop-blur-sm">
           <AnimatePresence mode="wait">
@@ -227,20 +227,6 @@ export default function EmployerLogin() {
               </div>
             </motion.div>
           </AnimatePresence>
-        </div>
-
-        {/* Right Column - Gradient Background */}
-        <div className="hidden lg:block relative">
-          <div className="absolute inset-4 top-12 bottom-12 right-8 left-8 bg-gradient-to-br from-blue-200 via-purple-500 to-pink-500 rounded-[16px]" />
-
-          {/* Floating notification */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl max-w-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-800 font-medium">FTN helps you find the right opportunity fast.</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </main>

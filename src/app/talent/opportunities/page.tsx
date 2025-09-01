@@ -14,145 +14,11 @@ import {
 } from "lucide-react";
 import OpportunityFilters, { type OpportunityFilters as FilterType } from "@/features/talent/opportunities/components/opportunity-filters";
 import OpportunityCard, { type Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
+import OpportunitiesPageSkeleton from "./loading";
 import LoadingAnimation from "@/components/loadingAnimation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-// Mock data for demonstration
-const MOCK_OPPORTUNITIES: Opportunity[] = [
-    {
-        id: "1",
-        title: "Senior Frontend Developer",
-        company: "TechCorp Saudi",
-        location: "Riyadh",
-        workStyle: "Hybrid",
-        jobType: "Full-time",
-        experience: "Senior Level",
-        industry: "Technology",
-        salaryMin: 15000,
-        salaryMax: 25000,
-        currency: "SAR",
-        description: "We are looking for a Senior Frontend Developer to join our dynamic team. You will be responsible for building modern, responsive web applications using React, TypeScript, and modern CSS frameworks. Our ideal candidate has strong experience in frontend architecture and a passion for creating exceptional user experiences.",
-        requirements: [
-            "5+ years of React experience",
-            "Strong TypeScript skills",
-            "Experience with modern CSS frameworks",
-            "Knowledge of state management libraries",
-            "Experience with testing frameworks"
-        ],
-        benefits: [
-            "Health Insurance",
-            "Annual Bonus",
-            "Flexible Hours",
-            "Professional Development",
-            "Remote Work Options"
-        ],
-        skills: ["React", "TypeScript", "CSS", "JavaScript", "Git", "Tailwind CSS"],
-        companySize: "Medium (51-200)",
-        postedAt: "2024-01-15T10:00:00Z",
-        expiresAt: "2024-02-15T23:59:59Z",
-        isRemote: false,
-        matchScore: 92,
-        isSaved: false
-    },
-    {
-        id: "2",
-        title: "Product Manager",
-        company: "Innovation Labs",
-        location: "Jeddah",
-        workStyle: "Remote",
-        jobType: "Full-time",
-        experience: "Mid Level",
-        industry: "Technology",
-        salaryMin: 12000,
-        salaryMax: 18000,
-        currency: "SAR",
-        description: "Join our product team as a Product Manager where you'll drive the development of cutting-edge SaaS solutions. You'll work closely with engineering, design, and business teams to define product strategy and roadmap.",
-        requirements: [
-            "3+ years of product management experience",
-            "Experience with agile methodologies",
-            "Strong analytical skills",
-            "Excellent communication skills"
-        ],
-        benefits: [
-            "Equity Package",
-            "Health Insurance",
-            "Learning Budget",
-            "Flexible PTO"
-        ],
-        skills: ["Product Strategy", "Agile", "Analytics", "User Research", "Roadmapping"],
-        companySize: "Startup (1-10)",
-        postedAt: "2024-01-14T15:30:00Z",
-        isRemote: true,
-        matchScore: 85,
-        isSaved: true
-    },
-    {
-        id: "3",
-        title: "Data Scientist Intern",
-        company: "Saudi Data Co",
-        location: "Dammam",
-        workStyle: "On-site",
-        jobType: "Internship",
-        experience: "Entry Level",
-        industry: "Technology",
-        salaryMin: 3000,
-        salaryMax: 5000,
-        currency: "SAR",
-        description: "Exciting internship opportunity for a Data Scientist to work with large datasets and build machine learning models. Perfect for recent graduates or students looking to gain hands-on experience in data science.",
-        requirements: [
-            "Bachelor's degree in Data Science, Computer Science, or related field",
-            "Knowledge of Python and pandas",
-            "Basic understanding of machine learning",
-            "Strong mathematical background"
-        ],
-        benefits: [
-            "Mentorship Program",
-            "Training Budget",
-            "Networking Opportunities",
-            "Potential for Full-time Offer"
-        ],
-        skills: ["Python", "Pandas", "Machine Learning", "Statistics", "SQL"],
-        companySize: "Large (201-1000)",
-        postedAt: "2024-01-13T09:00:00Z",
-        expiresAt: "2024-01-30T23:59:59Z",
-        isRemote: false,
-        matchScore: 78,
-        isSaved: false
-    },
-    {
-        id: "4",
-        title: "Marketing Manager",
-        company: "Retail Plus",
-        location: "Riyadh",
-        workStyle: "Hybrid",
-        jobType: "Full-time",
-        experience: "Mid Level",
-        industry: "Retail",
-        salaryMin: 10000,
-        salaryMax: 15000,
-        currency: "SAR",
-        description: "Lead our marketing efforts across digital and traditional channels. You'll develop comprehensive marketing strategies, manage campaigns, and analyze performance metrics to drive business growth.",
-        requirements: [
-            "3+ years of marketing experience",
-            "Digital marketing expertise",
-            "Campaign management experience",
-            "Strong analytical skills"
-        ],
-        benefits: [
-            "Health Insurance",
-            "Performance Bonus",
-            "Career Development",
-            "Employee Discounts"
-        ],
-        skills: ["Digital Marketing", "SEO", "Social Media", "Analytics", "Campaign Management"],
-        companySize: "Large (201-1000)",
-        postedAt: "2024-01-12T14:20:00Z",
-        isRemote: false,
-        matchScore: 72,
-        isSaved: false
-    }
-];
 
 const DEFAULT_FILTERS: FilterType = {
     search: "",
@@ -167,52 +33,6 @@ const DEFAULT_FILTERS: FilterType = {
     remote: false,
     sortBy: "relevance"
 };
-
-// Loading skeleton for opportunities page
-function OpportunitiesPageSkeleton() {
-    return (
-        <div className="space-y-6 animate-pulse">
-            {/* Header skeleton */}
-            <div className="flex justify-between items-center">
-                <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-10 bg-gray-200 rounded w-24"></div>
-            </div>
-
-            {/* Filters skeleton */}
-            <div className="bg-white p-6 rounded-lg border space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-10 bg-gray-200 rounded"></div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Opportunities skeleton */}
-            <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                    <div key={i} className="bg-white p-6 rounded-lg border">
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-start">
-                                <div className="space-y-2 flex-1">
-                                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                </div>
-                                <div className="h-8 bg-gray-200 rounded w-16"></div>
-                            </div>
-                            <div className="h-4 bg-gray-200 rounded w-full"></div>
-                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                            <div className="flex gap-2">
-                                {[...Array(3)].map((_, j) => (
-                                    <div key={j} className="h-6 bg-gray-200 rounded w-16"></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
 
 function TalentOpportunitiesContent() {
     const { user, authUser, isLoading, isAuthenticated } = useAuth();
@@ -251,10 +71,41 @@ function TalentOpportunitiesContent() {
     const loadOpportunities = async () => {
         setLoading(true);
         try {
-            // In a real app, this would be an API call to your backend
-            // For demo, we'll use mock data
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-            setOpportunities(MOCK_OPPORTUNITIES);
+            const { data: opportunities, error } = await supabase
+                .from('opportunities')
+                .select(`
+                    id,
+                    title,
+                    company_name,
+                    location,
+                    industry,
+                    workstyle,
+                    skills,
+                    description,
+                    created_at
+                `)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                throw error;
+            }
+
+            // Transform database format to component format
+            const transformedOpportunities: Opportunity[] = (opportunities || []).map(opp => ({
+                id: opp.id,
+                title: opp.title,
+                company_name: opp.company_name,
+                location: opp.location,
+                industry: opp.industry,
+                workstyle: opp.workstyle,
+                skills: opp.skills || [],
+                description: opp.description,
+                created_at: opp.created_at,
+                isSaved: false, // Will be updated by saved opportunities
+                matchScore: undefined // This would come from matching algorithm
+            }));
+
+            setOpportunities(transformedOpportunities);
         } catch (error) {
             console.error("Error loading opportunities:", error);
             toast.error("Failed to load opportunities");
@@ -265,15 +116,33 @@ function TalentOpportunitiesContent() {
 
     const loadSavedOpportunities = async () => {
         try {
-            const { data: userData } = await supabase.auth.getUser();
-            if (!userData.user) return;
+            if (!authUser?.id) return;
 
-            // In a real app, fetch saved opportunities from database
-            // For demo, we'll use localStorage
-            const saved = localStorage.getItem('savedOpportunities');
-            if (saved) {
-                setSavedOpportunityIds(new Set(JSON.parse(saved)));
+            // First get the talent_id from the talents table using user_id
+            const { data: talentData, error: talentError } = await supabase
+                .from('talents')
+                .select('id')
+                .eq('user_id', authUser.id)
+                .maybeSingle();
+
+            if (talentError) {
+                throw talentError;
             }
+
+            if (!talentData?.id) return;
+
+            // Then get saved opportunities using talent_id
+            const { data: savedOpportunities, error } = await supabase
+                .from('saved_opportunities')
+                .select('opportunity_id')
+                .eq('talent_id', talentData.id);
+
+            if (error) {
+                throw error;
+            }
+
+            const savedIds = new Set(savedOpportunities?.map(item => item.opportunity_id) || []);
+            setSavedOpportunityIds(savedIds);
         } catch (error) {
             console.error("Error loading saved opportunities:", error);
         }
@@ -293,9 +162,9 @@ function TalentOpportunitiesContent() {
             const searchLower = filters.search.toLowerCase();
             filtered = filtered.filter(opp =>
                 opp.title.toLowerCase().includes(searchLower) ||
-                opp.company.toLowerCase().includes(searchLower) ||
+                opp.company_name.toLowerCase().includes(searchLower) ||
                 opp.description.toLowerCase().includes(searchLower) ||
-                opp.skills.some(skill => skill.toLowerCase().includes(searchLower))
+                (opp.skills && opp.skills.some(skill => skill.toLowerCase().includes(searchLower)))
             );
         }
 
@@ -313,45 +182,17 @@ function TalentOpportunitiesContent() {
             );
         }
 
-        // Apply job type filter
-        if (filters.jobType.length > 0) {
-            filtered = filtered.filter(opp =>
-                filters.jobType.includes(opp.jobType)
-            );
-        }
-
-        // Apply experience level filter
-        if (filters.experienceLevel.length > 0) {
-            filtered = filtered.filter(opp =>
-                filters.experienceLevel.includes(opp.experience)
-            );
-        }
 
         // Apply work style filter
         if (filters.workStyle.length > 0) {
             filtered = filtered.filter(opp =>
-                filters.workStyle.includes(opp.workStyle)
-            );
-        }
-
-        // Apply salary range filter
-        filtered = filtered.filter(opp => {
-            if (!opp.salaryMin && !opp.salaryMax) return true;
-            const minSalary = opp.salaryMin || 0;
-            const maxSalary = opp.salaryMax || Infinity;
-            return maxSalary >= filters.salaryRange[0] && minSalary <= filters.salaryRange[1];
-        });
-
-        // Apply company size filter
-        if (filters.companySize.length > 0) {
-            filtered = filtered.filter(opp =>
-                filters.companySize.includes(opp.companySize)
+                filters.workStyle.includes(opp.workstyle)
             );
         }
 
         // Apply remote filter
         if (filters.remote) {
-            filtered = filtered.filter(opp => opp.isRemote || opp.workStyle === "Remote");
+            filtered = filtered.filter(opp => opp.workstyle.toLowerCase().includes('remote'));
         }
 
         // Apply posted within filter
@@ -365,25 +206,27 @@ function TalentOpportunitiesContent() {
                 "1m": 30
             };
             const daysAgo = timeMap[filters.postedWithin];
-            if (daysAgo) {
+            if (daysAgo && opportunities[0]?.created_at) {
                 const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-                filtered = filtered.filter(opp => new Date(opp.postedAt) >= cutoffDate);
+                filtered = filtered.filter(opp => opp.created_at && new Date(opp.created_at) >= cutoffDate);
             }
         }
 
         // Apply sorting
         switch (filters.sortBy) {
             case "newest":
-                filtered.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+                filtered.sort((a, b) => {
+                    const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+                    const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+                    return bDate - aDate;
+                });
                 break;
             case "oldest":
-                filtered.sort((a, b) => new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime());
-                break;
-            case "salary_high":
-                filtered.sort((a, b) => (b.salaryMax || 0) - (a.salaryMax || 0));
-                break;
-            case "salary_low":
-                filtered.sort((a, b) => (a.salaryMin || 0) - (b.salaryMin || 0));
+                filtered.sort((a, b) => {
+                    const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+                    const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+                    return aDate - bDate;
+                });
                 break;
             case "relevance":
             default:
@@ -396,12 +239,42 @@ function TalentOpportunitiesContent() {
 
     const handleSaveOpportunity = async (opportunityId: string) => {
         try {
+            if (!authUser?.id) {
+                toast.error("Please log in to save opportunities");
+                return;
+            }
+
+            // First get the talent_id from the talents table using user_id
+            const { data: talentData, error: talentError } = await supabase
+                .from('talents')
+                .select('id')
+                .eq('user_id', authUser.id)
+                .maybeSingle();
+
+            if (talentError) {
+                throw talentError;
+            }
+
+            if (!talentData?.id) {
+                toast.error("Talent profile not found");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('saved_opportunities')
+                .insert({
+                    talent_id: talentData.id,
+                    opportunity_id: opportunityId,
+                    saved_at: new Date().toISOString()
+                });
+
+            if (error) {
+                throw error;
+            }
+
             const newSavedIds = new Set(savedOpportunityIds);
             newSavedIds.add(opportunityId);
             setSavedOpportunityIds(newSavedIds);
-
-            // In a real app, save to database
-            localStorage.setItem('savedOpportunities', JSON.stringify(Array.from(newSavedIds)));
 
             toast.success("Opportunity saved successfully");
         } catch (error) {
@@ -412,12 +285,40 @@ function TalentOpportunitiesContent() {
 
     const handleUnsaveOpportunity = async (opportunityId: string) => {
         try {
+            if (!authUser?.id) {
+                toast.error("Please log in to manage saved opportunities");
+                return;
+            }
+
+            // First get the talent_id from the talents table using user_id
+            const { data: talentData, error: talentError } = await supabase
+                .from('talents')
+                .select('id')
+                .eq('user_id', authUser.id)
+                .maybeSingle();
+
+            if (talentError) {
+                throw talentError;
+            }
+
+            if (!talentData?.id) {
+                toast.error("Talent profile not found");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('saved_opportunities')
+                .delete()
+                .eq('talent_id', talentData.id)
+                .eq('opportunity_id', opportunityId);
+
+            if (error) {
+                throw error;
+            }
+
             const newSavedIds = new Set(savedOpportunityIds);
             newSavedIds.delete(opportunityId);
             setSavedOpportunityIds(newSavedIds);
-
-            // In a real app, remove from database
-            localStorage.setItem('savedOpportunities', JSON.stringify(Array.from(newSavedIds)));
 
             toast.success("Opportunity removed from saved");
         } catch (error) {

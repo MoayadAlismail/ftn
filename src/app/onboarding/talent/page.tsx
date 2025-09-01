@@ -14,7 +14,7 @@ import SelectIndustries from "@/features/talent/onboarding/components/select-ind
 import SelectOpportunities from "@/features/talent/onboarding/components/select-opportunities";
 import AboutYourself from "@/features/talent/onboarding/components/about-yourself";
 
-// Define the onboarding steps (removed resume upload since it's done on landing page)
+// Define the onboarding steps
 const ONBOARDING_STEPS = [
     {
         id: 'location',

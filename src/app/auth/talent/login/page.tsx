@@ -146,7 +146,7 @@ function TalentLoginContent() {
 
   const handleSocialLogin = async (provider: 'google' | 'github' | 'linkedin_oidc') => {
     setIsLoading(true);
-
+    console.log("This will redirect you back to:" ,window.location.origin);
     const { success, error } = await handleOAuthLogin(
       provider,
       Role.TALENT,

@@ -57,7 +57,7 @@ export default function EmployerDashboardHomeContent() {
   useEffect(() => {
     const fetchSavedCandidates = async () => {
       if (!user?.id) return;
-      
+
       const { data, error } = await supabase
         .from("saved_candidates")
         .select("talent_id")
@@ -73,7 +73,7 @@ export default function EmployerDashboardHomeContent() {
   useEffect(() => {
     const fetchInvitedCandidates = async () => {
       if (!user?.id) return;
-      
+
       const { data, error } = await supabase
         .from("invites")
         .select("talent_id")
@@ -100,6 +100,7 @@ export default function EmployerDashboardHomeContent() {
       });
 
       const matchesResults = await response.json();
+      console.log("Search matches:", matchesResults);
       setMatches(matchesResults);
     } catch (error) {
       console.error("Search error:", error);
@@ -247,130 +248,138 @@ export default function EmployerDashboardHomeContent() {
                   {matches.length} matches found
                 </span>
               </div>
-              <div className="grid gap-4">
-                {matches.map((talent, index) => (
-                  <motion.div
-                    key={talent.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <Card className="p-6 hover:shadow-md transition-shadow">
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="h-6 w-6 text-primary" />
-                            </div>
-                            <div>
-                              <h4 className="text-lg font-semibold">
-                                {talent.name}
-                              </h4>
-                              <div className="flex items-center text-gray-500 text-sm">
-                                <Mail className="w-4 h-4 mr-1" />
-                                <span>{talent.email}</span>
+              {!matches || matches.length === 0 ? (
+                <div className="text-center text-gray-500 py-10">
+                  No matching talents found. Try a different search!
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {matches.map((talent, index) => (
+                    <motion.div
+                      key={talent.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                    >
+                      <Card className="p-6 hover:shadow-md transition-shadow">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-3">
+                              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <User className="h-6 w-6 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="text-lg font-semibold">
+                                  {talent.name}
+                                </h4>
+                                <div className="flex items-center text-gray-500 text-sm">
+                                  <Mail className="w-4 h-4 mr-1" />
+                                  <span>{talent.email}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => saveCandidate(String(talent.id))}
-                              disabled={savedCandidatesIds.has(
-                                String(talent.id)
-                              )}
-                            >
-                              {savedCandidatesIds.has(String(talent.id))
-                                ? "Saved"
-                                : "Save"}
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="cursor-pointer bg-primary hover:bg-primary/90"
-                              onClick={() => handleOpenInvite(talent.id)}
-                              disabled={invitedIds.has(String(talent.id))}
-                            >
-                              {invitedIds.has(String(talent.id))
-                                ? "Invited"
-                                : "Invite"}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 bg-gray-50/50 p-3 rounded-md">
-                          <FileText className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
-                          <p className="text-gray-600 text-sm">{talent.bio}</p>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div className="flex items-start gap-2">
-                            <Users2 className="w-4 h-4 text-gray-400 mt-1" />
-                            <div>
-                              <div className="text-xs font-medium text-gray-500 mb-1">
-                                Work Style
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {talent.work_style_pref.map((pref, i) => (
-                                  <span
-                                    key={i}
-                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
-                                  >
-                                    {pref}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {inviteOpenId === talent.id && (
-                          <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
-                            <div className="text-xs font-medium text-gray-500 mb-2">
-                              Message to candidate
-                            </div>
-                            <Textarea
-                              placeholder={`Hi ${
-                                talent.name?.split(" ")[0] || "there"
-                              }, I think you'd be a great fit...`}
-                              className="min-h-[90px]"
-                              value={inviteMessages[String(talent.id)] || ""}
-                              onChange={(e) =>
-                                handleInviteMessageChange(
-                                  talent.id,
-                                  e.target.value
-                                )
-                              }
-                            />
-                            <div className="mt-2 flex items-center gap-2 justify-end">
+                            <div className="flex items-center gap-2">
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="cursor-pointer"
-                                onClick={() => setInviteOpenId(null)}
+                                onClick={() => saveCandidate(String(talent.id))}
+                                disabled={savedCandidatesIds.has(
+                                  String(talent.id)
+                                )}
                               >
-                                Cancel
+                                {savedCandidatesIds.has(String(talent.id))
+                                  ? "Saved"
+                                  : "Save"}
                               </Button>
                               <Button
                                 size="sm"
                                 className="cursor-pointer bg-primary hover:bg-primary/90"
-                                onClick={() => handleSendInvite(talent.id)}
-                                disabled={invitingId === String(talent.id)}
+                                onClick={() => handleOpenInvite(talent.id)}
+                                disabled={invitedIds.has(String(talent.id))}
                               >
-                                {invitingId === String(talent.id) ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  "Send Invite"
-                                )}
+                                {invitedIds.has(String(talent.id))
+                                  ? "Invited"
+                                  : "Invite"}
                               </Button>
                             </div>
                           </div>
-                        )}
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+
+                          <div className="flex gap-2 bg-gray-50/50 p-3 rounded-md">
+                            <FileText className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                            <p className="text-gray-600 text-sm">
+                              {talent.bio}
+                            </p>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div className="flex items-start gap-2">
+                              <Users2 className="w-4 h-4 text-gray-400 mt-1" />
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 mb-1">
+                                  Work Style
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {talent.work_style_pref.map((pref, i) => (
+                                    <span
+                                      key={i}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
+                                    >
+                                      {pref}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {inviteOpenId === talent.id && (
+                            <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
+                              <div className="text-xs font-medium text-gray-500 mb-2">
+                                Message to candidate
+                              </div>
+                              <Textarea
+                                placeholder={`Hi ${
+                                  talent.name?.split(" ")[0] || "there"
+                                }, I think you'd be a great fit...`}
+                                className="min-h-[90px]"
+                                value={inviteMessages[String(talent.id)] || ""}
+                                onChange={(e) =>
+                                  handleInviteMessageChange(
+                                    talent.id,
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <div className="mt-2 flex items-center gap-2 justify-end">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="cursor-pointer"
+                                  onClick={() => setInviteOpenId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="cursor-pointer bg-primary hover:bg-primary/90"
+                                  onClick={() => handleSendInvite(talent.id)}
+                                  disabled={invitingId === String(talent.id)}
+                                >
+                                  {invitingId === String(talent.id) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    "Send Invite"
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </motion.div>
