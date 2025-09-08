@@ -126,7 +126,7 @@ export default function OpportunityDetailModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
           {/* Backdrop */}
           <motion.div
             variants={backdropVariants}
@@ -143,11 +143,11 @@ export default function OpportunityDetailModal({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative w-full max-w-4xl max-h-[90vh] mx-auto"
+            className="relative w-full max-w-2xl lg:max-w-4xl h-[80vh] sm:h-[85vh] max-h-[80vh] sm:max-h-[85vh] min-h-[400px] mx-auto"
           >
-            <Card className="bg-white rounded-xl sm:rounded-2xl shadow-2xl h-full overflow-hidden">
+            <Card className="bg-white rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full">
               {/* Header */}
-              <div className="relative p-4 sm:p-6 bg-gradient-to-br from-primary/8 via-primary/6 to-primary/10 border-b">
+              <div className="relative p-4 sm:p-6 bg-gradient-to-br from-primary/8 via-primary/6 to-primary/10 border-b flex-shrink-0">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -214,7 +214,7 @@ export default function OpportunityDetailModal({
               </div>
 
               {/* Content */}
-              <div className="overflow-y-scroll max-h-[60vh]">
+              <div className="flex-1 overflow-y-auto">
                 <div className="p-4 sm:p-6 space-y-6">
                   {/* Job Description */}
                   <div>
@@ -397,41 +397,41 @@ export default function OpportunityDetailModal({
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Footer */}
-              <div className="px-4 sm:px-6 py-5 border-t bg-white shadow-lg">
-                <div className="flex items-center justify-center">
-                  {!hasApplied ? (
-                    <Button
-                      onClick={handleApply}
-                      disabled={isApplying || isApplyingLocal}
-                      className="px-8 py-3 font-bold bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                      size="lg"
-                    >
-                      {(isApplying || isApplyingLocal) ? (
-                        <>
-                          <Loader2 size={20} className="animate-spin mr-2" />
-                          Applying...
-                        </>
+                  {/* Apply Button - Now inside scrollable area */}
+                  <div className="border-t pt-6 pb-6 bg-white">
+                    <div className="flex items-center justify-center">
+                      {!hasApplied ? (
+                        <Button
+                          onClick={handleApply}
+                          disabled={isApplying || isApplyingLocal}
+                          className="px-8 py-3 font-bold bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                          size="lg"
+                        >
+                          {(isApplying || isApplyingLocal) ? (
+                            <>
+                              <Loader2 size={20} className="animate-spin mr-2" />
+                              Applying...
+                            </>
+                          ) : (
+                            <>
+                              Apply Now
+                              <span className="ml-2 text-lg">→</span>
+                            </>
+                          )}
+                        </Button>
                       ) : (
-                        <>
-                          Apply Now
-                          <span className="ml-2 text-lg">→</span>
-                        </>
+                        <Button 
+                          disabled 
+                          className="px-8 py-3 font-bold bg-green-600 hover:bg-green-600 text-white shadow-lg"
+                          size="lg"
+                        >
+                          <span className="mr-2 text-lg">✓</span>
+                          Applied
+                        </Button>
                       )}
-                    </Button>
-                  ) : (
-                    <Button 
-                      disabled 
-                      className="px-8 py-3 font-bold bg-green-600 hover:bg-green-600 text-white shadow-lg"
-                      size="lg"
-                    >
-                      <span className="mr-2 text-lg">✓</span>
-                      Applied
-                    </Button>
-                  )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
