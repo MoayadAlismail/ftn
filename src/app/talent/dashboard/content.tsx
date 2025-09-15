@@ -70,31 +70,33 @@ export default function TalentDashboardContent() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      {/* Welcome Header - Mobile Optimized */}
+      <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-4 md:p-6">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-2">
           Welcome back{authUser?.fullName ? `, ${authUser.fullName}` : ''}!
         </h1>
-        <p className="text-gray-600">Manage your profile, find opportunities, and track your applications.</p>
+        <p className="text-sm md:text-base text-gray-600">Manage your profile, find opportunities, and track your applications.</p>
       </div>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs - Mobile Optimized */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 size={16} />
-            Overview
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+          <TabsTrigger value="overview" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+            <BarChart3 size={14} className="md:size-4" />
+            <span className="hidden sm:inline">Overview</span>
+            <span className="sm:hidden">Stats</span>
           </TabsTrigger>
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User size={16} />
+          <TabsTrigger value="profile" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+            <User size={14} className="md:size-4" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="applications" className="flex items-center gap-2">
-            <FileText size={16} />
-            Applications
+          <TabsTrigger value="applications" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+            <FileText size={14} className="md:size-4" />
+            <span className="hidden sm:inline">Applications</span>
+            <span className="sm:hidden">Apps</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings size={16} />
+          <TabsTrigger value="settings" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+            <Settings size={14} className="md:size-4" />
             Settings
           </TabsTrigger>
         </TabsList>

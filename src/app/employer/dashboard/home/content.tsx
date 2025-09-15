@@ -168,11 +168,11 @@ export default function EmployerDashboardHomeContent() {
   };
 
   return (
-    <div className="relative mx-auto max-w-5xl px-4 py-10">
-      {/* Subtle gradient background glow */}
+    <div className="relative mx-auto max-w-5xl px-3 sm:px-4 py-6 sm:py-10">
+      {/* Subtle gradient background glow - Mobile optimized */}
       <div className="pointer-events-none absolute -z-10 inset-0">
-        <div className="absolute top-24 left-10 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-24 right-10 w-80 h-80 rounded-full bg-violet-300/20 blur-3xl" />
+        <div className="absolute top-12 sm:top-24 left-4 sm:left-10 w-32 h-32 sm:w-64 sm:h-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute bottom-12 sm:bottom-24 right-4 sm:right-10 w-40 h-40 sm:w-80 sm:h-80 rounded-full bg-violet-300/20 blur-3xl" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -183,18 +183,18 @@ export default function EmployerDashboardHomeContent() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Heading */}
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center text-5xl mb-3">
+          {/* Heading - Mobile optimized */}
+          <div className="text-center mb-6 sm:mb-10">
+            <div className="inline-flex items-center justify-center text-3xl sm:text-5xl mb-2 sm:mb-3">
               ✌️
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 sm:mb-6 px-2">
               Find the perfect fit for any role
             </h1>
           </div>
 
-          {/* Search box */}
-          <div className="relative overflow-hidden rounded-3xl p-4 sm:p-6 bg-white/80 backdrop-blur border border-transparent shadow-[0_10px_40px_-10px_rgba(148,74,219,0.25)]">
+          {/* Search box - Mobile optimized */}
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-6 bg-white/80 backdrop-blur border border-transparent shadow-[0_10px_40px_-10px_rgba(148,74,219,0.25)]">
             <ShineBorder
               borderWidth={2}
               duration={16}
@@ -203,13 +203,13 @@ export default function EmployerDashboardHomeContent() {
             />
             <Textarea
               placeholder="Describe your ideal candidate, and we'll find matching student profile."
-              className="min-h-[120px] text-base md:text-lg border-0 focus:border-transparent focus-visible:ring-0 outline-none bg-transparent resize-none rounded-2xl placeholder:text-gray-500/80"
+              className="min-h-[100px] sm:min-h-[120px] text-sm sm:text-base md:text-lg border-0 focus:border-transparent focus-visible:ring-0 outline-none bg-transparent resize-none rounded-2xl placeholder:text-gray-500/80"
               value={prompt}
               onChange={(e) => setprompt(e.target.value)}
             />
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-3 sm:mt-4">
               <Button
-                className="px-6 md:px-8 h-11 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg"
+                className="px-4 sm:px-6 md:px-8 h-10 sm:h-11 text-sm sm:text-base bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg"
                 onClick={handleSearch}
               >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
@@ -219,41 +219,41 @@ export default function EmployerDashboardHomeContent() {
             </div>
           </div>
 
-          {/* Sample searches */}
-          <div className="mt-6">
-            <div className="flex items-center text-sm text-gray-600 mb-3">
+          {/* Sample searches - Mobile optimized */}
+          <div className="mt-4 sm:mt-6">
+            <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-3">
               <WandSparkles className="w-4 h-4 mr-2 text-primary" />
               Or try a sample search:
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 sm:gap-3">
               {suggestions.map((s, i) => (
                 <Button
                   key={i}
                   variant="outline"
-                  className="justify-start h-auto py-3 text-gray-700 border-violet-200 hover:bg-violet-50"
+                  className="justify-start h-auto py-2 sm:py-3 text-xs sm:text-sm text-gray-700 border-violet-200 hover:bg-violet-50 text-left whitespace-normal break-words min-h-[40px] w-full"
                   onClick={() => handleSuggestionClick(s)}
                 >
-                  {s}
+                  <span className="text-left leading-tight">{s}</span>
                 </Button>
               ))}
             </div>
           </div>
 
-          {/* Results */}
+          {/* Results - Mobile optimized */}
           {showResults && (
-            <div className="mt-10 space-y-4">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">Matching Talents</h3>
-                <span className="text-sm text-gray-500">
+            <div className="mt-6 sm:mt-10 space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
+                <h3 className="text-base sm:text-lg font-semibold">Matching Talents</h3>
+                <span className="text-xs sm:text-sm text-gray-500">
                   {matches.length} matches found
                 </span>
               </div>
               {!matches || matches.length === 0 ? (
-                <div className="text-center text-gray-500 py-10">
+                <div className="text-center text-gray-500 py-8 sm:py-10">
                   No matching talents found. Try a different search!
                 </div>
               ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-3 sm:gap-4">
                   {matches.map((talent, index) => (
                     <motion.div
                       key={talent.id}
@@ -261,8 +261,80 @@ export default function EmployerDashboardHomeContent() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
-                      <Card className="p-6 hover:shadow-md transition-shadow">
-                        <div className="space-y-4">
+                      <Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+                        {/* Mobile Layout - Stack vertically */}
+                        <div className="block sm:hidden space-y-4">
+                          {/* Header */}
+                          <div className="flex items-start gap-3">
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-base font-semibold truncate">
+                                {talent.name}
+                              </h4>
+                              <div className="flex items-center text-gray-500 text-xs">
+                                <Mail className="w-3 h-3 mr-1 flex-shrink-0" />
+                                <span className="truncate">{talent.email}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Bio */}
+                          <div className="flex gap-2 bg-gray-50/50 p-3 rounded-md">
+                            <FileText className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                            <p className="text-gray-600 text-sm line-clamp-2">
+                              {talent.bio}
+                            </p>
+                          </div>
+
+                          {/* Work Style */}
+                          <div className="space-y-2">
+                            <div className="text-xs font-medium text-gray-500">
+                              Work Style
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {talent.work_style_pref.map((pref, i) => (
+                                <span
+                                  key={i}
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
+                                >
+                                  {pref}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons - Mobile */}
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              size="sm"
+                              className="w-full cursor-pointer bg-primary hover:bg-primary/90"
+                              onClick={() => handleOpenInvite(talent.id)}
+                              disabled={invitedIds.has(String(talent.id))}
+                            >
+                              {invitedIds.has(String(talent.id))
+                                ? "Invited"
+                                : "Invite"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                              onClick={() => saveCandidate(String(talent.id))}
+                              disabled={savedCandidatesIds.has(
+                                String(talent.id)
+                              )}
+                            >
+                              {savedCandidatesIds.has(String(talent.id))
+                                ? "Saved"
+                                : "Save"}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Desktop Layout - Original horizontal layout */}
+                        <div className="hidden sm:block space-y-4">
                           <div className="flex justify-between items-start">
                             <div className="flex items-center gap-3">
                               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -331,50 +403,51 @@ export default function EmployerDashboardHomeContent() {
                               </div>
                             </div>
                           </div>
-
-                          {inviteOpenId === talent.id && (
-                            <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
-                              <div className="text-xs font-medium text-gray-500 mb-2">
-                                Message to candidate
-                              </div>
-                              <Textarea
-                                placeholder={`Hi ${
-                                  talent.name?.split(" ")[0] || "there"
-                                }, I think you'd be a great fit...`}
-                                className="min-h-[90px]"
-                                value={inviteMessages[String(talent.id)] || ""}
-                                onChange={(e) =>
-                                  handleInviteMessageChange(
-                                    talent.id,
-                                    e.target.value
-                                  )
-                                }
-                              />
-                              <div className="mt-2 flex items-center gap-2 justify-end">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="cursor-pointer"
-                                  onClick={() => setInviteOpenId(null)}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  className="cursor-pointer bg-primary hover:bg-primary/90"
-                                  onClick={() => handleSendInvite(talent.id)}
-                                  disabled={invitingId === String(talent.id)}
-                                >
-                                  {invitingId === String(talent.id) ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    "Send Invite"
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                          )}
                         </div>
+
+                        {/* Invite Message Section - Works for both mobile and desktop */}
+                        {inviteOpenId === talent.id && (
+                          <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
+                            <div className="text-xs font-medium text-gray-500 mb-2">
+                              Message to candidate
+                            </div>
+                            <Textarea
+                              placeholder={`Hi ${
+                                talent.name?.split(" ")[0] || "there"
+                              }, I think you'd be a great fit...`}
+                              className="min-h-[70px] sm:min-h-[90px] text-sm"
+                              value={inviteMessages[String(talent.id)] || ""}
+                              onChange={(e) =>
+                                handleInviteMessageChange(
+                                  talent.id,
+                                  e.target.value
+                                )
+                              }
+                            />
+                            <div className="mt-2 flex flex-col sm:flex-row items-center gap-2 justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full sm:w-auto cursor-pointer"
+                                onClick={() => setInviteOpenId(null)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="w-full sm:w-auto cursor-pointer bg-primary hover:bg-primary/90"
+                                onClick={() => handleSendInvite(talent.id)}
+                                disabled={invitingId === String(talent.id)}
+                              >
+                                {invitingId === String(talent.id) ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  "Send Invite"
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </Card>
                     </motion.div>
                   ))}

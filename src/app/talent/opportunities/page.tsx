@@ -350,39 +350,44 @@ function TalentOpportunitiesContent() {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Browse Opportunities</h1>
-                    <p className="text-gray-600 mt-1">
-                        Discover opportunities that match your skills and interests
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={handleRefresh}
-                        disabled={refreshing}
-                        size="sm"
-                    >
-                        <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                        Refresh
-                    </Button>
-                    <div className="flex items-center border rounded-lg">
+            {/* Header - Mobile Optimized */}
+            <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Browse Opportunities</h1>
+                        <p className="text-sm md:text-base text-gray-600 mt-1">
+                            Discover opportunities that match your skills and interests
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <Button
-                            variant={viewMode === "list" ? "default" : "ghost"}
+                            variant="outline"
+                            onClick={handleRefresh}
+                            disabled={refreshing}
                             size="sm"
-                            onClick={() => setViewMode("list")}
+                            className="flex-1 sm:flex-none"
                         >
-                            <List className="h-4 w-4" />
+                            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                            <span className="hidden sm:inline">Refresh</span>
                         </Button>
-                        <Button
-                            variant={viewMode === "grid" ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => setViewMode("grid")}
-                        >
-                            <Grid className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center border rounded-lg">
+                            <Button
+                                variant={viewMode === "list" ? "default" : "ghost"}
+                                size="sm"
+                                onClick={() => setViewMode("list")}
+                                aria-label="List view"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === "grid" ? "default" : "ghost"}
+                                size="sm"
+                                onClick={() => setViewMode("grid")}
+                                aria-label="Grid view"
+                            >
+                                <Grid className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -415,7 +420,7 @@ function TalentOpportunitiesContent() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className={viewMode === "grid" ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : "space-y-6"}>
+                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6" : "space-y-4 md:space-y-6"}>
                     {filteredOpportunities.map((opportunity) => (
                         <OpportunityCard
                             key={opportunity.id}

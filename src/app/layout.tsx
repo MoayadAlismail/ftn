@@ -26,6 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${sora.variable} antialiased font-sans`}
+        suppressHydrationWarning={true}
       >
         <LoadingProvider>
           <AuthProvider>

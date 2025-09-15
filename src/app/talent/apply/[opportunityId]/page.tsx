@@ -225,25 +225,63 @@ export default function TalentApplicationPage() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" onClick={() => router.back()}>
+        <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-4 md:space-y-6">
+            {/* Header - Mobile Optimized */}
+            <div className="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
+                <Button variant="ghost" onClick={() => router.back()} className="w-fit">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Apply for Position</h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Apply for Position</h1>
+                    <p className="text-sm md:text-base text-gray-600 mt-1">
                         {opportunity.title} at {opportunity.company_name}
                     </p>
                 </div>
             </div>
 
-            {/* Progress Steps */}
+            {/* Progress Steps - Mobile Optimized */}
             <Card>
-                <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
+                <CardContent className="pt-4 md:pt-6">
+                    {/* Mobile Layout - Stacked */}
+                    <div className="block md:hidden space-y-4">
+                        {[
+                            { key: 'application', label: 'Application', icon: Info },
+                            { key: 'payment', label: 'Payment', icon: CreditCard },
+                            { key: 'confirmation', label: 'Confirmation', icon: Check }
+                        ].map((stepItem, index) => {
+                            const Icon = stepItem.icon;
+                            const isActive = step === stepItem.key;
+                            const isCompleted = ['application', 'payment', 'confirmation'].indexOf(step) > index;
+
+                            return (
+                                <div key={stepItem.key} className="flex items-center">
+                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${isCompleted ? 'bg-green-500 text-white' :
+                                        isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'
+                                        }`}>
+                                        <Icon className="h-4 w-4" />
+                                    </div>
+                                    <span className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-600'
+                                        }`}>
+                                        {stepItem.label}
+                                    </span>
+                                    {isActive && (
+                                        <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                            Current
+                                        </span>
+                                    )}
+                                    {isCompleted && (
+                                        <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                            ✓ Done
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Desktop Layout - Horizontal */}
+                    <div className="hidden md:flex items-center justify-between">
                         {[
                             { key: 'application', label: 'Application', icon: Info },
                             { key: 'payment', label: 'Payment', icon: CreditCard },
@@ -275,58 +313,59 @@ export default function TalentApplicationPage() {
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-4 lg:space-y-6">
                     {step === 'application' && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="space-y-6"
+                            className="space-y-4 lg:space-y-6"
                         >
                             <Card>
-                                <CardHeader>
-                                    <CardTitle>Application Details</CardTitle>
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg md:text-xl">Application Details</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <Label htmlFor="coverLetter">Cover Letter *</Label>
+                                        <Label htmlFor="coverLetter" className="text-sm font-medium">Cover Letter *</Label>
                                         <Textarea
                                             id="coverLetter"
                                             placeholder="Tell us why you're interested in this position and what makes you a great fit..."
                                             value={coverLetter}
                                             onChange={(e) => setCoverLetter(e.target.value)}
-                                            className="min-h-[150px] mt-2"
+                                            className="min-h-[120px] md:min-h-[150px] mt-2 text-sm"
                                         />
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="portfolio">Portfolio/Website URL</Label>
+                                        <Label htmlFor="portfolio" className="text-sm font-medium">Portfolio/Website URL</Label>
                                         <Input
                                             id="portfolio"
                                             type="url"
                                             placeholder="https://yourportfolio.com"
                                             value={portfolioUrl}
                                             onChange={(e) => setPortfolioUrl(e.target.value)}
-                                            className="mt-2"
+                                            className="mt-2 text-sm"
                                         />
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="availability">When can you start?</Label>
+                                        <Label htmlFor="availability" className="text-sm font-medium">When can you start?</Label>
                                         <Input
                                             id="availability"
                                             placeholder="e.g., Immediately, 2 weeks notice, etc."
                                             value={availability}
                                             onChange={(e) => setAvailability(e.target.value)}
-                                            className="mt-2"
+                                            className="mt-2 text-sm"
                                         />
                                     </div>
 
                                     <Button
                                         onClick={handleSubmitApplication}
                                         disabled={processing}
-                                        className="w-full"
+                                        className="w-full h-12"
+                                        size="lg"
                                     >
                                         {processing ? 'Submitting...' : 'Continue to Payment'}
                                     </Button>
@@ -390,12 +429,13 @@ export default function TalentApplicationPage() {
                                             </div>
                                         )}
 
-                                        <div className="text-sm text-gray-600">
-                                            <p className="flex items-center gap-1">
-                                                <Info className="h-3 w-3" />
-                                                Try: <span className="font-mono bg-gray-100 px-1 rounded">TALENT20</span>,
-                                                <span className="font-mono bg-gray-100 px-1 rounded">NEWUSER</span>, or
-                                                <span className="font-mono bg-gray-100 px-1 rounded">STUDENT</span>
+                                        <div className="text-xs md:text-sm text-gray-600">
+                                            <p className="flex flex-wrap items-center gap-1">
+                                                <Info className="h-3 w-3 flex-shrink-0" />
+                                                <span>Try:</span>
+                                                <span className="font-mono bg-gray-100 px-1 rounded text-xs">TALENT20</span>,
+                                                <span className="font-mono bg-gray-100 px-1 rounded text-xs">NEWUSER</span>, or
+                                                <span className="font-mono bg-gray-100 px-1 rounded text-xs">STUDENT</span>
                                             </p>
                                         </div>
                                     </div>
@@ -404,7 +444,7 @@ export default function TalentApplicationPage() {
 
                                     {/* Payment Method Selection */}
                                     <div className="space-y-4">
-                                        <Label>Payment Method</Label>
+                                        <Label className="text-sm font-medium">Payment Method</Label>
                                         <div className="grid grid-cols-1 gap-3">
                                             {[
                                                 { id: 'card', name: 'Credit/Debit Card', icon: '💳', desc: 'Visa, Mastercard, Mada' },
@@ -413,7 +453,7 @@ export default function TalentApplicationPage() {
                                             ].map((method) => (
                                                 <div
                                                     key={method.id}
-                                                    className={`p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === method.id
+                                                    className={`p-3 md:p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === method.id
                                                         ? 'border-blue-500 bg-blue-50'
                                                         : 'border-gray-200 hover:border-gray-300'
                                                         }`}
@@ -472,48 +512,51 @@ export default function TalentApplicationPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="space-y-6"
+                            className="space-y-4 lg:space-y-6"
                         >
                             <Card>
                                 <CardContent className="pt-6 text-center">
                                     <div className="mb-6">
-                                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Check className="h-8 w-8 text-green-600" />
+                                        <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Check className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
                                         </div>
-                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight">
                                             Application Submitted Successfully!
                                         </h2>
-                                        <p className="text-gray-600">
+                                        <p className="text-sm md:text-base text-gray-600 px-4">
                                             Your application has been sent to {opportunity.company_name}.
                                             You'll receive updates via email.
                                         </p>
                                     </div>
 
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-                                        <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 mb-6">
+                                        <h3 className="text-base md:text-lg font-semibold text-blue-900 mb-2">
                                             Schedule Your Consultation
                                         </h3>
-                                        <p className="text-blue-800 mb-4">
+                                        <p className="text-sm md:text-base text-blue-800 mb-4">
                                             Book a free 30-minute consultation with our career experts to maximize your chances of success.
                                         </p>
                                         <Button
                                             onClick={handleScheduleCalendly}
-                                            className="bg-blue-600 hover:bg-blue-700"
+                                            className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
+                                            size="lg"
                                         >
                                             <Calendar className="h-4 w-4 mr-2" />
                                             Schedule Meeting
                                         </Button>
                                     </div>
 
-                                    <div className="flex gap-3 justify-center">
+                                    <div className="flex flex-col md:flex-row gap-3 justify-center">
                                         <Button
                                             variant="outline"
                                             onClick={() => router.push('/talent/opportunities')}
+                                            className="w-full md:w-auto"
                                         >
                                             Browse More Jobs
                                         </Button>
                                         <Button
                                             onClick={() => router.push('/talent/dashboard')}
+                                            className="w-full md:w-auto"
                                         >
                                             View Dashboard
                                         </Button>
@@ -525,25 +568,25 @@ export default function TalentApplicationPage() {
                 </div>
 
                 {/* Sidebar */}
-                <div className="space-y-6">
+                <div className="space-y-4 lg:space-y-6">
                     {/* Opportunity Summary */}
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Position Summary</CardTitle>
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-base md:text-lg">Position Summary</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <h3 className="font-semibold text-lg">{opportunity.title}</h3>
-                                <p className="text-gray-600">{opportunity.company_name}</p>
+                                <h3 className="font-semibold text-base md:text-lg leading-tight">{opportunity.title}</h3>
+                                <p className="text-sm md:text-base text-gray-600">{opportunity.company_name}</p>
                             </div>
 
                             <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <MapPin className="h-4 w-4 text-gray-400" />
+                                <div className="flex items-center gap-2 text-xs md:text-sm">
+                                    <MapPin className="h-3 w-3 md:h-4 md:w-4 text-gray-400 flex-shrink-0" />
                                     <span>{opportunity.location} • {opportunity.workstyle}</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Building2 className="h-4 w-4 text-gray-400" />
+                                <div className="flex items-center gap-2 text-xs md:text-sm">
+                                    <Building2 className="h-3 w-3 md:h-4 md:w-4 text-gray-400 flex-shrink-0" />
                                     <span>{opportunity.industry}</span>
                                 </div>
                             </div>
@@ -557,10 +600,10 @@ export default function TalentApplicationPage() {
                             </div>
 
                             {opportunity.matchScore && (
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-2 md:p-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <span className="text-sm font-medium text-green-800">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                                        <span className="text-xs md:text-sm font-medium text-green-800">
                                             {opportunity.matchScore}% Match
                                         </span>
                                     </div>
@@ -572,22 +615,22 @@ export default function TalentApplicationPage() {
                     {/* Pricing Breakdown */}
                     {step === 'payment' && (
                         <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Pricing</CardTitle>
+                            <CardHeader className="pb-4">
+                                <CardTitle className="text-base md:text-lg">Pricing</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <div className="flex justify-between">
+                                <div className="flex justify-between text-sm">
                                     <span>Application Fee</span>
-                                    <span>SAR {baseApplicationFee}</span>
+                                    <span className="font-medium">SAR {baseApplicationFee}</span>
                                 </div>
 
                                 {appliedDiscount && (
-                                    <div className="flex justify-between text-green-600">
+                                    <div className="flex justify-between text-green-600 text-sm">
                                         <span className="flex items-center gap-1">
-                                            <Percent className="h-3 w-3" />
+                                            <Percent className="h-3 w-3 flex-shrink-0" />
                                             {appliedDiscount.code}
                                         </span>
-                                        <span>
+                                        <span className="font-medium">
                                             -{appliedDiscount.type === 'percentage'
                                                 ? `${appliedDiscount.discount}%`
                                                 : `SAR ${appliedDiscount.discount}`}
@@ -597,12 +640,12 @@ export default function TalentApplicationPage() {
 
                                 <Separator />
 
-                                <div className="flex justify-between font-semibold text-lg">
+                                <div className="flex justify-between font-semibold text-base md:text-lg">
                                     <span>Total</span>
                                     <span>SAR {finalPrice}</span>
                                 </div>
 
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs text-gray-600 leading-relaxed">
                                     Includes consultation scheduling and career guidance
                                 </div>
                             </CardContent>
@@ -611,10 +654,10 @@ export default function TalentApplicationPage() {
 
                     {/* Support */}
                     <Card>
-                        <CardContent className="pt-6">
+                        <CardContent className="pt-4 md:pt-6">
                             <div className="text-center text-sm text-gray-600">
-                                <p>Need help?</p>
-                                <Button variant="link" className="text-sm p-0 h-auto">
+                                <p className="mb-2">Need help?</p>
+                                <Button variant="link" className="text-sm p-0 h-auto text-blue-600 hover:text-blue-800">
                                     Contact Support
                                 </Button>
                             </div>

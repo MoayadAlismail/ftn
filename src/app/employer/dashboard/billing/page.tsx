@@ -129,35 +129,35 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Subscription & Billing</h1>
-        <p className="text-gray-600 mt-1">Manage your plan, usage, payment method, and invoices.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Subscription & Billing</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your plan, usage, payment method, and invoices.</p>
       </div>
 
-      {/* Current Plan & Usage */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Current Plan & Usage - Mobile Optimized */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-3">
-                <ShieldCheck className="w-6 h-6 text-green-600" />
+                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 <div>
-                  <CardTitle className="text-xl">{currentPlan.name} Plan</CardTitle>
-                  <p className="text-sm text-gray-600">{currentPlan.description}</p>
+                  <CardTitle className="text-lg sm:text-xl">{currentPlan.name} Plan</CardTitle>
+                  <p className="text-xs sm:text-sm text-gray-600">{currentPlan.description}</p>
                 </div>
               </div>
-              <Badge variant="outline" className="text-green-700 bg-green-50">
+              <Badge variant="outline" className="text-green-700 bg-green-50 self-start sm:self-auto">
                 Active
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">
+              <span className="text-xl sm:text-2xl font-bold">
                 {currentPlan.currency} {currentPlan.price}
               </span>
-              <span className="text-gray-500">per {currentPlan.interval}</span>
+              <span className="text-sm sm:text-base text-gray-500">per {currentPlan.interval}</span>
             </div>
 
             {/* Usage Metrics */}
@@ -191,42 +191,42 @@ export default function BillingPage() {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button onClick={() => handleUpgrade('professional')}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4">
+              <Button onClick={() => handleUpgrade('professional')} className="w-full sm:w-auto">
                 Upgrade Plan
               </Button>
-              <Button variant="outline" onClick={handleCancelPlan}>
+              <Button variant="outline" onClick={handleCancelPlan} className="w-full sm:w-auto">
                 Cancel Plan
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Next Billing */}
+        {/* Next Billing - Mobile Optimized */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
               Next Billing
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <p className="text-2xl font-bold">Sep 15, 2024</p>
-                <p className="text-sm text-gray-600">Auto-renewal in 12 days</p>
+                <p className="text-lg sm:text-2xl font-bold">Sep 15, 2024</p>
+                <p className="text-xs sm:text-sm text-gray-600">Auto-renewal in 12 days</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex justify-between text-sm">
+              <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                <div className="flex justify-between text-xs sm:text-sm">
                   <span>Starter Plan</span>
                   <span>SAR 49.00</span>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 mt-1">
                   <span>Tax (15%)</span>
                   <span>SAR 7.35</span>
                 </div>
                 <hr className="my-2" />
-                <div className="flex justify-between font-medium">
+                <div className="flex justify-between text-sm sm:text-base font-medium">
                   <span>Total</span>
                   <span>SAR 56.35</span>
                 </div>
@@ -236,29 +236,30 @@ export default function BillingPage() {
         </Card>
       </div>
 
-      {/* Payment Method */}
+      {/* Payment Method - Mobile Optimized */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
             Payment Method
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-6 sm:w-12 sm:h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
                 <span className="text-white text-xs font-bold">VISA</span>
               </div>
               <div>
-                <p className="font-medium">•••• •••• •••• 4242</p>
-                <p className="text-sm text-gray-600">Expires 05/27</p>
+                <p className="text-sm sm:text-base font-medium">•••• •••• •••• 4242</p>
+                <p className="text-xs sm:text-sm text-gray-600">Expires 05/27</p>
               </div>
             </div>
             <Button
               variant="outline"
               disabled={isUpdating}
               onClick={handleUpdatePayment}
+              className="w-full sm:w-auto"
             >
               {isUpdating ? (
                 <>
@@ -273,55 +274,55 @@ export default function BillingPage() {
         </CardContent>
       </Card>
 
-      {/* Available Plans */}
+      {/* Available Plans - Mobile Optimized */}
       <Card>
-        <CardHeader>
-          <CardTitle>Available Plans</CardTitle>
-          <p className="text-sm text-gray-600">Compare plans and upgrade anytime</p>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-base sm:text-lg">Available Plans</CardTitle>
+          <p className="text-xs sm:text-sm text-gray-600">Compare plans and upgrade anytime</p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative border rounded-lg p-6 ${plan.recommended ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200'
+                className={`relative border rounded-lg p-4 sm:p-6 ${plan.recommended ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200'
                   } ${plan.current ? 'ring-2 ring-green-500' : ''}`}
               >
                 {plan.recommended && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500">
+                  <Badge className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-xs">
                     <Crown className="w-3 h-3 mr-1" />
                     Recommended
                   </Badge>
                 )}
                 {plan.current && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500">
+                  <Badge className="absolute -top-2 sm:-top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-xs">
                     Current Plan
                   </Badge>
                 )}
 
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold">{plan.name}</h3>
-                  <p className="text-gray-600 text-sm mt-2">{plan.description}</p>
-                  <div className="mt-4">
-                    <span className="text-3xl font-bold">{plan.currency} {plan.price}</span>
-                    <span className="text-gray-600">/{plan.interval}</span>
+                <div className="text-center mb-4 sm:mb-6">
+                  <h3 className="text-lg sm:text-xl font-bold">{plan.name}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mt-2">{plan.description}</p>
+                  <div className="mt-3 sm:mt-4">
+                    <span className="text-2xl sm:text-3xl font-bold">{plan.currency} {plan.price}</span>
+                    <span className="text-sm sm:text-base text-gray-600">/{plan.interval}</span>
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                   {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
+                    <div key={idx} className="flex items-start gap-2 sm:gap-3">
                       {feature.included ? (
-                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
                       ) : (
-                        <X className="w-5 h-5 text-gray-300 mt-0.5 flex-shrink-0" />
+                        <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mt-0.5 flex-shrink-0" />
                       )}
                       <div className="flex-1">
-                        <span className={feature.included ? 'text-gray-900' : 'text-gray-400'}>
+                        <span className={`text-sm sm:text-base ${feature.included ? 'text-gray-900' : 'text-gray-400'}`}>
                           {feature.name}
                         </span>
                         {feature.limit && (
-                          <span className="text-sm text-gray-500 block">
+                          <span className="text-xs sm:text-sm text-gray-500 block">
                             {feature.limit}
                           </span>
                         )}
@@ -331,7 +332,7 @@ export default function BillingPage() {
                 </div>
 
                 <Button
-                  className="w-full"
+                  className="w-full text-sm sm:text-base"
                   variant={plan.current ? "outline" : "default"}
                   disabled={plan.current}
                   onClick={() => handleUpgrade(plan.id)}
@@ -344,11 +345,11 @@ export default function BillingPage() {
         </CardContent>
       </Card>
 
-      {/* Invoices */}
+      {/* Invoices - Mobile Optimized */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Receipt className="w-5 h-5" />
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Receipt className="w-4 h-4 sm:w-5 sm:h-5" />
             Billing History
           </CardTitle>
         </CardHeader>
@@ -360,26 +361,29 @@ export default function BillingPage() {
               { id: '2024003', date: 'Jun 15, 2024', amount: 56.35, status: 'Paid' },
               { id: '2024004', date: 'May 15, 2024', amount: 56.35, status: 'Failed' }
             ].map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between py-3 px-4 border rounded-lg">
-                <div className="flex items-center gap-4">
+              <div key={invoice.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 py-3 px-3 sm:px-4 border rounded-lg">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div>
-                    <p className="font-medium">Invoice #{invoice.id}</p>
-                    <p className="text-sm text-gray-600">{invoice.date}</p>
+                    <p className="text-sm sm:text-base font-medium">Invoice #{invoice.id}</p>
+                    <p className="text-xs sm:text-sm text-gray-600">{invoice.date}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Badge
-                    variant={invoice.status === 'Paid' ? 'default' : 'destructive'}
-                    className={invoice.status === 'Paid' ? 'bg-green-500' : ''}
-                  >
-                    {invoice.status}
-                  </Badge>
-                  <span className="font-medium">SAR {invoice.amount}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-4">
+                    <Badge
+                      variant={invoice.status === 'Paid' ? 'default' : 'destructive'}
+                      className={`text-xs ${invoice.status === 'Paid' ? 'bg-green-500' : ''}`}
+                    >
+                      {invoice.status}
+                    </Badge>
+                    <span className="text-sm sm:text-base font-medium">SAR {invoice.amount}</span>
+                  </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleDownloadInvoice(invoice.id)}
                     disabled={invoice.status === 'Failed'}
+                    className="w-full sm:w-auto"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
@@ -391,14 +395,14 @@ export default function BillingPage() {
         </CardContent>
       </Card>
 
-      {/* Notice */}
+      {/* Notice - Mobile Optimized */}
       <Card className="bg-amber-50 border-amber-200">
-        <CardContent className="pt-6">
-          <div className="flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+        <CardContent className="pt-4 sm:pt-6">
+          <div className="flex gap-2 sm:gap-3">
+            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-amber-800">Demo Notice</h4>
-              <p className="text-sm text-amber-700 mt-1">
+              <h4 className="text-sm sm:text-base font-medium text-amber-800">Demo Notice</h4>
+              <p className="text-xs sm:text-sm text-amber-700 mt-1">
                 This is a demonstration of the billing system. No actual payments are processed.
                 In a production environment, this would integrate with payment processors like Stripe, PayPal, or local Saudi payment gateways.
               </p>

@@ -104,46 +104,50 @@ const OpportunityCard = memo(function OpportunityCard({
 
     if (compact) {
         return (
-            <Card className="hover:shadow-md transition-all duration-200 cursor-pointer" onClick={handleViewDetails}>
+            <Card className="hover:shadow-md transition-all duration-200">
                 <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Building2 className="h-5 w-5 text-white" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold text-gray-900 truncate">{opportunity.title}</h3>
-                                    <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <Badge variant="outline" className="text-xs">
-                                            <MapPin className="h-3 w-3 mr-1" />
-                                            {opportunity.location}
-                                        </Badge>
-                                        <Badge variant="outline" className="text-xs">
-                                            {opportunity.workstyle}
-                                        </Badge>
-                                        <Badge variant="secondary" className="text-xs">
-                                            {opportunity.industry}
-                                        </Badge>
-                                    </div>
-                                </div>
+                    {/* Mobile Layout - Stack content */}
+                    <div className="block sm:hidden space-y-3">
+                        <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Building2 className="h-5 w-5 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-gray-900 truncate">{opportunity.title}</h3>
+                                <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
                             </div>
                         </div>
-
-                        <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                        
+                        <div className="flex flex-wrap gap-1">
+                            <Badge variant="outline" className="text-xs">
+                                <MapPin className="h-3 w-3 mr-1" />
+                                {opportunity.location}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                                {opportunity.workstyle}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                                {opportunity.industry}
+                            </Badge>
                             {opportunity.matchScore && (
-                                <Badge variant="default" className="bg-green-500">
+                                <Badge variant="default" className="bg-green-500 text-xs">
                                     {opportunity.matchScore}% match
                                 </Badge>
                             )}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button onClick={handleViewDetails} variant="outline" size="sm" className="flex-1">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                            </Button>
+                            <Button onClick={handleApply} size="sm" className="flex-1">
+                                Apply Now
+                            </Button>
                             <Button
                                 variant={isSaved ? "default" : "outline"}
                                 size="sm"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSaveToggle();
-                                }}
+                                onClick={handleSaveToggle}
                                 disabled={isLoading}
                             >
                                 {isSaved ? (
@@ -152,6 +156,58 @@ const OpportunityCard = memo(function OpportunityCard({
                                     <Heart className="h-4 w-4" />
                                 )}
                             </Button>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout - Original horizontal layout */}
+                    <div className="hidden sm:block" onClick={handleViewDetails} style={{ cursor: 'pointer' }}>
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Building2 className="h-5 w-5 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-semibold text-gray-900 truncate">{opportunity.title}</h3>
+                                        <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <Badge variant="outline" className="text-xs">
+                                                <MapPin className="h-3 w-3 mr-1" />
+                                                {opportunity.location}
+                                            </Badge>
+                                            <Badge variant="outline" className="text-xs">
+                                                {opportunity.workstyle}
+                                            </Badge>
+                                            <Badge variant="secondary" className="text-xs">
+                                                {opportunity.industry}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                                {opportunity.matchScore && (
+                                    <Badge variant="default" className="bg-green-500">
+                                        {opportunity.matchScore}% match
+                                    </Badge>
+                                )}
+                                <Button
+                                    variant={isSaved ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSaveToggle();
+                                    }}
+                                    disabled={isLoading}
+                                >
+                                    {isSaved ? (
+                                        <HeartOff className="h-4 w-4" />
+                                    ) : (
+                                        <Heart className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </CardContent>
@@ -257,23 +313,43 @@ const OpportunityCard = memo(function OpportunityCard({
                     </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="flex items-center gap-3">
-                        <Button onClick={handleViewDetails} variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                        </Button>
-                        <Button onClick={handleShare} variant="ghost" size="sm">
-                            <Share2 className="h-4 w-4 mr-2" />
-                            Share
-                        </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button onClick={handleApply} size="sm">
+                {/* Action Buttons - Mobile Responsive */}
+                <div className="pt-4 border-t space-y-3">
+                    {/* Mobile Layout - Stack vertically */}
+                    <div className="flex flex-col sm:hidden space-y-3">
+                        <Button onClick={handleApply} size="sm" className="w-full">
                             Apply Now
                         </Button>
+                        <div className="flex items-center gap-2">
+                            <Button onClick={handleViewDetails} variant="outline" size="sm" className="flex-1">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                            </Button>
+                            <Button onClick={handleShare} variant="ghost" size="sm" className="flex-1">
+                                <Share2 className="h-4 w-4 mr-2" />
+                                Share
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout - Horizontal */}
+                    <div className="hidden sm:flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <Button onClick={handleViewDetails} variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                            </Button>
+                            <Button onClick={handleShare} variant="ghost" size="sm">
+                                <Share2 className="h-4 w-4 mr-2" />
+                                Share
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Button onClick={handleApply} size="sm">
+                                Apply Now
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </CardContent>
