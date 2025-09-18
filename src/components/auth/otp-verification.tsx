@@ -125,14 +125,15 @@ export function OtpVerification({
   const isComplete = otp.every(digit => digit !== "");
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
+        className="w-full max-w-md"
       >
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center pb-6">
+        <Card className="w-full shadow-xl">
+          <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
             {onBack && (
               <Button
                 variant="ghost"
@@ -145,32 +146,32 @@ export function OtpVerification({
               </Button>
             )}
             
-            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <Mail className="w-8 h-8 text-blue-600" />
+            <div className="mx-auto mb-3 sm:mb-4 w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center">
+              <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
             </div>
             
-            <CardTitle className="text-2xl font-semibold text-gray-900">
+            <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-900">
               {title}
             </CardTitle>
             
-            <p className="text-gray-600 mt-2">
+            <p className="text-sm sm:text-base text-gray-600 mt-2">
               {description || (
                 <>
                   We sent a verification code to{" "}
-                  <span className="font-medium text-gray-900">{email}</span>
+                  <span className="font-medium text-gray-900 break-all">{email}</span>
                 </>
               )}
             </p>
           </CardHeader>
           
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
             {/* OTP Input */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 text-center">
                 Enter 6-digit verification code
               </label>
               
-              <div className="flex justify-center space-x-3" onPaste={handlePaste}>
+              <div className="flex justify-center space-x-2 sm:space-x-3" onPaste={handlePaste}>
                 {otp.map((digit, index) => (
                   <motion.input
                     key={index}
@@ -182,7 +183,7 @@ export function OtpVerification({
                     onChange={(e) => handleInputChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     className={cn(
-                      "w-12 h-12 text-center text-lg font-semibold border-2 rounded-lg",
+                      "w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg font-semibold border-2 rounded-lg",
                       "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
                       "transition-all duration-200",
                       digit ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white",
@@ -200,7 +201,7 @@ export function OtpVerification({
             {/* Verify Button */}
             <Button
               onClick={handleVerify}
-              className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium"
+              className="w-full h-10 sm:h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium"
               disabled={!isComplete || isLoading}
             >
               <AnimatePresence mode="wait">
@@ -253,7 +254,7 @@ export function OtpVerification({
             )}
 
             {/* Help Text */}
-            <div className="text-xs text-gray-500 text-center bg-gray-50 p-3 rounded-lg">
+            <div className="text-xs sm:text-sm text-gray-500 text-center bg-gray-50 p-2 sm:p-3 rounded-lg">
               <p>💡 <strong>Tip:</strong> You can paste the entire code at once</p>
               <p className="mt-1">Check your spam folder if you don't see the email</p>
             </div>

@@ -301,12 +301,12 @@ function OpportunitiesPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
+      {/* Header - Mobile Optimized */}
+      <div className="space-y-4 sm:space-y-0 sm:flex sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Opportunities</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Opportunities</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Post new opportunities and manage your existing job postings
           </p>
         </div>
@@ -315,6 +315,7 @@ function OpportunitiesPageContent() {
           disabled={refreshing}
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
         >
           {refreshing ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -325,32 +326,34 @@ function OpportunitiesPageContent() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="post" className="flex items-center gap-2">
-            <PlusCircle size={16} />
-            Post New Opportunity
+          <TabsTrigger value="post" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <PlusCircle size={14} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Post New Opportunity</span>
+            <span className="sm:hidden">Post New</span>
           </TabsTrigger>
-          <TabsTrigger value="manage" className="flex items-center gap-2">
-            <Briefcase size={16} />
-            My Opportunities ({opportunities.length})
+          <TabsTrigger value="manage" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <Briefcase size={14} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">My Opportunities ({opportunities.length})</span>
+            <span className="sm:hidden">My Jobs ({opportunities.length})</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Post Opportunity Tab */}
-        <TabsContent value="post" className="space-y-6">
-          <Card className="p-6">
-            <div className="space-y-6">
+        {/* Post Opportunity Tab - Mobile Optimized */}
+        <TabsContent value="post" className="space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                   Create New Job Posting
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Fill in the details below to post a new opportunity and attract talented candidates.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Left Column */}
                 <div className="space-y-4">
                   <div>
@@ -455,18 +458,19 @@ function OpportunitiesPageContent() {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-4 pt-6 border-t">
+              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4 sm:pt-6 border-t">
                 <Button
                   variant="outline"
                   onClick={() => setFormData(initialFormData)}
                   disabled={isSubmitting}
+                  className="w-full sm:w-auto"
                 >
                   Reset Form
                 </Button>
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="min-w-32"
+                  className="w-full sm:w-auto sm:min-w-32"
                 >
                   {isSubmitting ? (
                     <>
@@ -485,26 +489,27 @@ function OpportunitiesPageContent() {
           </Card>
         </TabsContent>
 
-        {/* My Opportunities Tab */}
-        <TabsContent value="manage" className="space-y-6">
+        {/* My Opportunities Tab - Mobile Optimized */}
+        <TabsContent value="manage" className="space-y-4 sm:space-y-6">
           {opportunities.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="text-center py-12 sm:py-16 px-4">
               <div className="text-gray-400 mb-4">
-                <Briefcase size={48} className="mx-auto" />
+                <Briefcase size={36} className="sm:w-12 sm:h-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                 No opportunities posted yet
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-sm sm:text-base text-gray-600 mb-6">
                 Create your first job posting to start attracting talented candidates.
               </p>
-              <Button onClick={() => setActiveTab("post")}>
+              <Button onClick={() => setActiveTab("post")} className="w-full sm:w-auto">
                 <PlusCircle className="h-4 w-4 mr-2" />
-                Post Your First Opportunity
+                <span className="hidden sm:inline">Post Your First Opportunity</span>
+                <span className="sm:hidden">Post First Job</span>
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {opportunities.map((opportunity) => (
                 <OpportunityCard
                   key={opportunity.id}
@@ -520,16 +525,16 @@ function OpportunitiesPageContent() {
         </TabsContent>
       </Tabs>
 
-      {/* Applicants Modal */}
+      {/* Applicants Modal - Mobile Optimized */}
       {isApplicantsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
+          <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                   Applicants{selectedOpp ? ` for ${selectedOpp.title}` : ""}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Found {applicants.length} applicant{applicants.length === 1 ? "" : "s"}
                 </p>
               </div>
@@ -538,11 +543,12 @@ function OpportunitiesPageContent() {
                 size="icon" 
                 onClick={() => setIsApplicantsOpen(false)} 
                 aria-label="Close applicants"
+                className="flex-shrink-0"
               >
                 <X size={18} />
               </Button>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto p-5">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5">
               {applicantsLoading ? (
                 <div className="flex justify-center py-10">
                   <LoadingAnimation size="md" text="Loading applicants" />
@@ -554,21 +560,21 @@ function OpportunitiesPageContent() {
               ) : (
                 <ul className="divide-y">
                   {applicants.map((talent) => (
-                    <li key={talent.id} className="py-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
+                    <li key={talent.id} className="py-3 sm:py-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                        <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-gray-900">
                             {talent.full_name}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 break-words">
                             {talent.email}
                           </div>
                           {talent.bio && (
-                            <p className="mt-1 text-sm text-gray-700 line-clamp-3">
+                            <p className="mt-1 text-sm text-gray-700 line-clamp-2 sm:line-clamp-3">
                               {talent.bio}
                             </p>
                           )}
-                          <div className="mt-2 flex flex-wrap gap-2">
+                          <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
                             {talent.work_style_pref?.map((w) => (
                               <span 
                                 key={w} 
@@ -593,7 +599,7 @@ function OpportunitiesPageContent() {
                           </div>
                         </div>
                         <div className="flex-shrink-0">
-                          <Button variant="outline" size="sm" asChild>
+                          <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                             <a href={`mailto:${talent.email}`}>Contact</a>
                           </Button>
                         </div>
@@ -603,8 +609,8 @@ function OpportunitiesPageContent() {
                 </ul>
               )}
             </div>
-            <div className="px-5 py-4 border-t flex justify-end">
-              <Button onClick={() => setIsApplicantsOpen(false)}>
+            <div className="px-4 sm:px-5 py-3 sm:py-4 border-t flex justify-end">
+              <Button onClick={() => setIsApplicantsOpen(false)} className="w-full sm:w-auto">
                 Close
               </Button>
             </div>

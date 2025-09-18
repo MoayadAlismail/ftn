@@ -126,11 +126,11 @@ export default function MatchMakingPage() {
   }, [router]);
 
   return (
-    <div className="max-h-screen flex items-center justify-center mt-3">
+    <div className="min-h-screen flex items-center justify-center p-4">
       {isScanning && <InProgress />}
       {/* {isMatchesLoading && </>} */}
       {showResults && (
-        <div className="mt-18">
+        <div className="w-full">
           <OppMatchResults
             opportunities={oppMatches}
             isLoading={isMatchesLoading}

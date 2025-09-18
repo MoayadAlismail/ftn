@@ -117,17 +117,19 @@ export default function Testimonials() {
         </div>
 
         <div className="text-center mt-16">
-          <div className="inline-flex items-center space-x-8 p-6 bg-card rounded-lg border border-border">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 p-6 bg-card rounded-lg border border-border max-w-4xl mx-auto">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">10,000+</div>
               <div className="text-sm text-muted-foreground">Successful Matches</div>
             </div>
-            <div className="h-12 w-px bg-border"></div>
+            <div className="hidden sm:block h-12 w-px bg-border"></div>
+            <div className="sm:hidden w-full h-px bg-border"></div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">95%</div>
               <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
             </div>
-            <div className="h-12 w-px bg-border"></div>
+            <div className="hidden sm:block h-12 w-px bg-border"></div>
+            <div className="sm:hidden w-full h-px bg-border"></div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">500+</div>
               <div className="text-sm text-muted-foreground">Partner Companies</div>

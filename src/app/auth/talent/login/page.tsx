@@ -234,10 +234,10 @@ function TalentLoginContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br relative overflow-hidden">
-      <div className=" min-h-screen z-10">
-        {/* Left Column - Simple Form */}
-        <div className="flex flex-col justify-center px-8 py-12 lg:px-16 bg-white backdrop-blur-sm">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+      <div className="grid lg:grid-cols-2 min-h-screen relative z-10">
+        {/* Left Column - Login Form */}
+        <div className="flex flex-col justify-center px-4 py-8 sm:px-8 sm:py-12 lg:px-16 bg-white backdrop-blur-sm">
           <AnimatePresence mode="wait">
             <motion.div
               initial="initial"
@@ -247,23 +247,23 @@ function TalentLoginContent() {
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="mx-auto w-full max-w-sm"
             >
-              {/* Logo */}
-              <div className="flex items-center mb-12">
+              {/* Logo - Mobile Optimized */}
+              <div className="flex items-center mb-8 sm:mb-12">
                 <img
                   src="/logo.svg"
                   alt="FTN Logo"
-                  className="w-10 h-10 mr-3"
+                  className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3"
                   style={{ display: "block" }}
                 />
-                <span className="text-xl font-semibold text-gray-900">FTN</span>
+                <span className="text-lg sm:text-xl font-semibold text-gray-900">FTN</span>
               </div>
 
-              {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              {/* Header - Mobile Optimized */}
+              <div className="mb-6 sm:mb-8">
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                   Welcome Back!
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Enter your email to receive a verification code
                 </p>
               </div>
@@ -273,14 +273,14 @@ function TalentLoginContent() {
                 {/* Google Login */}
                 <Button
                   variant="outline"
-                  className="w-full h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+                  className="w-full h-10 sm:h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
                   onClick={() => handleSocialLogin('google')}
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-3" />
+                    <Loader2 className="h-4 w-4 animate-spin mr-2 sm:mr-3" />
                   ) : (
-                    <GoogleIcon className="mr-3" />
+                    <GoogleIcon className="mr-2 sm:mr-3" />
                   )}
                   Continue with Google
                 </Button>
@@ -288,22 +288,22 @@ function TalentLoginContent() {
                 {/* GitHub Login */}
                 <Button
                   variant="outline"
-                  className="w-full h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+                  className="w-full h-10 sm:h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
                   onClick={() => handleSocialLogin('github')}
                   disabled={isLoading}
                 >
-                  <GitHubIcon className="mr-3" />
+                  <GitHubIcon className="mr-2 sm:mr-3" />
                   Continue with GitHub
                 </Button>
 
                 {/* LinkedIn Login */}
                 <Button
                   variant="outline"
-                  className="w-full h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
+                  className="w-full h-10 sm:h-12 text-sm font-medium bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
                   onClick={() => handleSocialLogin('linkedin_oidc')}
                   disabled={isLoading}
                 >
-                  <LinkedInIcon className="mr-3" />
+                  <LinkedInIcon className="mr-2 sm:mr-3" />
                   Continue with LinkedIn
                 </Button>
 
@@ -327,7 +327,7 @@ function TalentLoginContent() {
                       id="email"
                       type="email"
                       placeholder="Enter your email address"
-                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 sm:h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -336,7 +336,7 @@ function TalentLoginContent() {
 
                 {/* Sign In Button */}
                 <Button
-                  className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-6"
+                  className="w-full h-10 sm:h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-4 sm:mt-6"
                   onClick={handleEmailLogin}
                   disabled={isLoading}
                 >
@@ -344,8 +344,8 @@ function TalentLoginContent() {
                 </Button>
 
                 {/* Footer Links */}
-                <div className="text-center mt-6 space-y-2">
-                  <p className="text-sm text-gray-600">
+                <div className="text-center mt-4 sm:mt-6 space-y-2">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Don't have an account?{" "}
                     <Link href="/auth/talent/signup" className="text-gray-900 underline font-medium">
                       Create your account
@@ -357,8 +357,28 @@ function TalentLoginContent() {
           </AnimatePresence>
         </div>
 
-        {/* Right Column - Gradient Background */}
-       
+        {/* Right Column - Reviews (Hidden on mobile) */}
+        <div className="hidden lg:flex flex-col bg-gray-50 relative overflow-hidden">
+          <div className="flex flex-col justify-center p-8 h-full">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Join thousands of talents finding their dream jobs
+              </h2>
+              <p className="text-gray-600 mb-8">
+                See what our community says about their experience with FTN.
+              </p>
+            </div>
+            
+            {/* Reviews Marquee */}
+            <div className="relative">
+              <Marquee pauseOnHover className="[--duration:40s]">
+                {reviews.map((review, index) => (
+                  <ReviewCard key={index} {...review} />
+                ))}
+              </Marquee>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
