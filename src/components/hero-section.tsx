@@ -478,7 +478,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                     <Button
                       size="default"
                       className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg font-medium w-full sm:w-auto"
-                      onClick={handleCardClick}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick();
+                      }}
                     >
                       Choose File →
                     </Button>

@@ -153,6 +153,10 @@ export default function ResumeUpload({
                   <Button
                     type="button"
                     className="mt-2 px-6 py-2 text-white font-medium cursor-pointer bg-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
                   >
                     Choose File &rarr;
                   </Button>
