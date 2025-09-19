@@ -18,6 +18,7 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import CandidateProfileModal from "@/features/employer/dashboard/components/candidate-profile-modal";
 
 const suggestions = [
   "Software engineer intern with Python and React skills",
@@ -53,6 +54,8 @@ export default function EmployerDashboardHomeContent() {
   const [savedCandidatesIds, setSavedCandidatesIds] = useState<Set<String>>(
     new Set()
   );
+  const [selectedCandidate, setSelectedCandidate] = useState<Talent | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchSavedCandidates = async () => {
@@ -131,6 +134,16 @@ export default function EmployerDashboardHomeContent() {
       toast.error("Unable to save candidate");
     }
   };
+
+  const handleViewProfile = useCallback((talent: Talent) => {
+    setSelectedCandidate(talent);
+    setIsProfileModalOpen(true);
+  }, []);
+
+  const handleCloseProfileModal = useCallback(() => {
+    setIsProfileModalOpen(false);
+    setSelectedCandidate(null);
+  }, []);
 
   const handleInviteMessageChange = useCallback(
     (talentId: any, message: string) => {
@@ -261,7 +274,10 @@ export default function EmployerDashboardHomeContent() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
-                      <Card className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+                      <Card 
+                        className="p-4 sm:p-6 hover:shadow-md transition-shadow cursor-pointer" 
+                        onClick={() => handleViewProfile(talent)}
+                      >
                         {/* Mobile Layout - Stack vertically */}
                         <div className="block sm:hidden space-y-4">
                           {/* Header */}
@@ -310,7 +326,10 @@ export default function EmployerDashboardHomeContent() {
                             <Button
                               size="sm"
                               className="w-full cursor-pointer bg-primary hover:bg-primary/90"
-                              onClick={() => handleOpenInvite(talent.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenInvite(talent.id);
+                              }}
                               disabled={invitedIds.has(String(talent.id))}
                             >
                               {invitedIds.has(String(talent.id))
@@ -321,7 +340,10 @@ export default function EmployerDashboardHomeContent() {
                               variant="outline"
                               size="sm"
                               className="w-full"
-                              onClick={() => saveCandidate(String(talent.id))}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                saveCandidate(String(talent.id));
+                              }}
                               disabled={savedCandidatesIds.has(
                                 String(talent.id)
                               )}
@@ -354,7 +376,10 @@ export default function EmployerDashboardHomeContent() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => saveCandidate(String(talent.id))}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  saveCandidate(String(talent.id));
+                                }}
                                 disabled={savedCandidatesIds.has(
                                   String(talent.id)
                                 )}
@@ -366,7 +391,10 @@ export default function EmployerDashboardHomeContent() {
                               <Button
                                 size="sm"
                                 className="cursor-pointer bg-primary hover:bg-primary/90"
-                                onClick={() => handleOpenInvite(talent.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenInvite(talent.id);
+                                }}
                                 disabled={invitedIds.has(String(talent.id))}
                               >
                                 {invitedIds.has(String(talent.id))
@@ -400,54 +428,54 @@ export default function EmployerDashboardHomeContent() {
                                     </span>
                                   ))}
                                 </div>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
                         {/* Invite Message Section - Works for both mobile and desktop */}
-                        {inviteOpenId === talent.id && (
-                          <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
-                            <div className="text-xs font-medium text-gray-500 mb-2">
-                              Message to candidate
-                            </div>
-                            <Textarea
-                              placeholder={`Hi ${
-                                talent.name?.split(" ")[0] || "there"
-                              }, I think you'd be a great fit...`}
+                          {inviteOpenId === talent.id && (
+                            <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
+                              <div className="text-xs font-medium text-gray-500 mb-2">
+                                Message to candidate
+                              </div>
+                              <Textarea
+                                placeholder={`Hi ${
+                                  talent.name?.split(" ")[0] || "there"
+                                }, I think you'd be a great fit...`}
                               className="min-h-[70px] sm:min-h-[90px] text-sm"
-                              value={inviteMessages[String(talent.id)] || ""}
-                              onChange={(e) =>
-                                handleInviteMessageChange(
-                                  talent.id,
-                                  e.target.value
-                                )
-                              }
-                            />
+                                value={inviteMessages[String(talent.id)] || ""}
+                                onChange={(e) =>
+                                  handleInviteMessageChange(
+                                    talent.id,
+                                    e.target.value
+                                  )
+                                }
+                              />
                             <div className="mt-2 flex flex-col sm:flex-row items-center gap-2 justify-end">
-                              <Button
-                                variant="outline"
-                                size="sm"
+                                <Button
+                                  variant="outline"
+                                  size="sm"
                                 className="w-full sm:w-auto cursor-pointer"
-                                onClick={() => setInviteOpenId(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                size="sm"
+                                  onClick={() => setInviteOpenId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
                                 className="w-full sm:w-auto cursor-pointer bg-primary hover:bg-primary/90"
-                                onClick={() => handleSendInvite(talent.id)}
-                                disabled={invitingId === String(talent.id)}
-                              >
-                                {invitingId === String(talent.id) ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  "Send Invite"
-                                )}
-                              </Button>
+                                  onClick={() => handleSendInvite(talent.id)}
+                                  disabled={invitingId === String(talent.id)}
+                                >
+                                  {invitingId === String(talent.id) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    "Send Invite"
+                                  )}
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </Card>
                     </motion.div>
                   ))}
@@ -457,6 +485,28 @@ export default function EmployerDashboardHomeContent() {
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* Candidate Profile Modal */}
+      <CandidateProfileModal
+        candidate={{
+          id: selectedCandidate?.id || '',
+          full_name: selectedCandidate?.name || '',
+          email: selectedCandidate?.email || '',
+          bio: selectedCandidate?.bio || '',
+          location_pref: selectedCandidate?.location_pref || [],
+          industry_pref: selectedCandidate?.industry_pref || [],
+          work_style_pref: selectedCandidate?.work_style_pref || [],
+          resume_url: selectedCandidate?.resume_url,
+          created_at: selectedCandidate?.created_at || ''
+        }}
+        isOpen={isProfileModalOpen}
+        onOpenChange={setIsProfileModalOpen}
+        onSave={(candidateId: string) => saveCandidate(candidateId)}
+        onUnsave={(candidateId: string) => {
+          // Handle unsave if needed
+          console.log('Unsave candidate:', candidateId);
+        }}
+      />
     </div>
   );
 }
