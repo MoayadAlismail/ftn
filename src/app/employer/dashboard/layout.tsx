@@ -138,10 +138,10 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
               
               {/* Mobile user info and sign out */}
               <div className="pt-4 mt-4 border-t border-gray-200">
-                <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600">
+                <Link href="/employer/dashboard/settings" className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer">
                   <User size={18} />
                   <span className="font-medium">{user?.user_metadata?.company_name || user?.email}</span>
-                </div>
+                </Link>
                 <div className="px-3 py-2">
                   <SignOutButton />
                 </div>

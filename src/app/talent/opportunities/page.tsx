@@ -18,6 +18,7 @@ import OpportunitiesPageSkeleton from "./loading";
 import LoadingAnimation from "@/components/loadingAnimation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import OpportunityDetailModal from "@/components/opportunity-detail-modal";
 
 
 const DEFAULT_FILTERS: FilterType = {
@@ -44,6 +45,8 @@ function TalentOpportunitiesContent() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
+    const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Show loading while auth is resolving
     if (isLoading) {
@@ -333,8 +336,13 @@ function TalentOpportunitiesContent() {
     };
 
     const handleViewDetails = (opportunity: Opportunity) => {
-        // Navigate to detailed opportunity view
-        router.push(`/talent/opportunities/${opportunity.id}`);
+        setSelectedOpportunity(opportunity);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedOpportunity(null);
     };
 
     const handleRefresh = async () => {
@@ -443,6 +451,19 @@ function TalentOpportunitiesContent() {
                     </Button>
                 </div>
             )}
+
+            {/* Opportunity Detail Modal */}
+            <OpportunityDetailModal
+                opportunity={selectedOpportunity}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onApply={async (opportunityId: string) => {
+                    const opportunity = opportunities.find(opp => opp.id === opportunityId);
+                    if (opportunity) {
+                        handleApplyToOpportunity(opportunity);
+                    }
+                }}
+            />
         </div>
     );
 }

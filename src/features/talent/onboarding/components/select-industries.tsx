@@ -48,82 +48,108 @@ export default function SelectIndustries({
   };
 
   return (
-    <Card className="w-full max-w-4xl p-8 mt-10">
-      {/* Progress Indicator */}
-      <div className="mb-3">
-        <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-          <span>Step 2 of 4</span>
-          <span>{Math.round((2 / 4) * 100)}% Complete</span>
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+        {/* Progress Indicator */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between text-xs sm:text-sm text-gray-600 mb-2">
+            <span>Step 2 of 4</span>
+            <span>{Math.round((2 / 4) * 100)}% Complete</span>
+          </div>
+          <div className="w-full h-2 bg-gray-100 rounded-full">
+            <div
+              className="h-full bg-primary rounded-full transition-all"
+              style={{ width: "50%" }}
+            />
+          </div>
         </div>
-        <div className="w-full h-2 bg-gray-100 rounded-full">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: "50%" }}
-          />
-        </div>
-      </div>
 
-      {/* Header */}
-      <div className="text-center mb-6">
-        <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
-          <BriefcaseIcon className="w-6 h-6 text-primary" />
+        {/* Header */}
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="mx-auto w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center mb-3">
+            <BriefcaseIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+          </div>
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1">
+            What are your top 3 target industries?
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600">
+            Selected: {industryPreference.length}/{MAX_SELECTIONS}
+          </p>
         </div>
-        <h2 className="text-2xl font-semibold mb-1">
-          What are your top 3 target industries?
-        </h2>
-        <p className="text-gray-600">
-          Selected: {industryPreference.length}/{MAX_SELECTIONS}
-        </p>
-      </div>
 
-      {/* Industry Grid */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {INDUSTRIES.map((industry) => {
-          const isSelected = industryPreference.includes(industry);
-          return (
-            <button
-              key={industry}
-              onClick={() => toggleIndustry(industry)}
-              className={cn(
-                "py-3 px-4 rounded-lg border text-center transition-all text-sm",
-                "hover:border-primary/40 hover:bg-primary/5",
-                isSelected
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-gray-200 text-gray-700",
-                industryPreference.length >= MAX_SELECTIONS && !isSelected
-                  ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer"
-              )}
+        {/* Industry Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+          {INDUSTRIES.map((industry) => {
+            const isSelected = industryPreference.includes(industry);
+            return (
+              <button
+                key={industry}
+                onClick={() => toggleIndustry(industry)}
+                className={cn(
+                  "py-2 sm:py-3 px-2 sm:px-4 rounded-lg border text-center transition-all text-xs sm:text-sm",
+                  "hover:border-primary/40 hover:bg-primary/5",
+                  isSelected
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-gray-200 text-gray-700",
+                  industryPreference.length >= MAX_SELECTIONS && !isSelected
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                )}
+              >
+                {industry}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="block sm:hidden space-y-3 pt-4">
+          <Button className="cursor-pointer w-full" variant="outline" onClick={prev}>
+            Back
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="cursor-pointer flex-1"
+              type="button"
+              variant="ghost"
+              onClick={next}
             >
-              {industry}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button className="cursor-pointer" variant="outline" onClick={prev}>
-          Back
-        </Button>
-        <div className="flex items-center gap-2">
-          <Button
-            className="cursor-pointer"
-            type="button"
-            variant="ghost"
-            onClick={next}
-          >
-            Skip for now
-          </Button>
-          <Button
-            className="cursor-pointer"
-            onClick={next}
-            disabled={industryPreference.length !== MAX_SELECTIONS}
-          >
-            Next &rarr;
-          </Button>
+              Skip for now
+            </Button>
+            <Button
+              className="cursor-pointer flex-1"
+              onClick={next}
+              disabled={industryPreference.length !== MAX_SELECTIONS}
+            >
+              Next &rarr;
+            </Button>
+          </div>
         </div>
-      </div>
-    </Card>
+
+        {/* Desktop Navigation */}
+        <div className="hidden sm:flex justify-between pt-4">
+          <Button className="cursor-pointer" variant="outline" onClick={prev}>
+            Back
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              className="cursor-pointer"
+              type="button"
+              variant="ghost"
+              onClick={next}
+            >
+              Skip for now
+            </Button>
+            <Button
+              className="cursor-pointer"
+              onClick={next}
+              disabled={industryPreference.length !== MAX_SELECTIONS}
+            >
+              Next &rarr;
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

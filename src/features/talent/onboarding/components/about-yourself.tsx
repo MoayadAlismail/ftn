@@ -41,11 +41,11 @@ export default function AboutYourself({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8 px-4 mt-10">
-      <Card className="w-full max-w-2xl p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Progress indicator */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-xs sm:text-sm text-gray-600">
             <span>Step 4 of 4</span>
             <span>100% Complete</span>
           </div>
@@ -55,12 +55,12 @@ export default function AboutYourself({
         </div>
 
         {/* Content */}
-        <div className="space-y-5 text-center">
+        <div className="space-y-4 sm:space-y-5 text-center">
           {/* Icon */}
           <div className="space-y-2 flex flex-col items-center justify-center">
-            <User size={40} className="text-primary" />
-            <h1 className="text-2xl font-semibold">Tell us about yourself</h1>
-            <p className="text-gray-600">
+            <User size={32} className="sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-primary" />
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold">Tell us about yourself</h1>
+            <p className="text-xs sm:text-sm text-gray-600">
               Write a brief bio to help us match you better
             </p>
           </div>
@@ -70,16 +70,42 @@ export default function AboutYourself({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="I'm a computer science student passionate about AI and machine learning. I enjoy building projects that solve real-world problems..."
-              className="w-xl h-32"
+              className="w-full h-24 sm:h-28 lg:h-32 text-sm sm:text-base resize-none"
             />
-            <p className="text-sm text-gray-600 text-left">
+            <p className="text-xs sm:text-sm text-gray-600 text-left">
               {bio.length} characters (minimum {minCharacters})
             </p>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between pt-4">
+        {/* Mobile Navigation */}
+        <div className="block sm:hidden space-y-3 pt-4">
+          <Button className="cursor-pointer w-full" variant="outline" onClick={prev}>
+            Back
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="cursor-pointer flex-1"
+              type="button"
+              variant="ghost"
+              onClick={handleCompleteSetup}
+              disabled={isCompleting}
+            >
+              Skip for now
+            </Button>
+            <Button
+              className="cursor-pointer flex-1 flex items-center justify-center gap-2"
+              onClick={handleCompleteSetup}
+              disabled={bio.length < minCharacters || isCompleting}
+            >
+              {isCompleting && <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />}
+              <span className="text-xs sm:text-sm">Complete Setup</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Desktop Navigation */}
+        <div className="hidden sm:flex justify-between pt-4">
           <Button className="cursor-pointer" variant="outline" onClick={prev}>
             Back
           </Button>

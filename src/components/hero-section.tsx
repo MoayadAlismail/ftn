@@ -9,6 +9,8 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import OpportunitiesSection from "./opportunities-section";
 import { ShineBorder } from "@/components/magicui/shine-border";
+import { useAuth } from "@/contexts/AuthContext";
+import { Role } from "@/constants/enums";
 
 const FloatingCard = ({
   children,
@@ -75,6 +77,7 @@ const OpportunityCard = ({
 export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResumeUpload?: boolean) => void }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated, userRole, isLoading } = useAuth();
 
   // Resume upload state
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -136,6 +139,37 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
     }
   };
 
+  // Helper function to get the dashboard URL based on user role
+  const getDashboardUrl = () => {
+    if (userRole === Role.TALENT) {
+      return "/talent/dashboard";
+    } else if (userRole === Role.EMPLOYER) {
+      return "/employer/dashboard/home";
+    }
+    return "/talent/dashboard"; // default fallback
+  };
+
+  // Helper function for employer button content (when not authenticated)
+  const getEmployerButtonContent = () => {
+    return {
+      text: "Recruiter? Login here ↗",
+      mobileText: "Recruiter",
+      href: "/auth/employer/login"
+    };
+  };
+
+  // Helper function for student button content (when not authenticated)
+  const getStudentButtonContent = () => {
+    return {
+      text: "Login",
+      mobileText: "Student",
+      href: "/auth/talent/login"
+    };
+  };
+
+  const employerButtonContent = getEmployerButtonContent();
+  const studentButtonContent = getStudentButtonContent();
+
   return (
     <div className="relative bg-gradient-to-br from-primary/5 via-white to-primary/10">
       {/* Hero Section */}
@@ -147,37 +181,57 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/3 to-transparent rounded-full" />
         </div>
 
-        {/* Top navigation */}
-        <div className="absolute top-8 left-4 sm:top-12 sm:left-6 z-50 pointer-events-auto">
-          <Link href="/auth/employer/login" prefetch={true}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
-            >
-              <span className="hidden sm:inline">
-                Recruiter? Login here{" "}
-                <span aria-label="diagonal arrow" role="img" className="inline-block align-middle">
-                  ↗
-                </span>
-              </span>
-              <span className="sm:hidden">Recruiter </span>
-            </Button>
-          </Link>
-        </div>
+        {/* Navigation Buttons - Show both when not authenticated, single dashboard when authenticated */}
+        {!isAuthenticated ? (
+          <>
+            {/* Employer Login Button */}
+            <div className="absolute top-8 left-4 sm:top-12 sm:left-6 z-50 pointer-events-auto">
+              <Link href={employerButtonContent.href} prefetch={true}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/90 backdrop-blur-sm border-white/40 hover:bg-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
+                  disabled={isLoading}
+                >
+                  <span className="hidden sm:inline">
+                    {employerButtonContent.text}
+                  </span>
+                  <span className="sm:hidden">{employerButtonContent.mobileText}</span>
+                </Button>
+              </Link>
+            </div>
 
-        {/* Student Login Button */}
-        <div className="absolute top-8 right-4 sm:top-12 sm:right-6 z-50 pointer-events-auto">
-          <Link href="/auth/talent/login" prefetch={true}>
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
-            >
-              <span className="hidden sm:inline">Login</span>
-              <span className="sm:hidden">Student</span>
-            </Button>
-          </Link>
-        </div>
+            {/* Student Login Button */}
+            <div className="absolute top-8 right-4 sm:top-12 sm:right-6 z-50 pointer-events-auto">
+              <Link href={studentButtonContent.href} prefetch={true}>
+                <Button
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
+                  disabled={isLoading}
+                >
+                  <span className="hidden sm:inline">{studentButtonContent.text}</span>
+                  <span className="sm:hidden">{studentButtonContent.mobileText}</span>
+                </Button>
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Single Dashboard Button - aligned right when authenticated */}
+            <div className="absolute top-8 right-4 sm:top-12 sm:right-6 z-50 pointer-events-auto">
+              <Link href={getDashboardUrl()} prefetch={true}>
+                <Button
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
+                  disabled={isLoading}
+                >
+                  <span className="hidden sm:inline">Go to Dashboard</span>
+                  <span className="sm:hidden">Dashboard</span>
+                </Button>
+              </Link>
+            </div>
+          </>
+        )}
 
         {/* Floating opportunity cards - Hidden on mobile for cleaner design */}
         <div className="absolute inset-0 pointer-events-none hidden lg:block">
@@ -424,7 +478,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                     <Button
                       size="default"
                       className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg font-medium w-full sm:w-auto"
-                      onClick={handleCardClick}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardClick();
+                      }}
                     >
                       Choose File →
                     </Button>

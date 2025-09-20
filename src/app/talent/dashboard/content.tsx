@@ -19,12 +19,22 @@ import TalentProfile from "@/components/talent-profile";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function TalentDashboardContent() {
   const { user, authUser, isLoading, isAuthenticated } = useAuth();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
   const [invitationStats, setInvitationStats] = useState({ total: 0, pending: 0 });
   const [applicationStats, setApplicationStats] = useState({ total: 0, thisMonth: 0 });
+
+  // Check for tab parameter in URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['overview', 'profile', 'applications', 'settings'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   // Fetch invitation and application stats
   useEffect(() => {
