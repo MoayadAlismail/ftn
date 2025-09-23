@@ -228,49 +228,89 @@ export default function OpportunityFilters({
                             <div className="flex flex-wrap gap-2">
                                 {filters.search.trim() && (
                                     <Badge variant="outline" className="flex items-center gap-1">
-                                        Search: "{filters.search}"
-                                        <X
-                                            className="h-3 w-3 cursor-pointer"
-                                            onClick={() => updateFilter('search', '')}
-                                        />
+                                        <span>Search: "{filters.search}"</span>
+                                        <button
+                                            type="button"
+                                            className="ml-1 p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                updateFilter('search', '');
+                                            }}
+                                            aria-label="Remove search filter"
+                                        >
+                                            <X className="h-3 w-3 text-gray-500 hover:text-violet-600" />
+                                        </button>
                                     </Badge>
                                 )}
                                 {filters.location.map((location) => (
                                     <Badge key={location} variant="outline" className="flex items-center gap-1">
                                         <MapPin className="h-3 w-3" />
-                                        {location}
-                                        <X
-                                            className="h-3 w-3 cursor-pointer"
-                                            onClick={() => removeFilterItem('location', location)}
-                                        />
+                                        <span>{location}</span>
+                                        <button
+                                            type="button"
+                                            className="ml-1 p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                removeFilterItem('location', location);
+                                            }}
+                                            aria-label={`Remove ${location} filter`}
+                                        >
+                                            <X className="h-3 w-3 text-gray-500 hover:text-violet-600" />
+                                        </button>
                                     </Badge>
                                 ))}
                                 {filters.industry.map((industry) => (
                                     <Badge key={industry} variant="outline" className="flex items-center gap-1">
                                         <Building2 className="h-3 w-3" />
-                                        {industry}
-                                        <X
-                                            className="h-3 w-3 cursor-pointer"
-                                            onClick={() => removeFilterItem('industry', industry)}
-                                        />
+                                        <span>{industry}</span>
+                                        <button
+                                            type="button"
+                                            className="ml-1 p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                removeFilterItem('industry', industry);
+                                            }}
+                                            aria-label={`Remove ${industry} filter`}
+                                        >
+                                            <X className="h-3 w-3 text-gray-500 hover:text-violet-600" />
+                                        </button>
                                     </Badge>
                                 ))}
                                 {filters.jobType.map((type) => (
                                     <Badge key={type} variant="outline" className="flex items-center gap-1">
-                                        {type}
-                                        <X
-                                            className="h-3 w-3 cursor-pointer"
-                                            onClick={() => removeFilterItem('jobType', type)}
-                                        />
+                                        <span>{type}</span>
+                                        <button
+                                            type="button"
+                                            className="ml-1 p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                removeFilterItem('jobType', type);
+                                            }}
+                                            aria-label={`Remove ${type} filter`}
+                                        >
+                                            <X className="h-3 w-3 text-gray-500 hover:text-violet-600" />
+                                        </button>
                                     </Badge>
                                 ))}
                                 {filters.workStyle.map((style) => (
                                     <Badge key={style} variant="outline" className="flex items-center gap-1">
-                                        {style}
-                                        <X
-                                            className="h-3 w-3 cursor-pointer"
-                                            onClick={() => removeFilterItem('workStyle', style)}
-                                        />
+                                        <span>{style}</span>
+                                        <button
+                                            type="button"
+                                            className="ml-1 p-0.5 hover:bg-violet-100 rounded-full transition-colors"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                removeFilterItem('workStyle', style);
+                                            }}
+                                            aria-label={`Remove ${style} filter`}
+                                        >
+                                            <X className="h-3 w-3 text-gray-500 hover:text-violet-600" />
+                                        </button>
                                     </Badge>
                                 ))}
                             </div>
