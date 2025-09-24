@@ -81,6 +81,7 @@ const POSTED_WITHIN_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
+    { value: "ai_match", label: "AI Recommended" },
     { value: "relevance", label: "Most Relevant" },
     { value: "newest", label: "Newest First" },
     { value: "oldest", label: "Oldest First" },

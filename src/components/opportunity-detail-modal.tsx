@@ -3,12 +3,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  X, 
-  MapPin, 
-  Building2, 
-  Clock, 
-  Users, 
+import {
+  X,
+  MapPin,
+  Building2,
+  Clock,
+  Users,
   Calendar,
   Briefcase,
   DollarSign,
@@ -88,12 +88,12 @@ export default function OpportunityDetailModal({
         const { error } = await supabase
           .from("interests")
           .insert([{ user_id: user.id, opp_id: opportunity.id }]);
-        
+
         if (error) {
           toast.error(error.message || "Failed to apply.");
           return;
         }
-        
+
         toast.success("Applied successfully");
       } catch (e) {
         toast.error("Something went wrong. Please try again.");
@@ -105,13 +105,13 @@ export default function OpportunityDetailModal({
 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: { type: "spring" as const, duration: 0.5 }
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       scale: 0.8,
       transition: { duration: 0.3 }
     }
@@ -192,12 +192,11 @@ export default function OpportunityDetailModal({
                   {/* Match Score & Status */}
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     {opportunity.similarity && (
-                      <span className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full ${
-                        opportunity.similarity >= 95
+                      <span className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full ${opportunity.similarity >= 95
                           ? "bg-green-100 text-green-700"
                           : "bg-primary/15 text-primary"
-                      }`}>
-                        {opportunity.similarity}% Match
+                        }`}>
+                        {Math.round(opportunity.similarity)}% Match
                       </span>
                     )}
                     <span className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-blue-100 text-blue-700 rounded-full">
@@ -291,7 +290,7 @@ export default function OpportunityDetailModal({
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
                       Boost Your Application Success
                     </h3>
-                    
+
                     {/* Free Tips */}
                     <div className="bg-primary/5 rounded-xl p-4 mb-4">
                       <h4 className="font-medium text-gray-900 mb-2">Free Tips</h4>
@@ -325,9 +324,9 @@ export default function OpportunityDetailModal({
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                             Professional resume review and optimization by industry experts
                           </p>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -353,9 +352,9 @@ export default function OpportunityDetailModal({
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                             Optimize your LinkedIn profile to attract recruiters and opportunities
                           </p>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -381,9 +380,9 @@ export default function OpportunityDetailModal({
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                             Practice with industry professionals and get personalized feedback
                           </p>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -421,8 +420,8 @@ export default function OpportunityDetailModal({
                           )}
                         </Button>
                       ) : (
-                        <Button 
-                          disabled 
+                        <Button
+                          disabled
                           className="px-8 py-3 font-bold bg-green-600 hover:bg-green-600 text-white shadow-lg"
                           size="lg"
                         >
