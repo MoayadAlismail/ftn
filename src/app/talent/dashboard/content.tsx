@@ -121,13 +121,13 @@ export default function TalentDashboardContent() {
                   <Search size={24} className="text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Find Opportunities</h3>
-                  <p className="text-sm text-gray-600">Discover personalized matches</p>
+                  <h3 className="font-semibold text-gray-900">AI-Powered Opportunities</h3>
+                  <p className="text-sm text-gray-600">Personalized job recommendations</p>
                 </div>
               </div>
-              <Link href="/talent/match-making" prefetch={true}>
+              <Link href="/talent/opportunities" prefetch={true}>
                 <Button className="w-full">
-                  Start Matching
+                  Explore Feed
                 </Button>
               </Link>
             </Card>
@@ -160,7 +160,7 @@ export default function TalentDashboardContent() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Applications</h3>
                   <p className="text-sm text-gray-600">
-                    {applicationStats.thisMonth > 0 
+                    {applicationStats.thisMonth > 0
                       ? `${applicationStats.thisMonth} this month`
                       : 'Total applications'
                     }
@@ -268,7 +268,7 @@ export default function TalentDashboardContent() {
                 {applicationStats.total === 0 ? "No applications yet" : `${applicationStats.total} applications`}
               </h4>
               <p className="text-gray-600 mb-4">
-                {applicationStats.total === 0 
+                {applicationStats.total === 0
                   ? "When you apply to opportunities, they'll appear here for you to track."
                   : "Click 'View All Applications' to see detailed application status and manage your applications."
                 }

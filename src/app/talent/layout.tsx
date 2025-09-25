@@ -67,14 +67,10 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
       label: "Dashboard"
     },
     {
-      href: "/talent/match-making", 
-      icon: Search,
-      label: "AI Matching"
-    },
-    {
       href: "/talent/opportunities",
       icon: Building2,
-      label: "Browse Jobs"
+      label: "Opportunities",
+      description: "AI-powered job recommendations"
     },
     {
       href: "/talent/applications",
@@ -115,11 +111,10 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                   key={item.href}
                   href={item.href}
                   prefetch={true}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                    pathname === item.href
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${pathname === item.href
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                 >
                   <item.icon size={16} />
                   {item.label}
@@ -141,7 +136,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                   {user?.user_metadata.name}
                 </p>
               </Link>
-              
+
               {/* Desktop sign out */}
               <div className="hidden lg:block">
                 <SignOutButton />
@@ -170,11 +165,10 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                     href={item.href}
                     prefetch={true}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors relative ${
-                      pathname === item.href
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors relative ${pathname === item.href
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
                   >
                     <item.icon size={18} />
                     {item.label}
@@ -185,11 +179,11 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                     )}
                   </Link>
                 ))}
-                
+
                 {/* Mobile user info and sign out */}
                 <div className="pt-4 mt-4 border-t border-gray-200">
-                  <Link 
-                    href="/talent/dashboard?tab=profile" 
+                  <Link
+                    href="/talent/dashboard?tab=profile"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer"
                   >

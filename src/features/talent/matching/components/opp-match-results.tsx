@@ -130,7 +130,7 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {opportunities.map((opp) => (
                         <motion.div key={opp.id} variants={itemVariants}>
-                            <Card 
+                            <Card
                                 className="p-6 relative overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30"
                                 onClick={() => handleViewDetails(opp)}
                             >
@@ -138,14 +138,14 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                                     <div className="space-y-4 flex-1">
                                         <div className="flex items-center gap-2">
                                             <h2 className="text-xl font-semibold">{opp.title}</h2>
-                                             <span className={`px-3 py-1 text-sm rounded-full ${opp.similarity >= 95
+                                            <span className={`px-3 py-1 text-sm rounded-full ${opp.similarity >= 95
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-primary/15 text-primary"
                                                 }`}>
-                                                {opp.similarity}% Match
+                                                {Math.round(opp.similarity)}% Match
                                             </span>
                                             {opp.workstyle && (
-                                                 <span className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full">
+                                                <span className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full">
                                                     {opp.workstyle}
                                                 </span>
                                             )}
