@@ -85,7 +85,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
       href: "/talent/invitations",
       icon: Mail,
       label: "Invitations",
-      badge: pendingInvitations
+      badge: pendingInvitations > 0 ? pendingInvitations : undefined
     }
   ];
 
