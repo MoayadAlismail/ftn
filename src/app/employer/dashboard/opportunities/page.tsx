@@ -23,6 +23,7 @@ import {
   Briefcase,
   PlusCircle,
 } from "lucide-react";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,9 +33,8 @@ import { toast } from "sonner";
 
 const workStyles = [
   "Full Time",
-  "Internships",
-  "Bootcamps",
-  "Hackathons",
+  "Internship/Co-op",
+  "Tamheer",
 ] as const;
 
 type WorkStyle = (typeof workStyles)[number];
@@ -42,7 +42,7 @@ type WorkStyle = (typeof workStyles)[number];
 interface OpportunityFormData {
   title: string;
   company_name: string;
-  workstyle: WorkStyle | "";
+  workstyle: WorkStyle[];
   location: string;
   industry: string;
   description: string;
@@ -52,7 +52,7 @@ interface OpportunityFormData {
 const initialFormData: OpportunityFormData = {
   title: "",
   company_name: "",
-  workstyle: "",
+  workstyle: [],
   location: "",
   industry: "",
   description: "",
@@ -97,13 +97,26 @@ function OpportunitiesPageContent() {
     try {
       if (!user?.id) return;
 
+      // Get the employer record ID first
+      const { data: employerData, error: employerError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+        
+      if (employerError || !employerData) {
+        console.error("Employer profile not found:", employerError);
+        if (!showRefreshToast) toast.error("Employer profile not found");
+        return;
+      }
+
       const { data, error } = await supabase
         .from("opportunities")
         .select(`
           *,
           application_count:interests(count)
         `)
-        .eq("user_id", user.id);
+        .eq("user_id", employerData.id);
 
       if (error) {
         console.error("Error fetching opportunities:", error);
@@ -162,10 +175,10 @@ function OpportunitiesPageContent() {
     }));
   };
 
-  const handleWorkStyleChange = (value: string) => {
+  const handleWorkStyleChange = (values: string[]) => {
     setFormData((prev) => ({
       ...prev,
-      workstyle: value as WorkStyle,
+      workstyle: values as WorkStyle[],
     }));
   };
 
@@ -176,15 +189,31 @@ function OpportunitiesPageContent() {
       if (
         !formData.title ||
         !formData.company_name ||
-        !formData.workstyle ||
+        formData.workstyle.length === 0 ||
         !formData.location
       ) {
         throw new Error("Please fill in all required fields");
       }
 
       const user_data = await supabase.auth.getUser();
-      const user_id = user_data.data.user?.id;
-      const dataToInsert = { ...formData, user_id: user_id };
+      const auth_user_id = user_data.data.user?.id;
+      
+      // Get the employer record ID (not the auth user ID)
+      const { data: employerData, error: employerError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("user_id", auth_user_id)
+        .single();
+        
+      if (employerError || !employerData) {
+        throw new Error("Employer profile not found. Please complete your onboarding first.");
+      }
+      
+      const dataToInsert = { 
+        ...formData, 
+        user_id: employerData.id, // Use employer ID, not auth user ID
+        workstyle: formData.workstyle.join(", ") // Join array for storage
+      };
       dataToInsert.skills = (dataToInsert.skills as string).split(",").map((skill) => skill.trim());
 
       const { data, error } = await supabase
@@ -386,18 +415,13 @@ function OpportunitiesPageContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Work Style *
                     </label>
-                    <Select value={formData.workstyle} onValueChange={handleWorkStyleChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select work style" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {workStyles.map((style) => (
-                          <SelectItem key={style} value={style}>
-                            {style}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <MultiSelect
+                      options={workStyles.map(style => ({ label: style, value: style }))}
+                      selected={formData.workstyle}
+                      onChange={handleWorkStyleChange}
+                      placeholder="Select work styles..."
+                      className="w-full"
+                    />
                   </div>
 
                   <div>

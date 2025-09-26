@@ -76,7 +76,7 @@ export default function TalentOnboarding() {
 
                 const queryPromise = supabase
                     .from('talents')
-                    .select('id')
+                    .select('id, user_id')
                     .eq('user_id', user!.id)
                     .maybeSingle();
 
@@ -207,7 +207,7 @@ export default function TalentOnboarding() {
 
                 while (dbAttempts < maxDbAttempts && !profileCreated) {
                     try {
-                        const { data, error } = await supabase.from("talents").insert({
+                        const profileData = {
                             id: user.id,
                             user_id: user.id,
                             email: user.email || "unknown@email.com",
@@ -217,7 +217,9 @@ export default function TalentOnboarding() {
                             industry_pref: onboardingData.industryPreference,
                             location_pref: onboardingData.locationPreference,
                             resume_url: resumeUrl,
-                        });
+                        };
+                        
+                        const { data, error } = await supabase.from("talents").insert(profileData);
 
                         if (error) {
                             throw error;
@@ -226,6 +228,7 @@ export default function TalentOnboarding() {
                         profileCreated = true;
                     } catch (error) {
                         dbAttempts++;
+                        
                         if (dbAttempts >= maxDbAttempts) {
                             console.error("Error inserting talent profile after retries:", error);
                             toast.error("Failed to create profile after multiple attempts");
@@ -236,11 +239,35 @@ export default function TalentOnboarding() {
                     }
                 }
 
-                // Update user metadata to mark as onboarded (non-blocking)
+                // Verify profile was created by checking it exists
                 try {
-                    await supabase.auth.updateUser({
+                    const { data: verifyData, error: verifyError } = await supabase
+                        .from('talents')
+                        .select('id, user_id')
+                        .eq('user_id', user.id)
+                        .maybeSingle();
+                        
+                    if (verifyError || !verifyData) {
+                        console.error("Profile verification failed:", verifyError);
+                        toast.error("Profile creation verification failed. Please try again.");
+                        return;
+                    }
+                } catch (verifyError) {
+                    console.error("Error verifying profile:", verifyError);
+                    toast.error("Profile creation verification failed. Please try again.");
+                    return;
+                }
+
+                // Update user metadata to mark as onboarded (non-blocking but important)
+                try {
+                    const { error: metadataError } = await supabase.auth.updateUser({
                         data: { is_onboarded: true }
                     });
+                    
+                    if (metadataError) {
+                        console.error("Error updating user metadata:", metadataError);
+                        // This is important but not fatal - the profile exists in DB
+                    }
                 } catch (metadataError) {
                     console.error("Error updating user metadata:", metadataError);
                     // Don't fail the entire process for metadata update failure

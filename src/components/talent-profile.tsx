@@ -20,11 +20,37 @@ import {
   Building2,
   Globe,
   Phone,
-  Loader2
+  Loader2,
+  Check
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+
+// Constants for onboarding preferences
+const INDUSTRIES = [
+  "Technology",
+  "Finance", 
+  "Healthcare",
+  "Marketing",
+  "Design",
+  "Consulting",
+  "Education",
+  "Non-profit",
+  "Media",
+  "Retail",
+  "Manufacturing",
+  "Real Estate",
+  "Energy",
+  "Transportation",
+] as const;
+
+const WORK_STYLES = [
+  { id: "full-time", label: "Full-time Jobs" },
+  { id: "internships", label: "Internships" },
+  { id: "bootcamps", label: "Bootcamps" },
+  { id: "hackathons", label: "Hackathons" },
+] as const;
 
 interface TalentProfile {
   id: string;
@@ -103,10 +129,11 @@ export default function TalentProfile() {
           full_name: editForm.full_name,
           bio: editForm.bio,
           location_pref: editForm.location_pref,
+          work_style_pref: editForm.work_style_pref,
+          industry_pref: editForm.industry_pref,
           phone: editForm.phone,
           linkedin_url: editForm.linkedin_url,
           website_url: editForm.website_url,
-          updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
 
@@ -129,6 +156,32 @@ export default function TalentProfile() {
 
   const handleInputChange = (field: keyof TalentProfile, value: string) => {
     setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleArrayChange = (field: keyof TalentProfile, value: string[]) => {
+    setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const toggleIndustry = (industry: string) => {
+    const currentIndustries = editForm.industry_pref || [];
+    const isSelected = currentIndustries.includes(industry);
+    
+    if (isSelected) {
+      handleArrayChange('industry_pref', currentIndustries.filter(i => i !== industry));
+    } else if (currentIndustries.length < 3) {
+      handleArrayChange('industry_pref', [...currentIndustries, industry]);
+    }
+  };
+
+  const toggleWorkStyle = (workStyleId: string) => {
+    const currentWorkStyles = editForm.work_style_pref || [];
+    const isSelected = currentWorkStyles.includes(workStyleId);
+    
+    if (isSelected) {
+      handleArrayChange('work_style_pref', currentWorkStyles.filter(w => w !== workStyleId));
+    } else {
+      handleArrayChange('work_style_pref', [...currentWorkStyles, workStyleId]);
+    }
   };
 
   if (isLoading) {
@@ -296,7 +349,7 @@ export default function TalentProfile() {
               {/* Website */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Personal Website
+                  Personal Website/Portfolio
                 </label>
                 {isEditing ? (
                   <Input
@@ -356,18 +409,49 @@ export default function TalentProfile() {
               {/* Work Style */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Work Style
+                  Work Style Preferences
                 </label>
-                <div className="flex flex-wrap gap-1 md:gap-2">
-                  {profile.work_style_pref?.map((style, index) => (
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500">Select the types of opportunities you're interested in:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {WORK_STYLES.map((workStyle) => {
+                        const isSelected = editForm.work_style_pref?.includes(workStyle.id) || false;
+                        return (
+                          <button
+                            key={workStyle.id}
+                            type="button"
+                            onClick={() => toggleWorkStyle(workStyle.id)}
+                            className={`p-2 text-sm border rounded-lg text-left transition-colors ${
+                              isSelected
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{workStyle.label}</span>
+                              {isSelected && <Check size={16} />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-1 md:gap-2">
+                    {profile.work_style_pref?.map((styleId, index) => {
+                      const workStyle = WORK_STYLES.find(w => w.id === styleId);
+                      return (
                     <span 
                       key={index}
-                      className="px-2 md:px-3 py-1 bg-primary/10 text-primary text-xs md:text-sm rounded-full"
+                          className="px-2 md:px-3 py-1 bg-primary/10 text-primary text-xs md:text-sm rounded-full"
                     >
-                      {style}
+                          {workStyle?.label || styleId}
                     </span>
-                  ))}
+                      );
+                    })}
                 </div>
+                )}
               </div>
 
               {/* Industries */}
@@ -375,16 +459,48 @@ export default function TalentProfile() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Industry Preferences
                 </label>
-                <div className="flex flex-wrap gap-1 md:gap-2">
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500">Select up to 3 industries that interest you most:</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {INDUSTRIES.map((industry) => {
+                        const isSelected = editForm.industry_pref?.includes(industry) || false;
+                        const isDisabled = !isSelected && (editForm.industry_pref?.length || 0) >= 3;
+                        return (
+                          <button
+                            key={industry}
+                            type="button"
+                            onClick={() => toggleIndustry(industry)}
+                            disabled={isDisabled}
+                            className={`p-2 text-sm border rounded-lg text-left transition-colors ${
+                              isSelected
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : isDisabled
+                                ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{industry}</span>
+                              {isSelected && <Check size={16} />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-1 md:gap-2">
                   {profile.industry_pref?.map((industry, index) => (
                     <span 
                       key={index}
-                      className="px-2 md:px-3 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded-full"
+                        className="px-2 md:px-3 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded-full"
                     >
                       {industry}
                     </span>
                   ))}
                 </div>
+                )}
               </div>
             </div>
           </Card>

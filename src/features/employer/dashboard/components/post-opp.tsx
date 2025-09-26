@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { supabase } from "@/lib/supabase/client";
 import { CirclePlus, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -16,9 +17,8 @@ import { toast } from "sonner";
 
 const workStyles = [
   "Full Time",
-  "Internships",
-  "Bootcamps",
-  "Hackathons",
+  "Internship/Co-op",
+  "Tamheer",
 ] as const;
 
 type WorkStyle = (typeof workStyles)[number];
@@ -26,7 +26,7 @@ type WorkStyle = (typeof workStyles)[number];
 interface OpportunityFormData {
   title: string;
   company_name: string;
-  workstyle: WorkStyle | "";
+  workstyle: WorkStyle[];
   location: string;
   industry: string;
   description: string;
@@ -36,7 +36,7 @@ interface OpportunityFormData {
 const initialFormData: OpportunityFormData = {
   title: "",
   company_name: "",
-  workstyle: "",
+  workstyle: [],
   location: "",
   industry: "",
   description: "",
@@ -58,10 +58,10 @@ export default function PostOpp() {
     }));
   };
 
-  const handleWorkStyleChange = (value: string) => {
+  const handleWorkStyleChange = (values: string[]) => {
     setFormData((prev) => ({
       ...prev,
-      workstyle: value as WorkStyle,
+      workstyle: values as WorkStyle[],
     }));
   };
 
@@ -72,17 +72,31 @@ export default function PostOpp() {
       if (
         !formData.title ||
         !formData.company_name ||
-        !formData.workstyle ||
+        formData.workstyle.length === 0 ||
         !formData.location
       ) {
         throw new Error("Please fill in all required fields");
       }
 
       // TODO: API call will be implemented by user
-      console.log("Form submitted:", formData);
       const user = await supabase.auth.getUser();
-      const user_id = user.data.user?.id;
-      const dataToInsert = { ...formData, user_id: user_id };
+      const auth_user_id = user.data.user?.id;
+      
+      const { data: employerData, error: employerError } = await supabase
+        .from("employers")
+        .select("id")
+        .eq("user_id", auth_user_id)
+        .single();
+        
+      if (employerError || !employerData) {
+        throw new Error("Employer profile not found. Please complete your onboarding first.");
+      }
+      
+      const dataToInsert = { 
+        ...formData, 
+        user_id: employerData.id, // Use employer ID, not auth user ID
+        workstyle: formData.workstyle.join(", ") // Join array for storage
+      };
       dataToInsert.skills = (dataToInsert.skills as string).split(",").map((skill) => skill.trim());
       console.log("full form data", dataToInsert);
 
@@ -180,22 +194,18 @@ export default function PostOpp() {
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Select
-            name="workstyle"
-            value={formData.workstyle}
-            onValueChange={handleWorkStyleChange}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Job Type" />
-            </SelectTrigger>
-            <SelectContent className="w-full">
-              {workStyles.map((workStyle) => (
-                <SelectItem key={workStyle} value={workStyle}>
-                  {workStyle}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Work Style *
+            </label>
+            <MultiSelect
+              options={workStyles.map(style => ({ label: style, value: style }))}
+              selected={formData.workstyle}
+              onChange={handleWorkStyleChange}
+              placeholder="Select work styles..."
+              className="w-full"
+            />
+          </div>
           <Input
             name="location"
             placeholder="Location (e.g., Remote, San Francisco, CA)"
