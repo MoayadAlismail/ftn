@@ -10,7 +10,9 @@ import {
     Grid,
     List,
     Search,
-    RefreshCw
+    RefreshCw,
+    Bookmark,
+    BookmarkCheck
 } from "lucide-react";
 import OpportunityFilters, { type OpportunityFilters as FilterType } from "@/features/talent/opportunities/components/opportunity-filters";
 import OpportunityCard, { type Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
@@ -39,10 +41,13 @@ function TalentOpportunitiesContent() {
     const { user, authUser, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [savedOpportunities, setSavedOpportunities] = useState<Opportunity[]>([]);
     const [filteredOpportunities, setFilteredOpportunities] = useState<Opportunity[]>([]);
     const [filters, setFilters] = useState<FilterType>(DEFAULT_FILTERS);
     const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+    const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
     const [loading, setLoading] = useState(true);
+    const [savedLoading, setSavedLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
     const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
@@ -63,13 +68,20 @@ function TalentOpportunitiesContent() {
     // Load opportunities
     useEffect(() => {
         loadOpportunities();
-        loadSavedOpportunities();
+        loadSavedOpportunityIds();
     }, []);
 
-    // Apply filters whenever filters or opportunities change
+    // Load saved opportunities when switching to saved tab
+    useEffect(() => {
+        if (activeTab === "saved") {
+            loadSavedOpportunitiesData();
+        }
+    }, [activeTab, authUser?.id]);
+
+    // Apply filters whenever filters, opportunities, or activeTab change
     useEffect(() => {
         applyFilters();
-    }, [filters, opportunities]);
+    }, [filters, opportunities, savedOpportunities, activeTab]);
 
     const loadOpportunities = async () => {
         setLoading(true);
@@ -117,28 +129,15 @@ function TalentOpportunitiesContent() {
         }
     };
 
-    const loadSavedOpportunities = async () => {
+    const loadSavedOpportunityIds = async () => {
         try {
             if (!authUser?.id) return;
 
-            // First get the talent_id from the talents table using user_id
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError) {
-                throw talentError;
-            }
-
-            if (!talentData?.id) return;
-
-            // Then get saved opportunities using talent_id
+            // Use auth user ID directly since saved_opportunities.talent_id references auth.users(id)
             const { data: savedOpportunities, error } = await supabase
                 .from('saved_opportunities')
                 .select('opportunity_id')
-                .eq('talent_id', talentData.id);
+                .eq('talent_id', authUser.id);
 
             if (error) {
                 throw error;
@@ -151,14 +150,101 @@ function TalentOpportunitiesContent() {
         }
     };
 
-    const applyFilters = useCallback(() => {
-        let filtered = [...opportunities];
+    const loadSavedOpportunitiesData = async () => {
+        setSavedLoading(true);
+        try {
+            if (!authUser?.id) return;
 
-        // Update saved status
-        filtered = filtered.map(opp => ({
-            ...opp,
-            isSaved: savedOpportunityIds.has(opp.id)
-        }));
+            // First, get saved opportunity records with metadata
+            const { data: savedRecords, error: savedError } = await supabase
+                .from('saved_opportunities')
+                .select('opportunity_id, saved_at, notes')
+                .eq('talent_id', authUser.id)
+                .order('saved_at', { ascending: false });
+
+            if (savedError) {
+                throw savedError;
+            }
+
+            if (!savedRecords || savedRecords.length === 0) {
+                setSavedOpportunities([]);
+                return;
+            }
+
+            // Extract opportunity IDs
+            const opportunityIds = savedRecords.map(record => record.opportunity_id);
+
+            // Then fetch the full opportunity data
+            const { data: opportunities, error: oppError } = await supabase
+                .from('opportunities')
+                .select(`
+                    id,
+                    title,
+                    company_name,
+                    location,
+                    industry,
+                    workstyle,
+                    skills,
+                    description,
+                    created_at
+                `)
+                .in('id', opportunityIds);
+
+            if (oppError) {
+                throw oppError;
+            }
+
+            // Combine the data
+            const transformedSavedOpportunities: Opportunity[] = (opportunities || [])
+                .map(opp => {
+                    const savedRecord = savedRecords.find(record => record.opportunity_id === opp.id);
+                    if (!savedRecord) return null;
+                    
+                    return {
+                        id: opp.id,
+                        title: opp.title,
+                        company_name: opp.company_name,
+                        location: opp.location,
+                        industry: opp.industry,
+                        workstyle: opp.workstyle,
+                        skills: opp.skills || [],
+                        description: opp.description,
+                        created_at: opp.created_at,
+                        isSaved: true,
+                        savedAt: savedRecord.saved_at,
+                        savedNotes: savedRecord.notes,
+                        matchScore: undefined
+                    };
+                })
+                .filter(Boolean) as Opportunity[];
+
+            // Sort by saved_at date (most recent first)
+            transformedSavedOpportunities.sort((a, b) => {
+                const aDate = a.savedAt ? new Date(a.savedAt).getTime() : 0;
+                const bDate = b.savedAt ? new Date(b.savedAt).getTime() : 0;
+                return bDate - aDate;
+            });
+
+            setSavedOpportunities(transformedSavedOpportunities);
+        } catch (error) {
+            console.error("Error loading saved opportunities data:", error);
+            toast.error("Failed to load saved opportunities");
+        } finally {
+            setSavedLoading(false);
+        }
+    };
+
+    const applyFilters = useCallback(() => {
+        // Choose the appropriate data source based on active tab
+        let filtered = activeTab === "saved" ? [...savedOpportunities] : [...opportunities];
+
+        // Update saved status for "all" tab opportunities
+        if (activeTab === "all") {
+            filtered = filtered.map(opp => ({
+                ...opp,
+                isSaved: savedOpportunityIds.has(opp.id)
+            }));
+        }
 
         // Apply search filter
         if (filters.search.trim()) {
@@ -238,7 +324,7 @@ function TalentOpportunitiesContent() {
         }
 
         setFilteredOpportunities(filtered);
-    }, [filters, opportunities, savedOpportunityIds]);
+    }, [filters, opportunities, savedOpportunities, savedOpportunityIds, activeTab]);
 
     const handleSaveOpportunity = async (opportunityId: string) => {
         try {
@@ -247,26 +333,11 @@ function TalentOpportunitiesContent() {
                 return;
             }
 
-            // First get the talent_id from the talents table using user_id
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError) {
-                throw talentError;
-            }
-
-            if (!talentData?.id) {
-                toast.error("Talent profile not found");
-                return;
-            }
-
+            // Use auth user ID directly since saved_opportunities.talent_id references auth.users(id)
             const { error } = await supabase
                 .from('saved_opportunities')
                 .insert({
-                    talent_id: talentData.id,
+                    talent_id: authUser.id,
                     opportunity_id: opportunityId,
                     saved_at: new Date().toISOString()
                 });
@@ -278,6 +349,11 @@ function TalentOpportunitiesContent() {
             const newSavedIds = new Set(savedOpportunityIds);
             newSavedIds.add(opportunityId);
             setSavedOpportunityIds(newSavedIds);
+
+            // Refresh saved opportunities if on saved tab
+            if (activeTab === "saved") {
+                loadSavedOpportunitiesData();
+            }
 
             toast.success("Opportunity saved successfully");
         } catch (error) {
@@ -293,26 +369,11 @@ function TalentOpportunitiesContent() {
                 return;
             }
 
-            // First get the talent_id from the talents table using user_id
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError) {
-                throw talentError;
-            }
-
-            if (!talentData?.id) {
-                toast.error("Talent profile not found");
-                return;
-            }
-
+            // Use auth user ID directly since saved_opportunities.talent_id references auth.users(id)
             const { error } = await supabase
                 .from('saved_opportunities')
                 .delete()
-                .eq('talent_id', talentData.id)
+                .eq('talent_id', authUser.id)
                 .eq('opportunity_id', opportunityId);
 
             if (error) {
@@ -322,6 +383,11 @@ function TalentOpportunitiesContent() {
             const newSavedIds = new Set(savedOpportunityIds);
             newSavedIds.delete(opportunityId);
             setSavedOpportunityIds(newSavedIds);
+
+            // Refresh saved opportunities if on saved tab
+            if (activeTab === "saved") {
+                loadSavedOpportunitiesData();
+            }
 
             toast.success("Opportunity removed from saved");
         } catch (error) {
@@ -347,9 +413,13 @@ function TalentOpportunitiesContent() {
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        await loadOpportunities();
+        if (activeTab === "all") {
+            await loadOpportunities();
+        } else {
+            await loadSavedOpportunitiesData();
+        }
         setRefreshing(false);
-        toast.success("Opportunities refreshed");
+        toast.success(`${activeTab === "all" ? "Opportunities" : "Saved opportunities"} refreshed`);
     };
 
     const clearFilters = () => {
@@ -398,6 +468,42 @@ function TalentOpportunitiesContent() {
                         </div>
                     </div>
                 </div>
+
+                {/* Tabs */}
+                <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+                    <Button
+                        variant={activeTab === "all" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveTab("all")}
+                        className={`relative ${
+                            activeTab === "all" 
+                                ? "bg-white shadow-sm text-gray-900" 
+                                : "text-gray-600 hover:text-gray-900"
+                        }`}
+                    >
+                        <Search className="h-4 w-4 mr-2" />
+                        All Jobs
+                        <span className="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                            {opportunities.length}
+                        </span>
+                    </Button>
+                    <Button
+                        variant={activeTab === "saved" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveTab("saved")}
+                        className={`relative ${
+                            activeTab === "saved" 
+                                ? "bg-white shadow-sm text-gray-900" 
+                                : "text-gray-600 hover:text-gray-900"
+                        }`}
+                    >
+                        <BookmarkCheck className="h-4 w-4 mr-2" />
+                        Saved Jobs
+                        <span className="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                            {savedOpportunityIds.size}
+                        </span>
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -410,21 +516,37 @@ function TalentOpportunitiesContent() {
             />
 
             {/* Results */}
-            {loading ? (
+            {(activeTab === "all" && loading) || (activeTab === "saved" && savedLoading) ? (
                 <div className="flex justify-center py-12">
-                    <LoadingAnimation size="md" text="Loading opportunities..." />
+                    <LoadingAnimation size="md" text={`Loading ${activeTab === "all" ? "opportunities" : "saved opportunities"}...`} />
                 </div>
             ) : filteredOpportunities.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
-                        <p className="text-gray-600 mb-6">
-                            Try adjusting your filters or search terms to find more opportunities.
-                        </p>
-                        <Button onClick={clearFilters} variant="outline">
-                            Clear All Filters
-                        </Button>
+                        {activeTab === "saved" ? (
+                            <>
+                                <Bookmark className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">No saved opportunities yet</h3>
+                                <p className="text-gray-600 mb-6">
+                                    Start exploring opportunities and save the ones that interest you. 
+                                    Your saved opportunities will appear here for easy access.
+                                </p>
+                                <Button onClick={() => setActiveTab("all")} variant="outline">
+                                    Browse All Jobs
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                                <p className="text-gray-600 mb-6">
+                                    Try adjusting your filters or search terms to find more opportunities.
+                                </p>
+                                <Button onClick={clearFilters} variant="outline">
+                                    Clear All Filters
+                                </Button>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             ) : (

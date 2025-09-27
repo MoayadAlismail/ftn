@@ -32,6 +32,8 @@ export interface Opportunity {
     isSaved?: boolean;
     matchScore?: number; // 0-100 AI match percentage
     created_at?: string;
+    savedAt?: string; // When the opportunity was saved
+    savedNotes?: string; // Notes added when saving
 }
 
 interface OpportunityCardProps {
@@ -151,7 +153,7 @@ const OpportunityCard = memo(function OpportunityCard({
                                 disabled={isLoading}
                             >
                                 {isSaved ? (
-                                    <HeartOff className="h-4 w-4" />
+                                    <Heart className="h-4 w-4 fill-current" />
                                 ) : (
                                     <Heart className="h-4 w-4" />
                                 )}
@@ -202,7 +204,7 @@ const OpportunityCard = memo(function OpportunityCard({
                                     disabled={isLoading}
                                 >
                                     {isSaved ? (
-                                        <HeartOff className="h-4 w-4" />
+                                        <Heart className="h-4 w-4 fill-current" />
                                     ) : (
                                         <Heart className="h-4 w-4" />
                                     )}
@@ -226,7 +228,7 @@ const OpportunityCard = memo(function OpportunityCard({
 
                         <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between">
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0 pr-2">
                                     <h3 className="text-xl font-semibold text-gray-900 mb-1">
                                         {opportunity.title}
                                     </h3>
@@ -247,9 +249,9 @@ const OpportunityCard = memo(function OpportunityCard({
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 ml-4">
+                                <div className="flex items-start gap-2 flex-shrink-0">
                                     {opportunity.matchScore && (
-                                        <Badge variant="default" className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                        <Badge variant="default" className="bg-gradient-to-r from-green-500 to-green-600 text-white hidden sm:block">
                                             {opportunity.matchScore}% match
                                         </Badge>
                                     )}
@@ -258,21 +260,31 @@ const OpportunityCard = memo(function OpportunityCard({
                                         size="sm"
                                         onClick={handleSaveToggle}
                                         disabled={isLoading}
+                                        className="flex-shrink-0"
                                     >
                                         {isSaved ? (
                                             <>
-                                                <HeartOff className="h-4 w-4 mr-2" />
-                                                Saved
+                                                <Heart className="h-4 w-4 fill-current font-bold" />
+                                                <span className="ml-2 hidden sm:inline">Saved</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Heart className="h-4 w-4 mr-2" />
-                                                Save
+                                                <Heart className="h-4 w-4" />
+                                                <span className="ml-2 hidden sm:inline">Save</span>
                                             </>
                                         )}
                                     </Button>
                                 </div>
                             </div>
+                            
+                            {/* Mobile-only match score badge */}
+                            {opportunity.matchScore && (
+                                <div className="mt-2 sm:hidden">
+                                    <Badge variant="default" className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                        {opportunity.matchScore}% match
+                                    </Badge>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
