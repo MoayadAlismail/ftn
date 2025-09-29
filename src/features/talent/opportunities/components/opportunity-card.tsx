@@ -261,13 +261,13 @@ const OpportunityCard = memo(function OpportunityCard({
                                     >
                                         {isSaved ? (
                                             <>
-                                                <HeartOff className="h-4 w-4 mr-2" />
-                                                Saved
+                                                <Heart className="h-4 w-4 fill-current sm:mr-2" />
+                                                <span className="hidden sm:inline">Saved</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Heart className="h-4 w-4 mr-2" />
-                                                Save
+                                                <Heart className="h-4 w-4 sm:mr-2" />
+                                                <span className="hidden sm:inline">Save</span>
                                             </>
                                         )}
                                     </Button>
