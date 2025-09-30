@@ -15,13 +15,17 @@ import {
   MapPin,
   RefreshCw,
   Filter,
-  Eye
+  Eye,
+  Heart,
+  BookmarkCheck
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import OpportunityCard, { type Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
+import OpportunityDetailModal from "@/components/opportunity-detail-modal";
 
 interface Application {
   id: string;
@@ -49,10 +53,17 @@ export default function TalentApplicationsPage() {
   const { user, authUser, isLoading } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
+  const [savedOpportunities, setSavedOpportunities] = useState<Opportunity[]>([]);
+  const [filteredSavedOpportunities, setFilteredSavedOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [savedLoading, setSavedLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<"applications" | "saved">("applications");
+  const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<ApplicationStats>({
     total: 0,
     thisMonth: 0
@@ -61,12 +72,17 @@ export default function TalentApplicationsPage() {
   useEffect(() => {
     if (user?.id) {
       loadApplications();
+      loadSavedOpportunities();
     }
   }, [user]);
 
   useEffect(() => {
-    applyFilters();
-  }, [applications, searchQuery, industryFilter]);
+    if (activeTab === "applications") {
+      applyFilters();
+    } else {
+      applySavedFilters();
+    }
+  }, [applications, savedOpportunities, searchQuery, industryFilter, activeTab]);
 
   const loadApplications = async () => {
     if (!user?.id) return;
@@ -149,20 +165,201 @@ export default function TalentApplicationsPage() {
     setFilteredApplications(filtered);
   };
 
+  const loadSavedOpportunities = async () => {
+    if (!authUser?.id) return;
+    
+    setSavedLoading(true);
+    try {
+      // First, get saved opportunity records with metadata
+      const { data: savedRecords, error: savedError } = await supabase
+        .from('saved_opportunities')
+        .select('opportunity_id, saved_at, notes')
+        .eq('talent_id', authUser.id)
+        .order('saved_at', { ascending: false });
+
+      if (savedError) throw savedError;
+
+      if (!savedRecords || savedRecords.length === 0) {
+        setSavedOpportunities([]);
+        setSavedOpportunityIds(new Set());
+        return;
+      }
+
+      // Extract opportunity IDs for the set
+      const savedIds = new Set(savedRecords.map(record => record.opportunity_id));
+      setSavedOpportunityIds(savedIds);
+
+      // Get opportunity IDs
+      const opportunityIds = savedRecords.map(record => record.opportunity_id);
+
+      // Fetch the full opportunity data
+      const { data: opportunities, error: oppError } = await supabase
+        .from('opportunities')
+        .select(`
+          id, title, company_name, location, industry, workstyle,
+          skills, description, created_at
+        `)
+        .in('id', opportunityIds);
+
+      if (oppError) throw oppError;
+
+      // Combine the data
+      const transformedSavedOpportunities: Opportunity[] = (opportunities || [])
+        .map(opp => {
+          const savedRecord = savedRecords.find(record => record.opportunity_id === opp.id);
+          if (!savedRecord) return null;
+          
+          return {
+            id: opp.id,
+            title: opp.title,
+            company_name: opp.company_name,
+            location: opp.location,
+            industry: opp.industry,
+            workstyle: opp.workstyle,
+            skills: opp.skills || [],
+            description: opp.description,
+            created_at: opp.created_at,
+            isSaved: true
+          };
+        })
+        .filter(Boolean) as Opportunity[];
+
+      // Sort by saved_at date (most recent first)
+      transformedSavedOpportunities.sort((a, b) => {
+        const aRecord = savedRecords.find(r => r.opportunity_id === a.id);
+        const bRecord = savedRecords.find(r => r.opportunity_id === b.id);
+        const aDate = aRecord?.saved_at ? new Date(aRecord.saved_at).getTime() : 0;
+        const bDate = bRecord?.saved_at ? new Date(bRecord.saved_at).getTime() : 0;
+        return bDate - aDate;
+      });
+
+      setSavedOpportunities(transformedSavedOpportunities);
+    } catch (error) {
+      console.error("Error loading saved opportunities:", error);
+      toast.error("Failed to load saved opportunities");
+    } finally {
+      setSavedLoading(false);
+    }
+  };
+
+  const applySavedFilters = () => {
+    let filtered = [...savedOpportunities];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(opp =>
+        opp.title.toLowerCase().includes(query) ||
+        opp.company_name.toLowerCase().includes(query) ||
+        opp.industry.toLowerCase().includes(query)
+      );
+    }
+
+    // Industry filter
+    if (industryFilter !== "all") {
+      filtered = filtered.filter(opp => opp.industry === industryFilter);
+    }
+
+    setFilteredSavedOpportunities(filtered);
+  };
+
+  const handleSaveOpportunity = async (opportunityId: string) => {
+    try {
+      if (!authUser?.id) {
+        toast.error("Please log in to save opportunities");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('saved_opportunities')
+        .insert({
+          talent_id: authUser.id,
+          opportunity_id: opportunityId,
+          saved_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      const newSavedIds = new Set(savedOpportunityIds);
+      newSavedIds.add(opportunityId);
+      setSavedOpportunityIds(newSavedIds);
+
+      // Refresh saved opportunities if on saved tab
+      if (activeTab === "saved") {
+        await loadSavedOpportunities();
+      }
+
+      toast.success("Opportunity saved successfully");
+    } catch (error) {
+      console.error("Error saving opportunity:", error);
+      toast.error("Failed to save opportunity");
+    }
+  };
+
+  const handleUnsaveOpportunity = async (opportunityId: string) => {
+    try {
+      if (!authUser?.id) return;
+
+      const { error } = await supabase
+        .from('saved_opportunities')
+        .delete()
+        .eq('talent_id', authUser.id)
+        .eq('opportunity_id', opportunityId);
+
+      if (error) throw error;
+
+      const newSavedIds = new Set(savedOpportunityIds);
+      newSavedIds.delete(opportunityId);
+      setSavedOpportunityIds(newSavedIds);
+
+      // Refresh saved opportunities if on saved tab
+      if (activeTab === "saved") {
+        await loadSavedOpportunities();
+      }
+
+      toast.success("Opportunity removed from saved");
+    } catch (error) {
+      console.error("Error unsaving opportunity:", error);
+      toast.error("Failed to remove opportunity");
+    }
+  };
+
+  const handleViewDetails = (opportunity: Opportunity) => {
+    setSelectedOpportunity(opportunity);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedOpportunity(null);
+    setIsModalOpen(false);
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadApplications();
+    if (activeTab === "applications") {
+      await loadApplications();
+    } else {
+      await loadSavedOpportunities();
+    }
     setRefreshing(false);
-    toast.success("Applications refreshed");
+    toast.success(`${activeTab === "applications" ? "Applications" : "Saved opportunities"} refreshed`);
   };
 
 
   const getUniqueIndustries = () => {
-    const industries = applications
-      .map(app => app.opportunity?.industry)
-      .filter(Boolean)
-      .filter((industry, index, array) => array.indexOf(industry) === index);
-    return industries;
+    if (activeTab === "applications") {
+      const industries = applications
+        .map(app => app.opportunity?.industry)
+        .filter(Boolean)
+        .filter((industry, index, array) => array.indexOf(industry) === index);
+      return industries;
+    } else {
+      const industries = savedOpportunities
+        .map(opp => opp.industry)
+        .filter(Boolean)
+        .filter((industry, index, array) => array.indexOf(industry) === index);
+      return industries;
+    }
   };
 
   if (isLoading || loading) {
@@ -190,9 +387,9 @@ export default function TalentApplicationsPage() {
       {/* Header - Mobile Optimized */}
       <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">My Applications</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Applications & Saved Jobs</h1>
           <p className="text-sm md:text-base text-gray-600 mt-1">
-            Track and manage your job applications
+            Track your applications and manage saved opportunities
           </p>
         </div>
         <Button
@@ -207,227 +404,364 @@ export default function TalentApplicationsPage() {
         </Button>
       </div>
 
-      {/* Stats Cards - Mobile Optimized */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">Total Applications</p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-              <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">This Month</p>
-                <p className="text-xl md:text-2xl font-bold text-green-600">{stats.thisMonth}</p>
-              </div>
-              <Calendar className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "applications" | "saved")} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="applications" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            My Applications
+            <span className="ml-1 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+              {stats.total}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="saved" className="flex items-center gap-2">
+            <BookmarkCheck className="h-4 w-4" />
+            Saved Jobs
+            <span className="ml-1 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+              {savedOpportunities.length}
+            </span>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Filters - Mobile Optimized */}
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-            <Filter className="h-4 w-4 md:h-5 md:w-5" />
-            Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search jobs, companies..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Industry</label>
-              <Select value={industryFilter} onValueChange={setIndustryFilter}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="All industries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All industries</SelectItem>
-                  {getUniqueIndustries().map((industry) => (
-                    <SelectItem key={industry} value={industry!}>
-                      {industry}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Applications List */}
-      {filteredApplications.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 md:py-12 text-center px-4">
-            <FileText className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
-              {applications.length === 0 ? "No applications yet" : "No applications match your filters"}
-            </h3>
-            <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
-              {applications.length === 0 
-                ? "Start applying to opportunities to see them here."
-                : "Try adjusting your search criteria to see more results."
-              }
-            </p>
-            {applications.length === 0 && (
-              <Link href="/talent/opportunities">
-                <Button className="w-full md:w-auto">Browse Opportunities</Button>
-              </Link>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {filteredApplications.map((application) => (
-            <Card key={application.id} className="hover:shadow-md transition-shadow">
+        {/* Applications Tab */}
+        <TabsContent value="applications" className="space-y-6">
+          {/* Stats Cards - Mobile Optimized */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
               <CardContent className="p-4 md:p-6">
-                {/* Mobile Layout - Stack vertically */}
-                <div className="block md:hidden space-y-4">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">
-                      {application.opportunity?.title}
-                    </h3>
-                    
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Building2 className="h-4 w-4 flex-shrink-0" />
-                        <span>{application.opportunity?.company_name}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span>{application.opportunity?.location}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4 flex-shrink-0" />
-                        <span>Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}</span>
-                      </div>
-                    </div>
-
-                    {application.opportunity?.description && (
-                      <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-                        {application.opportunity.description.substring(0, 120)}...
-                      </p>
-                    )}
-
-                    {application.opportunity?.skills && (
-                      <div className="flex flex-wrap gap-1 mb-4">
-                        {application.opportunity.skills.slice(0, 3).map((skill, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {application.opportunity.skills.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{application.opportunity.skills.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    )}
+                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Applications</p>
+                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      window.open(`/talent/opportunities/${application.opp_id}`, '_blank');
-                    }}
-                    className="w-full"
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Job Details
-                  </Button>
+                  <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
                 </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4 md:p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs md:text-sm font-medium text-gray-600">This Month</p>
+                    <p className="text-xl md:text-2xl font-bold text-green-600">{stats.thisMonth}</p>
+                  </div>
+                  <Calendar className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-                {/* Desktop Layout - Original horizontal layout */}
-                <div className="hidden md:flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {application.opportunity?.title}
-                          </h3>
-                        </div>
+          {/* Filters - Mobile Optimized */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <Filter className="h-4 w-4 md:h-5 md:w-5" />
+                Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Search</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search jobs, companies..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 h-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Industry</label>
+                  <Select value={industryFilter} onValueChange={setIndustryFilter}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="All industries" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All industries</SelectItem>
+                      {getUniqueIndustries().map((industry) => (
+                        <SelectItem key={industry} value={industry!}>
+                          {industry}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Applications List */}
+          {filteredApplications.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 md:py-12 text-center px-4">
+                <FileText className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
+                  {applications.length === 0 ? "No applications yet" : "No applications match your filters"}
+                </h3>
+                <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
+                  {applications.length === 0 
+                    ? "Start applying to opportunities to see them here."
+                    : "Try adjusting your search criteria to see more results."
+                  }
+                </p>
+                {applications.length === 0 && (
+                  <Link href="/talent/opportunities">
+                    <Button className="w-full md:w-auto">Browse Opportunities</Button>
+                  </Link>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {filteredApplications.map((application) => (
+                <Card key={application.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 md:p-6">
+                    {/* Mobile Layout - Stack vertically */}
+                    <div className="block md:hidden space-y-4">
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">
+                          {application.opportunity?.title}
+                        </h3>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center gap-1">
-                            <Building2 className="h-4 w-4" />
-                            {application.opportunity?.company_name}
+                        <div className="space-y-2 mb-3">
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <Building2 className="h-4 w-4 flex-shrink-0" />
+                            <span>{application.opportunity?.company_name}</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {application.opportunity?.location}
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
+                            <span>{application.opportunity?.location}</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 flex-shrink-0" />
+                            <span>Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}</span>
                           </div>
                         </div>
 
                         {application.opportunity?.description && (
-                          <p className="text-gray-700 mb-3 line-clamp-2">
-                            {application.opportunity.description.substring(0, 150)}...
+                          <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                            {application.opportunity.description.substring(0, 120)}...
                           </p>
                         )}
 
                         {application.opportunity?.skills && (
-                          <div className="flex flex-wrap gap-2">
-                            {application.opportunity.skills.slice(0, 4).map((skill, index) => (
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {application.opportunity.skills.slice(0, 3).map((skill, index) => (
                               <Badge key={index} variant="outline" className="text-xs">
                                 {skill}
                               </Badge>
                             ))}
-                            {application.opportunity.skills.length > 4 && (
+                            {application.opportunity.skills.length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{application.opportunity.skills.length - 4} more
+                                +{application.opportunity.skills.length - 3} more
                               </Badge>
                             )}
                           </div>
                         )}
                       </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          window.open(`/talent/opportunities/${application.opp_id}`, '_blank');
+                        }}
+                        className="w-full"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Job Details
+                      </Button>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        window.open(`/talent/opportunities/${application.opp_id}`, '_blank');
-                      }}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Job
-                    </Button>
+
+                    {/* Desktop Layout - Original horizontal layout */}
+                    <div className="hidden md:flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                {application.opportunity?.title}
+                              </h3>
+                            </div>
+                            
+                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                              <div className="flex items-center gap-1">
+                                <Building2 className="h-4 w-4" />
+                                {application.opportunity?.company_name}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {application.opportunity?.location}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
+                              </div>
+                            </div>
+
+                            {application.opportunity?.description && (
+                              <p className="text-gray-700 mb-3 line-clamp-2">
+                                {application.opportunity.description.substring(0, 150)}...
+                              </p>
+                            )}
+
+                            {application.opportunity?.skills && (
+                              <div className="flex flex-wrap gap-2">
+                                {application.opportunity.skills.slice(0, 4).map((skill, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {skill}
+                                  </Badge>
+                                ))}
+                                {application.opportunity.skills.length > 4 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{application.opportunity.skills.length - 4} more
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 ml-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            window.open(`/talent/opportunities/${application.opp_id}`, '_blank');
+                          }}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Job
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Saved Opportunities Tab */}
+        <TabsContent value="saved" className="space-y-6">
+          {/* Saved Stats Card */}
+          <Card>
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs md:text-sm font-medium text-gray-600">Total Saved</p>
+                  <p className="text-xl md:text-2xl font-bold text-purple-600">{savedOpportunities.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Filters - Mobile Optimized */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <Filter className="h-4 w-4 md:h-5 md:w-5" />
+                Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Search</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search saved jobs, companies..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 h-10"
+                    />
                   </div>
                 </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Industry</label>
+                  <Select value={industryFilter} onValueChange={setIndustryFilter}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="All industries" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All industries</SelectItem>
+                      {getUniqueIndustries().map((industry) => (
+                        <SelectItem key={industry} value={industry!}>
+                          {industry}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Saved Opportunities List */}
+          {savedLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-pulse">
+                <div className="text-center">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
+                </div>
+              </div>
+            </div>
+          ) : filteredSavedOpportunities.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 md:py-12 text-center px-4">
+                <Heart className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
+                  {savedOpportunities.length === 0 ? "No saved opportunities yet" : "No saved opportunities match your filters"}
+                </h3>
+                <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
+                  {savedOpportunities.length === 0 
+                    ? "Start saving opportunities you're interested in to see them here."
+                    : "Try adjusting your search criteria to see more results."
+                  }
+                </p>
+                {savedOpportunities.length === 0 && (
+                  <Link href="/talent/opportunities">
+                    <Button className="w-full md:w-auto">Browse Opportunities</Button>
+                  </Link>
+                )}
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="space-y-4">
+              {filteredSavedOpportunities.map((opportunity) => (
+                <OpportunityCard
+                  key={opportunity.id}
+                  opportunity={opportunity}
+                  onSave={handleSaveOpportunity}
+                  onUnsave={handleUnsaveOpportunity}
+                  onApply={(opp) => window.open(`/talent/apply/${opp.id}`, '_blank')}
+                  onViewDetails={handleViewDetails}
+                  compact={false}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Opportunity Detail Modal */}
+      <OpportunityDetailModal
+        opportunity={selectedOpportunity}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onApply={async (opportunityId: string) => {
+          window.open(`/talent/apply/${opportunityId}`, '_blank');
+        }}
+      />
     </div>
   );
 }

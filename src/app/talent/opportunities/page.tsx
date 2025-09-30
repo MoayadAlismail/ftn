@@ -616,72 +616,80 @@ function TalentOpportunitiesContent() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-4" ref={containerRef}>
-            {/* Header with Search */}
-            <div className="sticky top-0 bg-white/80 backdrop-blur-sm z-40 pb-4 space-y-4">
-                {/* Feed Mode Indicator & Actions */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+        <div className="space-y-6">
+            {/* Header - Mobile Optimized */}
+            <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
                         {getFeedModeIcon()}
-                        <h1 className="text-lg font-semibold">{getFeedModeText()}</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-900">{getFeedModeText()}</h1>
                         {aiMatchingStatus === "loading" && (
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                                Processing AI matches...
+                                <span className="hidden sm:inline">Processing AI matches...</span>
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleRefresh}
-                            disabled={loading}
-                        >
-                            <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                            Refresh
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowFilters(!showFilters)}
-                        >
-                            <Filter className="h-4 w-4 mr-1" />
-                            Filters
-                        </Button>
-                    </div>
+                    <p className="text-sm md:text-base text-gray-600">
+                        {loading ? (
+                            "Loading opportunities..."
+                        ) : (
+                            `${memoizedFilteredOpportunities.length} opportunities found`
+                        )}
+                    </p>
                 </div>
-
-                {/* Search Bar */}
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                        placeholder="Search for opportunities, companies, or skills..."
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        className="pl-10 pr-10"
-                    />
-                    {searchInput && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                            onClick={clearSearch}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
-
-                {/* Results Count */}
-                <div className="text-sm text-gray-600">
-                    {loading ? (
-                        "Loading opportunities..."
-                    ) : (
-                        `${memoizedFilteredOpportunities.length} opportunities found`
-                    )}
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={handleRefresh}
+                        disabled={loading}
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                    >
+                        <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                        <span className="hidden sm:inline">Refresh</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="flex-1 sm:flex-none"
+                    >
+                        <Filter className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Filters</span>
+                    </Button>
                 </div>
             </div>
+
+            {/* Search Bar */}
+            <Card>
+                <CardContent className="p-4 md:p-6">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Search Opportunities</label>
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    placeholder="Search for opportunities, companies, or skills..."
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    className="pl-10 pr-10 h-10"
+                                />
+                                {searchInput && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                                        onClick={clearSearch}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Filters Panel */}
             <AnimatePresence>
@@ -710,16 +718,16 @@ function TalentOpportunitiesContent() {
                 </div>
             ) : memoizedFilteredOpportunities.length === 0 ? (
                 <Card>
-                    <CardContent className="py-12 text-center">
-                        <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
-                        <p className="text-gray-600 mb-6">
+                    <CardContent className="py-8 md:py-12 text-center px-4">
+                        <Search className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                        <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
                             {feedMode === "search"
                                 ? "Try different search terms or clear your search to see AI recommendations."
                                 : "Try adjusting your filters or refresh for new recommendations."
                             }
                         </p>
-                        <Button onClick={clearSearch} variant="outline">
+                        <Button onClick={clearSearch} variant="outline" className="w-full md:w-auto">
                             {feedMode === "search" ? "Clear Search" : "Clear Filters"}
                         </Button>
                     </CardContent>
@@ -755,19 +763,19 @@ function TalentOpportunitiesContent() {
                     ))}
 
                     {/* Load More Trigger */}
-                    <div ref={loadMoreRef} className="py-8">
+                    <div ref={loadMoreRef} className="py-4 md:py-8">
                         {loadingMore && (
                             <div className="flex justify-center">
                                 <LoadingAnimation size="sm" text="Loading more opportunities..." />
                             </div>
                         )}
                         {!hasMore && memoizedFilteredOpportunities.length > 0 && (
-                            <div className="text-center text-gray-500 py-8">
-                                <p>You've reached the end! Check back later for new opportunities.</p>
+                            <div className="text-center text-gray-500 py-4 md:py-8">
+                                <p className="text-sm md:text-base mb-4">You've reached the end! Check back later for new opportunities.</p>
                                 <Button
                                     variant="outline"
                                     onClick={handleRefresh}
-                                    className="mt-4"
+                                    className="w-full md:w-auto"
                                 >
                                     <RefreshCw className="h-4 w-4 mr-2" />
                                     Refresh for More
