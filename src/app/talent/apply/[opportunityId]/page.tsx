@@ -555,10 +555,10 @@ export default function TalentApplicationPage() {
                                             Browse More Jobs
                                         </Button>
                                         <Button
-                                            onClick={() => router.push('/talent/dashboard')}
+                                            onClick={() => router.push('/talent/opportunities')}
                                             className="w-full md:w-auto"
                                         >
-                                            View Dashboard
+                                            View More Jobs
                                         </Button>
                                     </div>
                                 </CardContent>

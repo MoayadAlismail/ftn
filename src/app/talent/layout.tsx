@@ -62,14 +62,9 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
 
   const navigationItems = [
     {
-      href: "/talent/dashboard",
-      icon: Home,
-      label: "Dashboard"
-    },
-    {
       href: "/talent/opportunities",
-      icon: Building2,
-      label: "Opportunities",
+      icon: Home,
+      label: "Home",
       description: "AI-powered job recommendations"
     },
     {
@@ -130,12 +125,12 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
             {/* Right side - User info and mobile menu */}
             <div className="flex items-center gap-2">
               {/* User info - hidden on small screens */}
-              <Link href="/talent/dashboard?tab=profile" className="hidden md:flex items-center gap-2 hover:bg-gray-100 rounded-lg px-2 py-1 transition-colors cursor-pointer">
+              <div className="hidden md:flex items-center gap-2 px-2 py-1">
                 <User size={18} />
                 <p className="text-sm font-semibold text-gray-700">
                   {user?.user_metadata.name}
                 </p>
-              </Link>
+              </div>
 
               {/* Desktop sign out */}
               <div className="hidden lg:block">
@@ -182,14 +177,10 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
 
                 {/* Mobile user info and sign out */}
                 <div className="pt-4 mt-4 border-t border-gray-200">
-                  <Link
-                    href="/talent/dashboard?tab=profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer"
-                  >
+                  <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 mx-2">
                     <User size={18} />
                     <span className="font-medium">{user?.user_metadata.name}</span>
-                  </Link>
+                  </div>
                   <div className="px-3 py-2">
                     <SignOutButton />
                   </div>

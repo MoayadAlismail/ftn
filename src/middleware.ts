@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
           // Check if onboarded to determine exact redirect
           const isOnboarded = user.user_metadata?.is_onboarded;
           const redirectUrl = isOnboarded
-            ? "/talent/dashboard"
+            ? "/talent/opportunities"
             : "/onboarding/talent";
           return NextResponse.redirect(new URL(redirectUrl, request.url));
         } else if (userRole === Role.EMPLOYER) {
@@ -101,7 +101,7 @@ export async function middleware(request: NextRequest) {
         if (userRole === Role.TALENT) {
           const isOnboarded = user.user_metadata?.is_onboarded;
           const redirectUrl = isOnboarded
-            ? "/talent/dashboard"
+            ? "/talent/opportunities"
             : "/onboarding/talent";
           return NextResponse.redirect(new URL(redirectUrl, request.url));
         } else if (userRole === Role.EMPLOYER) {
@@ -145,7 +145,7 @@ export async function middleware(request: NextRequest) {
         if (isOnboarded) {
           if (userRole === Role.TALENT) {
             return NextResponse.redirect(
-              new URL("/talent/dashboard", request.url)
+              new URL("/talent/opportunities", request.url)
             );
           } else if (userRole === Role.EMPLOYER) {
             return NextResponse.redirect(
@@ -203,8 +203,8 @@ export async function middleware(request: NextRequest) {
         );
       }
 
-      // Check if talent needs onboarding (only for dashboard routes)
-      if (pathname.startsWith("/talent/dashboard")) {
+      // Check if talent needs onboarding (only for opportunities routes)
+      if (pathname.startsWith("/talent/opportunities")) {
         // Simple onboarding check without full database call
         const isOnboarded = user.user_metadata?.is_onboarded;
         if (!isOnboarded) {
@@ -219,7 +219,7 @@ export async function middleware(request: NextRequest) {
       if (userRole !== Role.EMPLOYER) {
         if (userRole === Role.TALENT) {
           return NextResponse.redirect(
-            new URL("/talent/dashboard", request.url)
+            new URL("/talent/opportunities", request.url)
           );
         }
         return NextResponse.redirect(
