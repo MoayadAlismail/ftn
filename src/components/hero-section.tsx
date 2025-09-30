@@ -142,11 +142,11 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   // Helper function to get the dashboard URL based on user role
   const getDashboardUrl = () => {
     if (userRole === Role.TALENT) {
-      return "/talent/dashboard";
+      return "/talent/opportunities";
     } else if (userRole === Role.EMPLOYER) {
       return "/employer/dashboard/home";
     }
-    return "/talent/dashboard"; // default fallback
+    return "/talent/opportunities"; // default fallback
   };
 
   // Helper function for employer button content (when not authenticated)
