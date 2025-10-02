@@ -318,7 +318,7 @@ function TalentLoginContent() {
                 </div>
 
                 {/* Email Form */}
-                <div className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); handleEmailLogin(); }} className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       Email Address
@@ -332,16 +332,16 @@ function TalentLoginContent() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                </div>
 
-                {/* Sign In Button */}
-                <Button
-                  className="w-full h-10 sm:h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-4 sm:mt-6"
-                  onClick={handleEmailLogin}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Signing in..." : "Log in"}
-                </Button>
+                  {/* Sign In Button */}
+                  <Button
+                    type="submit"
+                    className="w-full h-10 sm:h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-4 sm:mt-6"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Signing in..." : "Log in"}
+                  </Button>
+                </form>
 
                 {/* Footer Links */}
                 <div className="text-center mt-4 sm:mt-6 space-y-2">

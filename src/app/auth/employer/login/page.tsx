@@ -190,7 +190,7 @@ export default function EmployerLogin() {
                 </div>
 
                 {/* Email Form */}
-                <div className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); handleEmailLogin(); }} className="space-y-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       Email Address
@@ -204,16 +204,16 @@ export default function EmployerLogin() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
-                </div>
 
-                {/* Sign In Button */}
-                <Button
-                  className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-6"
-                  onClick={handleEmailLogin}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending code..." : "Send verification code"}
-                </Button>
+                  {/* Sign In Button */}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-6"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Sending code..." : "Send verification code"}
+                  </Button>
+                </form>
 
                 {/* Footer Links */}
                 <div className="text-center mt-6 space-y-2">
