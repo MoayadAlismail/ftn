@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase/client";
-import { Loader2, User } from "lucide-react";
+import { generateBioFromResume } from "@/lib/generate-bio";
+import { extractResumeText } from "@/lib/extract-resume";
+import { Loader2, User, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface AboutYourselfProps {
   bio: string;
   setBio: (bio: string) => void;
   resumeFile: File | null;
+  resumeText: string | null; // Add pre-extracted resume text
   workStylePreference: string[];
   industryPreference: string[];
   locationPreference: string[];
@@ -22,6 +26,7 @@ interface AboutYourselfProps {
 export default function AboutYourself({
   bio,
   resumeFile,
+  resumeText,
   workStylePreference,
   industryPreference,
   locationPreference,
@@ -31,12 +36,50 @@ export default function AboutYourself({
 }: AboutYourselfProps) {
   const minCharacters = 10;
   const [isCompleting, setIsCompleting] = useState(false);
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const router = useRouter();
+
+  const handleGenerateBio = async () => {
+    // Use pre-extracted resume text for fast bio generation
+    if (!resumeText) {
+      toast.error("Resume text not available. Please try refreshing the page.");
+      return;
+    }
+
+    setIsGeneratingBio(true);
+    
+    try {
+      // Generate bio using AI
+      const result = await generateBioFromResume({
+        resumeText,
+        workStylePreference,
+        industryPreference,
+        locationPreference,
+      });
+
+      if (result.success && result.bio) {
+        setBio(result.bio);
+        toast.success("Bio generated successfully!");
+      } else {
+        toast.error(result.error || "Failed to generate bio");
+      }
+    } catch (error) {
+      console.error("Error generating bio:", error);
+      toast.error("An error occurred while generating the bio");
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
 
   const handleCompleteSetup = () => {
     if (bio.length < minCharacters) {
       return;
     }
+    onComplete();
+  };
+
+  const handleSkip = () => {
+    // Skip validation and complete setup with empty or current bio
     onComplete();
   };
 
@@ -65,16 +108,42 @@ export default function AboutYourself({
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="I'm a computer science student passionate about AI and machine learning. I enjoy building projects that solve real-world problems..."
-              className="w-full h-24 sm:h-28 lg:h-32 text-sm sm:text-base resize-none"
-            />
-            <p className="text-xs sm:text-sm text-gray-600 text-left">
-              {bio.length} characters (minimum {minCharacters})
-            </p>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="I'm a computer science student passionate about AI and machine learning. I enjoy building projects that solve real-world problems..."
+                className="w-full h-24 sm:h-28 lg:h-32 text-sm sm:text-base resize-none flex-1"
+              />
+              <div className="flex sm:flex-col gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateBio}
+                  disabled={isGeneratingBio}
+                  className="flex items-center gap-2 whitespace-nowrap"
+                >
+                  {isGeneratingBio ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  {isGeneratingBio ? "Generating..." : "AI Generate"}
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="text-xs sm:text-sm text-gray-600">
+                {bio.length} characters (minimum {minCharacters})
+              </p>
+              {localStorage.getItem("resumeFileBase64") && (
+                <p className="text-xs text-blue-600">
+                  Resume uploaded ✓
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -88,7 +157,7 @@ export default function AboutYourself({
               className="cursor-pointer flex-1"
               type="button"
               variant="ghost"
-              onClick={handleCompleteSetup}
+              onClick={handleSkip}
               disabled={isCompleting}
             >
               Skip for now
@@ -114,7 +183,7 @@ export default function AboutYourself({
               className="cursor-pointer"
               type="button"
               variant="ghost"
-              onClick={handleCompleteSetup}
+              onClick={handleSkip}
               disabled={isCompleting}
             >
               Skip for now
