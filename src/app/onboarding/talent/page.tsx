@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "@/contexts/LoadingContext";
+import { extractResumeText } from "@/lib/extract-resume";
 import { toast } from "sonner";
 
 // Import onboarding components
@@ -44,6 +45,7 @@ const ONBOARDING_STEPS = [
 
 interface OnboardingData {
     resumeFile: File | null;
+    resumeText: string | null; // Add extracted resume text
     locationPreference: string[];
     industryPreference: string[];
     workStylePreference: string[];
@@ -58,6 +60,7 @@ export default function TalentOnboarding() {
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({
         resumeFile: null,
+        resumeText: null,
         locationPreference: [],
         industryPreference: [],
         workStylePreference: [],
@@ -66,79 +69,87 @@ export default function TalentOnboarding() {
 
     useEffect(() => {
         // Auth is handled by middleware - user is guaranteed to be authenticated
-
-        // Check if already onboarded with timeout handling
-        const checkOnboardingStatus = async () => {
-            try {
-                const timeoutPromise = new Promise<never>((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 10000)
-                );
-
-                const queryPromise = supabase
-                    .from('talents')
-                    .select('id, user_id')
-                    .eq('user_id', user!.id)
-                    .maybeSingle();
-
-                const result = await Promise.race([queryPromise, timeoutPromise]);
-
-                if (result.data && !result.error) {
-                    // User already onboarded, redirect to opportunities
-                    router.push('/talent/opportunities');
-                }
-            } catch (error) {
-                console.error("Error checking onboarding status:", error);
-                // Continue with onboarding if check fails - don't block the user
-            }
-        };
-
-        if (user?.id) {
-            checkOnboardingStatus();
-        }
     }, [user, router]);
 
     useEffect(() => {
-        // Get existing resume data from localStorage for final submission
-        const resumeData = localStorage.getItem("resumeFileBase64");
-        const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
+        // Get existing resume data from localStorage and extract text immediately
+        const extractResumeOnStart = async () => {
+            const resumeData = localStorage.getItem("resumeFileBase64");
+            const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
 
-        if (resumeData && resumeTimestamp) {
-            // Check if resume data is not expired (1 hour)
-            const now = Date.now();
-            const uploadTime = parseInt(resumeTimestamp);
-            const isExpired = (now - uploadTime) > 3600000; // 1 hour
+            if (resumeData && resumeTimestamp) {
+                // Check if resume data is not expired (1 hour)
+                const now = Date.now();
+                const uploadTime = parseInt(resumeTimestamp);
+                const isExpired = (now - uploadTime) > 3600000; // 1 hour
 
-            if (!isExpired) {
-                // Convert base64 back to file for final submission
-                try {
-                    const byteCharacters = atob(resumeData.split(',')[1]);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                if (!isExpired) {
+                    try {
+                        // Convert base64 back to file
+                        const byteCharacters = atob(resumeData.split(',')[1]);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const file = new File([byteArray], "resume.pdf", { type: "application/pdf" });
+
+                        // Extract text from resume immediately
+                        const resumeText = await extractResumeText(file);
+                        
+                        if (resumeText) {
+                            console.log("✅ Resume text extracted successfully, length:", resumeText.length);
+                            setOnboardingData(prev => ({ 
+                                ...prev, 
+                                resumeFile: file,
+                                resumeText: resumeText 
+                            }));
+                        } else {
+                            console.error("❌ Failed to extract resume text");
+                            setOnboardingData(prev => ({ ...prev, resumeFile: file }));
+                        }
+                    } catch (error) {
+                        console.error("Error parsing resume data:", error);
+                        localStorage.removeItem("resumeFileBase64");
+                        localStorage.removeItem("resumeUploadTimestamp");
                     }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const file = new File([byteArray], "resume.pdf", { type: "application/pdf" });
-
-                    setOnboardingData(prev => ({ ...prev, resumeFile: file }));
-                } catch (error) {
-                    console.error("Error parsing resume data:", error);
+                } else {
+                    // Remove expired data
                     localStorage.removeItem("resumeFileBase64");
                     localStorage.removeItem("resumeUploadTimestamp");
                 }
-            } else {
-                // Remove expired data
-                localStorage.removeItem("resumeFileBase64");
-                localStorage.removeItem("resumeUploadTimestamp");
             }
-        }
+        };
+
+        extractResumeOnStart();
     }, []);
 
-    const updateOnboardingData = (field: keyof OnboardingData, value: any) => {
+    const updateOnboardingData = useCallback((field: keyof OnboardingData, value: any) => {
         setOnboardingData(prev => ({
             ...prev,
             [field]: value
         }));
-    };
+    }, []);
+
+    const setResumeFile = useCallback((file: File | null) => {
+        updateOnboardingData('resumeFile', file);
+    }, [updateOnboardingData]);
+
+    const setLocationPreference = useCallback((location: string) => {
+        updateOnboardingData('locationPreference', [location]);
+    }, [updateOnboardingData]);
+
+    const setIndustryPreference = useCallback((industries: string[]) => {
+        updateOnboardingData('industryPreference', industries);
+    }, [updateOnboardingData]);
+
+    const setWorkStylePreference = useCallback((styles: string[]) => {
+        updateOnboardingData('workStylePreference', styles);
+    }, [updateOnboardingData]);
+
+    const setBio = useCallback((bio: string) => {
+        updateOnboardingData('bio', bio);
+    }, [updateOnboardingData]);
 
     const nextStep = () => {
         if (currentStep < ONBOARDING_STEPS.length - 1) {
@@ -200,7 +211,7 @@ export default function TalentOnboarding() {
                     }
                 }
 
-                // Insert talent profile into database with retry logic
+                // Check if profile exists and insert/update accordingly
                 let dbAttempts = 0;
                 const maxDbAttempts = 3;
                 let profileCreated = false;
@@ -218,11 +229,36 @@ export default function TalentOnboarding() {
                             location_pref: onboardingData.locationPreference,
                             resume_url: resumeUrl,
                         };
+                        
+                        // First check if profile already exists
+                        const { data: existingProfile, error: checkError } = await supabase
+                            .from("talents")
+                            .select("id")
+                            .eq("user_id", user.id)
+                            .maybeSingle();
 
-                        const { data, error } = await supabase.from("talents").insert(profileData);
+                        if (checkError && checkError.code !== 'PGRST116') {
+                            throw checkError;
+                        }
 
-                        if (error) {
-                            throw error;
+                        let result;
+                        if (existingProfile) {
+                            // Profile exists, update it
+                            console.log("Updating existing talent profile");
+                            result = await supabase
+                                .from("talents")
+                                .update(profileData)
+                                .eq("user_id", user.id);
+                        } else {
+                            // Profile doesn't exist, insert new one
+                            console.log("Creating new talent profile");
+                            result = await supabase
+                                .from("talents")
+                                .insert(profileData);
+                        }
+
+                        if (result.error) {
+                            throw result.error;
                         }
 
                         profileCreated = true;
@@ -230,8 +266,8 @@ export default function TalentOnboarding() {
                         dbAttempts++;
 
                         if (dbAttempts >= maxDbAttempts) {
-                            console.error("Error inserting talent profile after retries:", error);
-                            toast.error("Failed to create profile after multiple attempts");
+                            console.error("Error saving talent profile after retries:", error);
+                            toast.error("Failed to save profile after multiple attempts");
                             return;
                         }
                         // Wait before retry
@@ -335,7 +371,7 @@ export default function TalentOnboarding() {
                         {currentStepConfig.id === 'location' && (
                             <LocationPreference
                                 locationPreference={onboardingData.locationPreference[0] || ''}
-                                setLocationPreference={(location: string) => updateOnboardingData('locationPreference', [location])}
+                                setLocationPreference={setLocationPreference}
                                 next={nextStep}
                                 {...(currentStep > 0 && { prev: prevStep })}
                             />
@@ -343,16 +379,16 @@ export default function TalentOnboarding() {
                         {currentStepConfig.id === 'industries' && (
                             <SelectIndustries
                                 industryPreference={onboardingData.industryPreference}
-                                setIndustryPreference={(industries: string[]) => updateOnboardingData('industryPreference', industries)}
+                                setIndustryPreference={setIndustryPreference}
                                 next={nextStep}
                                 prev={prevStep}
                             />
                         )}
                         {currentStepConfig.id === 'opportunities' && (
                             <SelectOpportunities
-                                setResumeFile={(file: File | null) => updateOnboardingData('resumeFile', file)}
+                                setResumeFile={setResumeFile}
                                 workStylePreference={onboardingData.workStylePreference}
-                                setWorkStylePreference={(styles: string[]) => updateOnboardingData('workStylePreference', styles)}
+                                setWorkStylePreference={setWorkStylePreference}
                                 next={nextStep}
                                 prev={prevStep}
                             />
@@ -360,8 +396,9 @@ export default function TalentOnboarding() {
                         {currentStepConfig.id === 'about' && (
                             <AboutYourself
                                 bio={onboardingData.bio}
-                                setBio={(bio: string) => updateOnboardingData('bio', bio)}
+                                setBio={setBio}
                                 resumeFile={onboardingData.resumeFile}
+                                resumeText={onboardingData.resumeText}
                                 workStylePreference={onboardingData.workStylePreference}
                                 industryPreference={onboardingData.industryPreference}
                                 locationPreference={onboardingData.locationPreference}
