@@ -78,7 +78,14 @@ export default function CandidateProfileModal({
             const { data, error } = await supabase
                 .from('talents')
                 .select(`
-          *,
+          id,
+          bio,
+          location_pref,
+          industry_pref,
+          work_style_pref,
+          skills,
+          resume_url,
+          created_at,
           user_id
         `)
                 .eq('id', candidate.id)
@@ -90,7 +97,14 @@ export default function CandidateProfileModal({
                 return;
             }
 
-            setFullProfile(data);
+            // Hide contact information until payment
+            const profileWithHiddenContact = {
+                ...data,
+                full_name: 'Candidate',
+                email: 'contact@hidden.com'
+            };
+
+            setFullProfile(profileWithHiddenContact);
         } catch (error) {
             console.error('Error loading profile:', error);
             toast.error('Failed to load profile');
@@ -255,10 +269,10 @@ export default function CandidateProfileModal({
                     
                     {/* Name and Info */}
                     <div className="space-y-2">
-                        <h2 className="text-lg font-bold text-gray-900 break-words">{profile.full_name}</h2>
+                        <h2 className="text-lg font-bold text-gray-900 break-words blur-sm select-none">{profile.full_name}</h2>
                         <div className="flex items-start text-gray-600 text-sm">
                             <Mail className="h-3 w-3 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="break-all">{profile.email}</span>
+                            <span className="break-all blur-sm select-none">{profile.email}</span>
                         </div>
                         {profile.created_at && (
                             <div className="flex items-center text-gray-500 text-xs">
@@ -276,10 +290,10 @@ export default function CandidateProfileModal({
                             <User className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{profile.full_name}</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 blur-sm select-none">{profile.full_name}</h2>
                             <div className="flex items-center text-gray-600 mt-1">
                                 <Mail className="h-4 w-4 mr-2" />
-                                <span>{profile.email}</span>
+                                <span className="blur-sm select-none">{profile.email}</span>
                             </div>
                             {profile.created_at && (
                                 <div className="flex items-center text-gray-500 text-sm mt-1">
@@ -313,7 +327,7 @@ export default function CandidateProfileModal({
 
                 {/* Action Buttons - Mobile Layout */}
                 <div className="block sm:hidden space-y-2">
-                    <Button onClick={handleContact} className="w-full text-sm">
+                    <Button onClick={handleContact} className="w-full text-sm" disabled>
                         <Mail className="h-4 w-4 mr-2" />
                         Contact Candidate
                     </Button>
@@ -341,7 +355,7 @@ export default function CandidateProfileModal({
 
                 {/* Action Buttons - Desktop Layout */}
                 <div className="hidden sm:flex space-x-3">
-                    <Button onClick={handleContact} className="flex-1">
+                    <Button onClick={handleContact} className="flex-1" disabled>
                         <Mail className="h-4 w-4 mr-2" />
                         Contact Candidate
                     </Button>

@@ -124,8 +124,6 @@ export default function EmployerDashboardHomeContent() {
         .from('talents')
         .select(`
           id,
-          full_name,
-          email,
           bio,
           location_pref,
           industry_pref,
@@ -140,9 +138,9 @@ export default function EmployerDashboardHomeContent() {
 
       const transformedTalents: Talent[] = (data || []).map(talent => ({
         id: talent.id,
-        name: talent.full_name,
-        full_name: talent.full_name,
-        email: talent.email,
+        name: 'Candidate', // Hidden until payment
+        full_name: 'Candidate', // Hidden until payment
+        email: 'contact@hidden.com', // Hidden until payment
         bio: talent.bio || '',
         location_pref: talent.location_pref || [],
         industry_pref: talent.industry_pref || [],
@@ -264,9 +262,9 @@ export default function EmployerDashboardHomeContent() {
       // Transform AI results to match Talent interface
       const transformedMatches: Talent[] = resultsArray.map((talent: any) => ({
         id: talent.id,
-        name: talent.name || talent.full_name,
-        full_name: talent.full_name || talent.name,
-        email: talent.email,
+        name: 'Candidate', // Hidden until payment
+        full_name: 'Candidate', // Hidden until payment
+        email: 'contact@hidden.com', // Hidden until payment
         bio: talent.bio || '',
         location_pref: talent.location_pref || [],
         industry_pref: talent.industry_pref || [],
@@ -600,12 +598,12 @@ export default function EmployerDashboardHomeContent() {
                       <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base font-semibold truncate">
+                      <h4 className="text-base font-semibold truncate blur-sm select-none">
                         {talent.name}
                       </h4>
                       <div className="flex items-center text-gray-500 text-xs">
                         <Mail className="w-3 h-3 mr-1 flex-shrink-0" />
-                        <span className="truncate">{talent.email}</span>
+                        <span className="truncate blur-sm select-none">{talent.email}</span>
                       </div>
                     </div>
                   </div>
@@ -673,10 +671,10 @@ export default function EmployerDashboardHomeContent() {
                                 <User className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                        <h4 className="text-lg font-semibold">{talent.name}</h4>
+                        <h4 className="text-lg font-semibold blur-sm select-none">{talent.name}</h4>
                                 <div className="flex items-center text-gray-500 text-sm">
                                   <Mail className="w-4 h-4 mr-1" />
-                                  <span>{talent.email}</span>
+                                  <span className="blur-sm select-none">{talent.email}</span>
                                 </div>
                               </div>
                             </div>
