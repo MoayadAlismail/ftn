@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Opportunity {
   id: string;
@@ -55,6 +56,7 @@ export default function OpportunityDetailModal({
   hasApplied = false,
 }: OpportunityDetailModalProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [isApplyingLocal, setIsApplyingLocal] = useState(false);
 
   // Prevent body scroll when modal is open
@@ -75,7 +77,7 @@ export default function OpportunityDetailModal({
 
   const handleApply = async () => {
     if (!user?.id) {
-      toast.error("You must be signed in to apply.");
+      router.push("/auth/talent/signup");
       return;
     }
 
