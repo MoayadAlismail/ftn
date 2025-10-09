@@ -30,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import LoadingAnimation from "@/components/loadingAnimation";
 import { OpportunityCard, type Opportunity } from "../my-opportunities/opportunity-card";
 import { toast } from "sonner";
+import { INDUSTRIES, SAUDI_CITIES, COMMON_SKILLS } from "@/constants/job-data";
 
 const workStyles = [
   "Full Time",
@@ -44,9 +45,9 @@ interface OpportunityFormData {
   company_name: string;
   workstyle: WorkStyle[];
   location: string;
-  industry: string;
+  industry: string[];
   description: string;
-  skills: string[] | string;
+  skills: string[];
 }
 
 const initialFormData: OpportunityFormData = {
@@ -54,9 +55,9 @@ const initialFormData: OpportunityFormData = {
   company_name: "",
   workstyle: [],
   location: "",
-  industry: "",
+  industry: [],
   description: "",
-  skills: "",
+  skills: [],
 };
 
 function OpportunitiesPageContent() {
@@ -182,6 +183,27 @@ function OpportunitiesPageContent() {
     }));
   };
 
+  const handleIndustryChange = (values: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      industry: values,
+    }));
+  };
+
+  const handleSkillsChange = (values: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: values,
+    }));
+  };
+
+  const handleLocationChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: value,
+    }));
+  };
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -208,13 +230,14 @@ function OpportunitiesPageContent() {
       if (employerError || !employerData) {
         throw new Error("Employer profile not found. Please complete your onboarding first.");
       }
-      
-      const dataToInsert = { 
-        ...formData, 
+
+      const dataToInsert = {
+        ...formData,
         user_id: employerData.id, // Use employer ID, not auth user ID
-        workstyle: formData.workstyle.join(", ") // Join array for storage
+        workstyle: formData.workstyle.join(", "), // Join array for storage
+        industry: formData.industry.join(", "), // Join array for storage
+        skills: formData.skills, // Already an array
       };
-      dataToInsert.skills = (dataToInsert.skills as string).split(",").map((skill) => skill.trim());
 
       const { data, error } = await supabase
         .from("opportunities")
@@ -428,13 +451,21 @@ function OpportunitiesPageContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Location *
                     </label>
-                    <Input
-                      name="location"
-                      placeholder="e.g. San Francisco, CA or Remote"
+                    <Select
                       value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full"
-                    />
+                      onValueChange={handleLocationChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select location..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SAUDI_CITIES.map((city) => (
+                          <SelectItem key={city} value={city}>
+                            {city}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -444,11 +475,11 @@ function OpportunitiesPageContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Industry
                     </label>
-                    <Input
-                      name="industry"
-                      placeholder="e.g. Technology, Healthcare"
-                      value={formData.industry}
-                      onChange={handleInputChange}
+                    <MultiSelect
+                      options={INDUSTRIES.map(industry => ({ label: industry, value: industry }))}
+                      selected={formData.industry}
+                      onChange={handleIndustryChange}
+                      placeholder="Select industries..."
                       className="w-full"
                     />
                   </div>
@@ -457,11 +488,11 @@ function OpportunitiesPageContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Required Skills
                     </label>
-                    <Input
-                      name="skills"
-                      placeholder="e.g. React, Node.js, Python (comma-separated)"
-                      value={formData.skills}
-                      onChange={handleInputChange}
+                    <MultiSelect
+                      options={COMMON_SKILLS.map(skill => ({ label: skill, value: skill }))}
+                      selected={formData.skills}
+                      onChange={handleSkillsChange}
+                      placeholder="Select required skills..."
                       className="w-full"
                     />
                   </div>
