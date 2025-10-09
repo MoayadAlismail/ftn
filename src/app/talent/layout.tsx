@@ -3,12 +3,12 @@ import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { Button } from '@/components/ui/button';
 import { Role } from '@/constants/enums'
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Home, Search, Building2, Mail, FileText, Menu, X } from 'lucide-react';
+import { User, Home, Mail, FileText, Menu, X, Settings, CreditCard, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import SignOutButton from '@/features/auth/SignOutButton';
+import { ProfileMenu } from '@/components/profile-menu';
 
 export default function TalentLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
@@ -124,17 +124,13 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
 
             {/* Right side - User info and mobile menu */}
             <div className="flex items-center gap-2">
-              {/* User info - hidden on small screens */}
-              <div className="hidden md:flex items-center gap-2 px-2 py-1">
-                <User size={18} />
-                <p className="text-sm font-semibold text-gray-700">
-                  {user?.user_metadata.name}
-                </p>
-              </div>
-
-              {/* Desktop sign out */}
+              {/* Desktop Profile Dropdown */}
               <div className="hidden lg:block">
-                <SignOutButton />
+                <ProfileMenu 
+                  userName={user?.user_metadata.name}
+                  userEmail={user?.email}
+                  onSignOut={signOut}
+                />
               </div>
 
               {/* Mobile menu button */}
@@ -175,14 +171,47 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                   </Link>
                 ))}
 
-                {/* Mobile user info and sign out */}
+                {/* Mobile user info and menu */}
                 <div className="pt-4 mt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 mx-2">
-                    <User size={18} />
-                    <span className="font-medium">{user?.user_metadata.name}</span>
+                  <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-700 mx-2 bg-gray-50 rounded-lg">
+                    <User size={18} className="text-gray-600" />
+                    <div className="flex-1">
+                      <p className="font-medium">{user?.user_metadata.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
                   </div>
-                  <div className="px-3 py-2">
-                    <SignOutButton />
+                  
+                  <div className="mt-2 space-y-1">
+                    <Link
+                      href="/talent/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer"
+                    >
+                      <User size={18} />
+                      <span>Personal Info</span>
+                    </Link>
+                    
+                    <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-400 rounded-lg mx-2 cursor-not-allowed">
+                      <CreditCard size={18} />
+                      <span>My Payments</span>
+                    </div>
+                    
+                    <div className="mx-2 my-2 border-t border-gray-200"></div>
+                    
+                    <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Settings
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        signOut();
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer w-full"
+                    >
+                      <LogOut size={18} />
+                      <span>Sign Out</span>
+                    </button>
                   </div>
                 </div>
               </div>
