@@ -16,32 +16,48 @@ This script assumes you have a COMPLETELY FRESH Supabase project with NO existin
 
 ```sql
 -- Create talents table (referenced by other tables)
-CREATE TABLE IF NOT EXISTS talents (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  full_name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  bio TEXT,
-  resume_url TEXT,
-  location_pref JSONB DEFAULT '[]',
-  industry_pref JSONB DEFAULT '[]',
-  work_style_pref JSONB DEFAULT '[]',
-  skills JSONB DEFAULT '[]',
-  experience_level VARCHAR(50),
-  education TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+profileCREATE TABLE public.talents (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NULL,
+  full_name TEXT NULL,
+  bio TEXT NULL,
+  skills TEXT[] NULL,
+  resume_url TEXT NULL,
+  created_at TIMESTAMP WITHOUT TIME ZONE NULL DEFAULT NOW(),
+  email TEXT NULL,
+  embedding public.vector NULL,
+  location_pref TEXT NULL,
+  industry_pref TEXT[] NULL,
+  work_style_pref TEXT[] NULL,
+  is_onboarded BOOLEAN NULL DEFAULT false,
+  CONSTRAINT talents_pkey PRIMARY KEY (id),
+  CONSTRAINT talents_id_fkey FOREIGN KEY (id) REFERENCES auth.users (id)
+) TABLESPACE pg_default;
 
 -- Add indexes for search performance
-CREATE INDEX idx_talents_user_id ON talents(user_id);
-CREATE INDEX idx_talents_email ON talents(email);
-CREATE INDEX idx_talents_location_pref ON talents USING GIN(location_pref);
-CREATE INDEX idx_talents_industry_pref ON talents USING GIN(industry_pref);
-CREATE INDEX idx_talents_work_style_pref ON talents USING GIN(work_style_pref);
-CREATE INDEX idx_talents_skills ON talents USING GIN(skills);
-CREATE INDEX idx_talents_created_at ON talents(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_talents_user_id ON talents(user_id);
+CREATE INDEX IF NOT EXISTS idx_talents_email ON talents(email);
+CREATE INDEX IF NOT EXISTS idx_talents_industry_pref ON talents USING GIN(industry_pref);
+CREATE INDEX IF NOT EXISTS idx_talents_work_style_pref ON talents USING GIN(work_style_pref);
+CREATE INDEX IF NOT EXISTS idx_talents_skills ON talents USING GIN(skills);
+CREATE INDEX IF NOT EXISTS idx_talents_created_at ON talents(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_talents_embedding ON talents USING ivfflat(embedding vector_cosine_ops) WITH (lists = 100);
 ```
+
+**Schema Notes:**
+- `id`: Primary key, references `auth.users(id)`
+- `user_id`: Additional user reference (nullable)
+- `full_name`: Talent's full name (TEXT)
+- `email`: Contact email (TEXT)
+- `bio`: Professional bio/summary (TEXT)
+- `skills`: Array of skills (TEXT[])
+- `location_pref`: Single location preference (TEXT, not array)
+- `industry_pref`: Array of industry preferences (TEXT[])
+- `work_style_pref`: Array of work style preferences (TEXT[])
+- `resume_url`: URL to uploaded resume (TEXT)
+- `is_onboarded`: Whether talent completed onboarding (BOOLEAN, default false)
+- `embedding`: Vector embedding for AI matching (public.vector)
+- `created_at`: Account creation timestamp
 
 ### 2. Create `employers` Table
 

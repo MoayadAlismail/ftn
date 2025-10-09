@@ -62,11 +62,10 @@ interface TalentProfile {
   industry_pref: string[];
   location_pref: string;
   resume_url?: string;
-  phone?: string;
-  linkedin_url?: string;
-  website_url?: string;
+  skills?: string[];
+  is_onboarded?: boolean;
+  embedding?: any;
   created_at: string;
-  updated_at?: string;
 }
 
 export default function TalentProfile() {
@@ -131,9 +130,7 @@ export default function TalentProfile() {
           location_pref: editForm.location_pref,
           work_style_pref: editForm.work_style_pref,
           industry_pref: editForm.industry_pref,
-          phone: editForm.phone,
-          linkedin_url: editForm.linkedin_url,
-          website_url: editForm.website_url,
+          skills: editForm.skills,
         })
         .eq("user_id", user.id);
 
@@ -206,25 +203,25 @@ export default function TalentProfile() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6">
+    <div className="space-y-6">
       {/* Header - Mobile Optimized */}
-      <div className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 mt-2 md:mt-4">Your Profile</h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">Manage your professional information</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Profile</h1>
+          <p className="text-sm text-gray-600 mt-1">Manage your professional information</p>
         </div>
         {!isEditing ? (
-          <Button onClick={handleEdit} className="flex items-center gap-2 w-full md:w-auto">
+          <Button onClick={handleEdit} className="flex items-center gap-2 w-full sm:w-auto">
             <Edit2 size={16} />
             Edit Profile
           </Button>
         ) : (
-          <div className="space-y-2 md:space-y-0 md:flex md:items-center md:gap-2">
+          <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               onClick={handleCancel} 
               disabled={isSaving}
-              className="w-full md:w-auto"
+              className="flex-1 sm:flex-none"
             >
               <X size={16} className="mr-2" />
               Cancel
@@ -232,7 +229,7 @@ export default function TalentProfile() {
             <Button 
               onClick={handleSave} 
               disabled={isSaving}
-              className="w-full md:w-auto"
+              className="flex-1 sm:flex-none"
             >
               {isSaving ? (
                 <Loader2 size={16} className="animate-spin mr-2" />
@@ -246,165 +243,55 @@ export default function TalentProfile() {
       </div>
 
       {/* Profile Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Main Profile Card */}
-        <div className="lg:col-span-2">
-          <Card className="p-4 md:p-6">
-            <div className="space-y-4 md:space-y-6">
-              {/* Profile Header */}
-              <div className="flex items-center gap-3 md:gap-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User size={24} className="md:size-8 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  {isEditing ? (
-                    <Input
-                      value={editForm.full_name || ""}
-                      onChange={(e) => handleInputChange("full_name", e.target.value)}
-                      className="text-lg md:text-xl font-semibold mb-2"
-                      placeholder="Your full name"
-                    />
-                  ) : (
-                    <h2 className="text-lg md:text-2xl font-bold text-gray-900 truncate">{profile.full_name}</h2>
-                  )}
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Mail size={14} className="md:size-4 flex-shrink-0" />
-                    <span className="text-sm md:text-base truncate">{profile.email}</span>
-                  </div>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Profile Info */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Profile Header Card */}
+          <Card className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <User size={32} className="text-primary" />
               </div>
-
-              {/* Bio Section */}
-              <div>
-                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">About</h3>
-                {isEditing ? (
-                  <Textarea
-                    value={editForm.bio || ""}
-                    onChange={(e) => handleInputChange("bio", e.target.value)}
-                    placeholder="Tell us about yourself, your skills, and career goals..."
-                    className="min-h-24 md:min-h-32 text-sm md:text-base"
-                  />
-                ) : (
-                  <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-                    {profile.bio || "No bio provided yet."}
-                  </p>
-                )}
-              </div>
-
-              {/* Contact Information */}
-              <div>
-                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Contact Information</h3>
-                <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    {isEditing ? (
-                      <Input
-                        value={editForm.phone || ""}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+1 (555) 123-4567"
-                        className="text-sm md:text-base"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Phone size={14} className="md:size-4 flex-shrink-0" />
-                        <span className="text-sm md:text-base">{profile.phone || "Not provided"}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      LinkedIn Profile
-                    </label>
-                    {isEditing ? (
-                      <Input
-                        value={editForm.linkedin_url || ""}
-                        onChange={(e) => handleInputChange("linkedin_url", e.target.value)}
-                        placeholder="https://linkedin.com/in/yourprofile"
-                        className="text-sm md:text-base"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-gray-600 min-w-0">
-                        <Building2 size={14} className="md:size-4 flex-shrink-0" />
-                        {profile.linkedin_url ? (
-                          <a 
-                            href={profile.linkedin_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline text-sm md:text-base truncate"
-                          >
-                            View LinkedIn
-                          </a>
-                        ) : (
-                          <span className="text-sm md:text-base">Not provided</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Website */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Personal Website/Portfolio
-                </label>
+              <div className="flex-1 min-w-0">
                 {isEditing ? (
                   <Input
-                    value={editForm.website_url || ""}
-                    onChange={(e) => handleInputChange("website_url", e.target.value)}
-                    placeholder="https://yourwebsite.com"
-                    className="text-sm md:text-base"
+                    value={editForm.full_name || ""}
+                    onChange={(e) => handleInputChange("full_name", e.target.value)}
+                    className="text-xl font-semibold mb-2"
+                    placeholder="Your full name"
                   />
                 ) : (
-                  <div className="flex items-center gap-2 text-gray-600 min-w-0">
-                    <Globe size={14} className="md:size-4 flex-shrink-0" />
-                    {profile.website_url ? (
-                      <a 
-                        href={profile.website_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm md:text-base truncate"
-                      >
-                        Visit Website
-                      </a>
-                    ) : (
-                      <span className="text-sm md:text-base">Not provided</span>
-                    )}
-                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">{profile.full_name}</h2>
                 )}
+                <div className="flex items-center gap-2 text-gray-600 mt-1">
+                  <Mail size={16} className="flex-shrink-0" />
+                  <span className="text-sm truncate">{profile.email}</span>
+                </div>
               </div>
             </div>
           </Card>
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-4 md:space-y-6">
-          {/* Preferences Card */}
-          <Card className="p-4 md:p-6">
-            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Preferences</h3>
-            <div className="space-y-4">
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location Preference
-                </label>
-                {isEditing ? (
-                  <Input
-                    value={editForm.location_pref || ""}
-                    onChange={(e) => handleInputChange("location_pref", e.target.value)}
-                    placeholder="e.g., San Francisco, CA or Remote"
-                    className="text-sm md:text-base"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin size={14} className="md:size-4 flex-shrink-0" />
-                    <span className="text-sm md:text-base">{profile.location_pref}</span>
-                  </div>
-                )}
-              </div>
+          {/* About Section */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
+            {isEditing ? (
+              <Textarea
+                value={editForm.bio || ""}
+                onChange={(e) => handleInputChange("bio", e.target.value)}
+                placeholder="Tell us about yourself, your skills, and career goals..."
+                className="min-h-32"
+              />
+            ) : (
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {profile.bio || "No bio provided yet."}
+              </p>
+            )}
+          </Card>
+
+          {/* Preferences Card - Full Width */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Preferences</h3>
+            <div className="space-y-6">
 
               {/* Work Style */}
               <div>
@@ -414,7 +301,7 @@ export default function TalentProfile() {
                 {isEditing ? (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-500">Select the types of opportunities you're interested in:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                       {WORK_STYLES.map((workStyle) => {
                         const isSelected = editForm.work_style_pref?.includes(workStyle.id) || false;
                         return (
@@ -422,7 +309,7 @@ export default function TalentProfile() {
                             key={workStyle.id}
                             type="button"
                             onClick={() => toggleWorkStyle(workStyle.id)}
-                            className={`p-2 text-sm border rounded-lg text-left transition-colors ${
+                            className={`p-2.5 text-sm border rounded-lg text-left transition-colors ${
                               isSelected
                                 ? 'border-primary bg-primary/10 text-primary'
                                 : 'border-gray-200 hover:border-gray-300 text-gray-700'
@@ -438,13 +325,13 @@ export default function TalentProfile() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-1 md:gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {profile.work_style_pref?.map((styleId, index) => {
                       const workStyle = WORK_STYLES.find(w => w.id === styleId);
                       return (
                     <span 
                       key={index}
-                          className="px-2 md:px-3 py-1 bg-primary/10 text-primary text-xs md:text-sm rounded-full"
+                          className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
                     >
                           {workStyle?.label || styleId}
                     </span>
@@ -462,7 +349,7 @@ export default function TalentProfile() {
                 {isEditing ? (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-500">Select up to 3 industries that interest you most:</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {INDUSTRIES.map((industry) => {
                         const isSelected = editForm.industry_pref?.includes(industry) || false;
                         const isDisabled = !isSelected && (editForm.industry_pref?.length || 0) >= 3;
@@ -472,7 +359,7 @@ export default function TalentProfile() {
                             type="button"
                             onClick={() => toggleIndustry(industry)}
                             disabled={isDisabled}
-                            className={`p-2 text-sm border rounded-lg text-left transition-colors ${
+                            className={`p-2.5 text-xs border rounded-lg text-left transition-colors ${
                               isSelected
                                 ? 'border-primary bg-primary/10 text-primary'
                                 : isDisabled
@@ -482,7 +369,7 @@ export default function TalentProfile() {
                           >
                             <div className="flex items-center justify-between">
                               <span>{industry}</span>
-                              {isSelected && <Check size={16} />}
+                              {isSelected && <Check size={14} />}
                             </div>
                           </button>
                         );
@@ -490,11 +377,11 @@ export default function TalentProfile() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-1 md:gap-2">
+                  <div className="flex flex-wrap gap-2">
                   {profile.industry_pref?.map((industry, index) => (
                     <span 
                       key={index}
-                        className="px-2 md:px-3 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded-full"
+                        className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
                     >
                       {industry}
                     </span>
@@ -505,13 +392,46 @@ export default function TalentProfile() {
             </div>
           </Card>
 
-          {/* Resume Card */}
-          <Card className="p-4 md:p-6">
-            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Resume</h3>
+          {/* Location & Account Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Location */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Location Preference</h3>
+              {isEditing ? (
+                <Input
+                  value={editForm.location_pref || ""}
+                  onChange={(e) => handleInputChange("location_pref", e.target.value)}
+                  placeholder="e.g., Riyadh, Jeddah, Remote"
+                />
+              ) : (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin size={16} className="flex-shrink-0" />
+                  <span className="text-sm">
+                    {profile.location_pref || "Not specified"}
+                  </span>
+                </div>
+              )}
+            </Card>
+
+            {/* Account Info */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Account</h3>
+              <div className="flex items-center gap-2 text-gray-600">
+                <Calendar size={16} className="flex-shrink-0" />
+                <span className="text-sm">Joined {new Date(profile.created_at).toLocaleDateString()}</span>
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* Right Sidebar - Resume */}
+        <div className="lg:col-span-1">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume</h3>
             {profile.resume_url ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <FileText className="text-green-600 flex-shrink-0" size={18} />
+                  <FileText className="text-green-600 flex-shrink-0" size={20} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-green-800">Resume Uploaded</p>
                     <p className="text-xs text-green-600 truncate">Last updated: {new Date(profile.created_at).toLocaleDateString()}</p>
@@ -523,32 +443,15 @@ export default function TalentProfile() {
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-4">
-                <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-600 mb-3">No resume uploaded</p>
+              <div className="text-center py-6">
+                <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p className="text-sm text-gray-600 mb-4">No resume uploaded</p>
                 <Button size="sm" className="w-full">
                   <Upload size={14} className="mr-2" />
                   Upload Resume
                 </Button>
               </div>
             )}
-          </Card>
-
-          {/* Account Info */}
-          <Card className="p-4 md:p-6">
-            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">Account</h3>
-            <div className="space-y-3 text-xs md:text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Calendar size={14} className="md:size-4 flex-shrink-0" />
-                <span>Joined {new Date(profile.created_at).toLocaleDateString()}</span>
-              </div>
-              {profile.updated_at && (
-                <div className="flex items-center gap-2">
-                  <Edit2 size={14} className="md:size-4 flex-shrink-0" />
-                  <span>Last updated {new Date(profile.updated_at).toLocaleDateString()}</span>
-                </div>
-              )}
-            </div>
           </Card>
         </div>
       </div>
