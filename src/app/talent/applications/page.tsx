@@ -26,6 +26,8 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import OpportunityCard, { type Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
 import OpportunityDetailModal from "@/components/opportunity-detail-modal";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { applicationsTranslations } from "@/lib/language";
 
 interface Application {
   id: string;
@@ -51,6 +53,8 @@ interface ApplicationStats {
 
 export default function TalentApplicationsPage() {
   const { user, authUser, isLoading } = useAuth();
+  const { language } = useLanguage();
+  const t = applicationsTranslations[language];
   const [applications, setApplications] = useState<Application[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
   const [savedOpportunities, setSavedOpportunities] = useState<Opportunity[]>([]);
@@ -113,7 +117,7 @@ export default function TalentApplicationsPage() {
 
       if (error) {
         console.error("Error fetching applications:", error);
-        toast.error("Failed to load applications");
+        toast.error(t.failedToLoadApplications);
         return;
       }
 
@@ -126,7 +130,7 @@ export default function TalentApplicationsPage() {
       calculateStats(applicationsData);
     } catch (error) {
       console.error("Error loading applications:", error);
-      toast.error("Failed to load applications");
+      toast.error(t.failedToLoadApplications);
     } finally {
       setLoading(false);
     }
@@ -236,7 +240,7 @@ export default function TalentApplicationsPage() {
       setSavedOpportunities(transformedSavedOpportunities);
     } catch (error) {
       console.error("Error loading saved opportunities:", error);
-      toast.error("Failed to load saved opportunities");
+      toast.error(t.failedToLoadSavedOpportunities);
     } finally {
       setSavedLoading(false);
     }
@@ -266,7 +270,7 @@ export default function TalentApplicationsPage() {
   const handleSaveOpportunity = async (opportunityId: string) => {
     try {
       if (!authUser?.id) {
-        toast.error("Please log in to save opportunities");
+        toast.error(t.pleaseLoginToSave);
         return;
       }
 
@@ -289,10 +293,10 @@ export default function TalentApplicationsPage() {
         await loadSavedOpportunities();
       }
 
-      toast.success("Opportunity saved successfully");
+      toast.success(t.opportunitySavedSuccess);
     } catch (error) {
       console.error("Error saving opportunity:", error);
-      toast.error("Failed to save opportunity");
+      toast.error(t.failedToSaveOpportunity);
     }
   };
 
@@ -317,10 +321,10 @@ export default function TalentApplicationsPage() {
         await loadSavedOpportunities();
       }
 
-      toast.success("Opportunity removed from saved");
+      toast.success(t.opportunityRemovedSuccess);
     } catch (error) {
       console.error("Error unsaving opportunity:", error);
-      toast.error("Failed to remove opportunity");
+      toast.error(t.failedToRemoveOpportunity);
     }
   };
 
@@ -342,7 +346,7 @@ export default function TalentApplicationsPage() {
       await loadSavedOpportunities();
     }
     setRefreshing(false);
-    toast.success(`${activeTab === "applications" ? "Applications" : "Saved opportunities"} refreshed`);
+    toast.success(activeTab === "applications" ? t.refreshedApplications : t.refreshedSavedOpportunities);
   };
 
 
@@ -387,9 +391,9 @@ export default function TalentApplicationsPage() {
       {/* Header - Mobile Optimized */}
       <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Applications & Saved Jobs</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">{t.pageTitle}</h1>
           <p className="text-sm md:text-base text-gray-600 mt-1">
-            Track your applications and manage saved opportunities
+            {t.pageDescription}
           </p>
         </div>
         <Button
@@ -400,7 +404,7 @@ export default function TalentApplicationsPage() {
           className="w-full md:w-auto"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          Refresh
+          {t.refresh}
         </Button>
       </div>
 
@@ -409,14 +413,14 @@ export default function TalentApplicationsPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="applications" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            My Applications
+            {t.myApplications}
             <span className="ml-1 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
               {stats.total}
             </span>
           </TabsTrigger>
           <TabsTrigger value="saved" className="flex items-center gap-2">
             <BookmarkCheck className="h-4 w-4" />
-            Saved Jobs
+            {t.savedJobs}
             <span className="ml-1 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
               {savedOpportunities.length}
             </span>
@@ -431,7 +435,7 @@ export default function TalentApplicationsPage() {
               <CardContent className="p-4 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs md:text-sm font-medium text-gray-600">Total Applications</p>
+                    <p className="text-xs md:text-sm font-medium text-gray-600">{t.totalApplications}</p>
                     <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
                   </div>
                   <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
@@ -443,7 +447,7 @@ export default function TalentApplicationsPage() {
               <CardContent className="p-4 md:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs md:text-sm font-medium text-gray-600">This Month</p>
+                    <p className="text-xs md:text-sm font-medium text-gray-600">{t.thisMonth}</p>
                     <p className="text-xl md:text-2xl font-bold text-green-600">{stats.thisMonth}</p>
                   </div>
                   <Calendar className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
@@ -457,17 +461,17 @@ export default function TalentApplicationsPage() {
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                 <Filter className="h-4 w-4 md:h-5 md:w-5" />
-                Filters
+                {t.filters}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Search</label>
+                  <label className="text-sm font-medium text-gray-700">{t.search}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search jobs, companies..."
+                      placeholder={t.searchPlaceholder}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10 h-10"
@@ -476,13 +480,13 @@ export default function TalentApplicationsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Industry</label>
+                  <label className="text-sm font-medium text-gray-700">{t.industry}</label>
                   <Select value={industryFilter} onValueChange={setIndustryFilter}>
                     <SelectTrigger className="h-10">
-                      <SelectValue placeholder="All industries" />
+                      <SelectValue placeholder={t.allIndustries} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All industries</SelectItem>
+                      <SelectItem value="all">{t.allIndustries}</SelectItem>
                       {getUniqueIndustries().map((industry) => (
                         <SelectItem key={industry} value={industry!}>
                           {industry}
@@ -501,17 +505,17 @@ export default function TalentApplicationsPage() {
               <CardContent className="py-8 md:py-12 text-center px-4">
                 <FileText className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
-                  {applications.length === 0 ? "No applications yet" : "No applications match your filters"}
+                  {applications.length === 0 ? t.noApplicationsYet : t.noApplicationsMatchFilters}
                 </h3>
                 <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
                   {applications.length === 0 
-                    ? "Start applying to opportunities to see them here."
-                    : "Try adjusting your search criteria to see more results."
+                    ? t.noApplicationsDescription
+                    : t.noApplicationsFilterDescription
                   }
                 </p>
                 {applications.length === 0 && (
                   <Link href="/talent/opportunities">
-                    <Button className="w-full md:w-auto">Browse Opportunities</Button>
+                    <Button className="w-full md:w-auto">{t.browseOpportunities}</Button>
                   </Link>
                 )}
               </CardContent>
@@ -539,7 +543,7 @@ export default function TalentApplicationsPage() {
                           </div>
                           <div className="flex items-center gap-1 text-sm text-gray-600">
                             <Calendar className="h-4 w-4 flex-shrink-0" />
-                            <span>Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}</span>
+                            <span>{t.applied} {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}</span>
                           </div>
                         </div>
 
@@ -558,7 +562,7 @@ export default function TalentApplicationsPage() {
                             ))}
                             {application.opportunity.skills.length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{application.opportunity.skills.length - 3} more
+                                +{application.opportunity.skills.length - 3} {t.moreSkills}
                               </Badge>
                             )}
                           </div>
@@ -574,7 +578,7 @@ export default function TalentApplicationsPage() {
                         className="w-full"
                       >
                         <Eye className="h-4 w-4 mr-2" />
-                        View Job Details
+                        {t.viewJobDetails}
                       </Button>
                     </div>
 
@@ -600,7 +604,7 @@ export default function TalentApplicationsPage() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
-                                Applied {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
+                                {t.applied} {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
                               </div>
                             </div>
 
@@ -619,7 +623,7 @@ export default function TalentApplicationsPage() {
                                 ))}
                                 {application.opportunity.skills.length > 4 && (
                                   <Badge variant="outline" className="text-xs">
-                                    +{application.opportunity.skills.length - 4} more
+                                    +{application.opportunity.skills.length - 4} {t.moreSkills}
                                   </Badge>
                                 )}
                               </div>
@@ -637,7 +641,7 @@ export default function TalentApplicationsPage() {
                           }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          View Job
+                          {t.viewJob}
                         </Button>
                       </div>
                     </div>
@@ -655,7 +659,7 @@ export default function TalentApplicationsPage() {
             <CardContent className="p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Total Saved</p>
+                  <p className="text-xs md:text-sm font-medium text-gray-600">{t.totalSaved}</p>
                   <p className="text-xl md:text-2xl font-bold text-purple-600">{savedOpportunities.length}</p>
                 </div>
               </div>
@@ -667,17 +671,17 @@ export default function TalentApplicationsPage() {
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                 <Filter className="h-4 w-4 md:h-5 md:w-5" />
-                Filters
+                {t.filters}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Search</label>
+                  <label className="text-sm font-medium text-gray-700">{t.search}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="Search saved jobs, companies..."
+                      placeholder={t.searchSavedPlaceholder}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10 h-10"
@@ -686,13 +690,13 @@ export default function TalentApplicationsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Industry</label>
+                  <label className="text-sm font-medium text-gray-700">{t.industry}</label>
                   <Select value={industryFilter} onValueChange={setIndustryFilter}>
                     <SelectTrigger className="h-10">
-                      <SelectValue placeholder="All industries" />
+                      <SelectValue placeholder={t.allIndustries} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All industries</SelectItem>
+                      <SelectItem value="all">{t.allIndustries}</SelectItem>
                       {getUniqueIndustries().map((industry) => (
                         <SelectItem key={industry} value={industry!}>
                           {industry}
@@ -720,17 +724,17 @@ export default function TalentApplicationsPage() {
               <CardContent className="py-8 md:py-12 text-center px-4">
                 <Heart className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
-                  {savedOpportunities.length === 0 ? "No saved opportunities yet" : "No saved opportunities match your filters"}
+                  {savedOpportunities.length === 0 ? t.noSavedOpportunitiesYet : t.noSavedOpportunitiesMatchFilters}
                 </h3>
                 <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
                   {savedOpportunities.length === 0 
-                    ? "Start saving opportunities you're interested in to see them here."
-                    : "Try adjusting your search criteria to see more results."
+                    ? t.noSavedOpportunitiesDescription
+                    : t.noSavedOpportunitiesFilterDescription
                   }
                 </p>
                 {savedOpportunities.length === 0 && (
                   <Link href="/talent/opportunities">
-                    <Button className="w-full md:w-auto">Browse Opportunities</Button>
+                    <Button className="w-full md:w-auto">{t.browseOpportunities}</Button>
                   </Link>
                 )}
               </CardContent>

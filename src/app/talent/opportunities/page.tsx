@@ -25,6 +25,8 @@ import LoadingAnimation from "@/components/loadingAnimation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import OpportunityDetailModal from "@/components/opportunity-detail-modal";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { opportunitiesTranslations } from "@/lib/language/opportunities";
 
 const DEFAULT_FILTERS: FilterType = {
     search: "",
@@ -52,6 +54,8 @@ interface ExtendedOpportunity extends Opportunity {
 function TalentOpportunitiesContent() {
     const { user, authUser, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
+    const { language } = useLanguage();
+    const t = opportunitiesTranslations[language];
     const [opportunities, setOpportunities] = useState<ExtendedOpportunity[]>([]);
     const [filteredOpportunities, setFilteredOpportunities] = useState<ExtendedOpportunity[]>([]);
     const [filters, setFilters] = useState<FilterType>(DEFAULT_FILTERS);
@@ -179,7 +183,7 @@ function TalentOpportunitiesContent() {
 
             if (!talentData?.embedding) {
                 // User needs to go through AI matching first
-                toast.info("Setting up your AI recommendations...");
+                toast.info(t.settingUpRecommendations);
                 await processUserForAIMatching();
             }
 
@@ -350,7 +354,7 @@ function TalentOpportunitiesContent() {
             return transformed;
         } catch (error) {
             console.error("Error loading general opportunities:", error);
-            toast.error("Failed to load opportunities");
+            toast.error(t.failedToLoadOpportunities);
             return [];
         }
     };
@@ -503,7 +507,7 @@ function TalentOpportunitiesContent() {
     const handleSaveOpportunity = async (opportunityId: string) => {
         try {
             if (!authUser?.id) {
-                toast.error("Please log in to save opportunities");
+                toast.error(t.loginToSave);
                 return;
             }
 
@@ -514,7 +518,7 @@ function TalentOpportunitiesContent() {
                 .maybeSingle();
 
             if (talentError || !talentData?.id) {
-                toast.error("Talent profile not found");
+                toast.error(t.talentProfileNotFound);
                 return;
             }
 
@@ -532,10 +536,10 @@ function TalentOpportunitiesContent() {
             newSavedIds.add(opportunityId);
             setSavedOpportunityIds(newSavedIds);
 
-            toast.success("Opportunity saved successfully");
+            toast.success(t.opportunitySaved);
         } catch (error) {
             console.error("Error saving opportunity:", error);
-            toast.error("Failed to save opportunity");
+            toast.error(t.opportunitySaveFailed);
         }
     };
 
@@ -563,10 +567,10 @@ function TalentOpportunitiesContent() {
             newSavedIds.delete(opportunityId);
             setSavedOpportunityIds(newSavedIds);
 
-            toast.success("Opportunity removed from saved");
+            toast.success(t.opportunityRemoved);
         } catch (error) {
             console.error("Error unsaving opportunity:", error);
-            toast.error("Failed to remove opportunity");
+            toast.error(t.opportunityRemoveFailed);
         }
     };
 
@@ -589,7 +593,7 @@ function TalentOpportunitiesContent() {
         setOpportunities([]);
         setAiMatchingStatus("loading");
         await initializeAIRecommendations();
-        toast.success("Feed refreshed with new recommendations");
+        toast.success(t.feedRefreshed);
     };
 
     const clearSearch = () => {
@@ -608,10 +612,10 @@ function TalentOpportunitiesContent() {
 
     const getFeedModeText = () => {
         switch (feedMode) {
-            case "ai_recommended": return "AI Recommendations";
-            case "search": return `Search: "${searchInput}"`;
-            case "filtered": return "Filtered Results";
-            default: return "All Opportunities";
+            case "ai_recommended": return t.aiRecommendations;
+            case "search": return `${t.searchResults}: "${searchInput}"`;
+            case "filtered": return t.filteredResults;
+            default: return t.allOpportunities;
         }
     };
 
@@ -626,15 +630,15 @@ function TalentOpportunitiesContent() {
                         {aiMatchingStatus === "loading" && (
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                                <span className="hidden sm:inline">Processing AI matches...</span>
+                                <span className="hidden sm:inline">{t.processingAiMatches}</span>
                             </div>
                         )}
                     </div>
                     <p className="text-sm md:text-base text-gray-600">
                         {loading ? (
-                            "Loading opportunities..."
+                            t.loadingOpportunities
                         ) : (
-                            `${memoizedFilteredOpportunities.length} opportunities found`
+                            `${memoizedFilteredOpportunities.length} ${t.opportunitiesFound}`
                         )}
                     </p>
                 </div>
@@ -647,7 +651,7 @@ function TalentOpportunitiesContent() {
                         className="flex-1 sm:flex-none"
                     >
                         <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                        <span className="hidden sm:inline">Refresh</span>
+                        <span className="hidden sm:inline">{t.refresh}</span>
                     </Button>
                     <Button
                         variant="outline"
@@ -656,7 +660,7 @@ function TalentOpportunitiesContent() {
                         className="flex-1 sm:flex-none"
                     >
                         <Filter className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Filters</span>
+                        <span className="hidden sm:inline">{t.filters}</span>
                     </Button>
                 </div>
             </div>
@@ -666,11 +670,11 @@ function TalentOpportunitiesContent() {
                 <CardContent className="p-4 md:p-6">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Search Opportunities</label>
+                            <label className="text-sm font-medium text-gray-700">{t.searchOpportunities}</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <Input
-                                    placeholder="Search for opportunities, companies, or skills..."
+                                    placeholder={t.searchPlaceholder}
                                     value={searchInput}
                                     onChange={(e) => setSearchInput(e.target.value)}
                                     className="pl-10 pr-10 h-10"
@@ -714,21 +718,21 @@ function TalentOpportunitiesContent() {
             {/* Opportunity Feed */}
             {loading ? (
                 <div className="flex justify-center py-12">
-                    <LoadingAnimation size="md" text="Loading your personalized feed..." />
+                    <LoadingAnimation size="md" text={t.loadingPersonalizedFeed} />
                 </div>
             ) : memoizedFilteredOpportunities.length === 0 ? (
                 <Card>
                     <CardContent className="py-8 md:py-12 text-center px-4">
                         <Search className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">{t.noOpportunitiesFound}</h3>
                         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-md mx-auto">
                             {feedMode === "search"
-                                ? "Try different search terms or clear your search to see AI recommendations."
-                                : "Try adjusting your filters or refresh for new recommendations."
+                                ? t.tryDifferentSearch
+                                : t.adjustFilters
                             }
                         </p>
                         <Button onClick={clearSearch} variant="outline" className="w-full md:w-auto">
-                            {feedMode === "search" ? "Clear Search" : "Clear Filters"}
+                            {feedMode === "search" ? t.clearSearch : t.clearFilters}
                         </Button>
                     </CardContent>
                 </Card>
@@ -746,7 +750,7 @@ function TalentOpportunitiesContent() {
                                     <div className="absolute -top-2 -right-2 z-10">
                                         <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                                             <Sparkles className="h-3 w-3" />
-                                            AI Match
+                                            {t.aiMatch}
                                         </div>
                                     </div>
                                 )}
@@ -766,19 +770,19 @@ function TalentOpportunitiesContent() {
                     <div ref={loadMoreRef} className="py-4 md:py-8">
                         {loadingMore && (
                             <div className="flex justify-center">
-                                <LoadingAnimation size="sm" text="Loading more opportunities..." />
+                                <LoadingAnimation size="sm" text={t.loadingMore} />
                             </div>
                         )}
                         {!hasMore && memoizedFilteredOpportunities.length > 0 && (
                             <div className="text-center text-gray-500 py-4 md:py-8">
-                                <p className="text-sm md:text-base mb-4">You've reached the end! Check back later for new opportunities.</p>
+                                <p className="text-sm md:text-base mb-4">{t.reachedTheEnd}</p>
                                 <Button
                                     variant="outline"
                                     onClick={handleRefresh}
                                     className="w-full md:w-auto"
                                 >
                                     <RefreshCw className="h-4 w-4 mr-2" />
-                                    Refresh for More
+                                    {t.refreshForMore}
                                 </Button>
                             </div>
                         )}

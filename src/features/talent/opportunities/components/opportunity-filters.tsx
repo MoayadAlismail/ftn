@@ -21,6 +21,8 @@ import {
     RefreshCw,
     Briefcase
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { opportunitiesTranslations } from "@/lib/language/opportunities";
 
 export interface OpportunityFilters {
     search: string;
@@ -71,24 +73,6 @@ const COMPANY_SIZES = [
     "Startup (1-10)", "Small (11-50)", "Medium (51-200)", "Large (201-1000)", "Enterprise (1000+)"
 ];
 
-const POSTED_WITHIN_OPTIONS = [
-    { value: "24h", label: "Last 24 hours" },
-    { value: "3d", label: "Last 3 days" },
-    { value: "1w", label: "Last week" },
-    { value: "2w", label: "Last 2 weeks" },
-    { value: "1m", label: "Last month" },
-    { value: "all", label: "All time" }
-];
-
-const SORT_OPTIONS = [
-    { value: "ai_match", label: "AI Recommended" },
-    { value: "relevance", label: "Most Relevant" },
-    { value: "newest", label: "Newest First" },
-    { value: "oldest", label: "Oldest First" },
-    { value: "salary_high", label: "Salary: High to Low" },
-    { value: "salary_low", label: "Salary: Low to High" },
-    { value: "company_size", label: "Company Size" }
-];
 
 export default function OpportunityFilters({
     filters,
@@ -97,6 +81,28 @@ export default function OpportunityFilters({
     resultsCount = 0,
     isLoading = false
 }: OpportunityFiltersProps) {
+    const { language } = useLanguage();
+    const t = opportunitiesTranslations[language];
+    
+    const POSTED_WITHIN_OPTIONS = [
+        { value: "24h", label: t.last24Hours },
+        { value: "3d", label: t.last3Days },
+        { value: "1w", label: t.lastWeek },
+        { value: "2w", label: t.last2Weeks },
+        { value: "1m", label: t.lastMonth },
+        { value: "all", label: t.allTime }
+    ];
+
+    const SORT_OPTIONS = [
+        { value: "ai_match", label: t.aiRecommended },
+        { value: "relevance", label: t.mostRelevant },
+        { value: "newest", label: t.newestFirst },
+        { value: "oldest", label: t.oldestFirst },
+        { value: "salary_high", label: t.salaryHighToLow },
+        { value: "salary_low", label: t.salaryLowToHigh },
+        { value: "company_size", label: t.companySizeSort }
+    ];
+    
     const [isExpanded, setIsExpanded] = useState(false);
     const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
@@ -149,7 +155,7 @@ export default function OpportunityFilters({
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <Input
-                                placeholder="Search opportunities by title, company, or keywords..."
+                                placeholder={t.searchPlaceholder}
                                 value={filters.search}
                                 onChange={(e) => updateFilter('search', e.target.value)}
                                 className="pl-10"
@@ -165,7 +171,7 @@ export default function OpportunityFilters({
                                     onCheckedChange={(checked) => updateFilter('remote', checked)}
                                 />
                                 <Label htmlFor="remote" className="text-sm font-medium cursor-pointer">
-                                    Remote Only
+                                    {t.remoteOnly}
                                 </Label>
                             </div>
 
@@ -203,7 +209,7 @@ export default function OpportunityFilters({
                                 className="flex items-center gap-2"
                             >
                                 <Filter className="h-4 w-4" />
-                                Advanced Filters
+                                {t.advancedFilters}
                                 {activeFiltersCount > 0 && (
                                     <Badge variant="secondary" className="ml-1">
                                         {activeFiltersCount}
@@ -219,7 +225,7 @@ export default function OpportunityFilters({
                                     className="text-gray-500 hover:text-gray-700"
                                 >
                                     <RefreshCw className="h-4 w-4 mr-2" />
-                                    Clear All
+                                    {t.clearAll}
                                 </Button>
                             )}
                         </div>
@@ -321,9 +327,9 @@ export default function OpportunityFilters({
                         <div className="flex items-center justify-between text-sm text-gray-600">
                             <span>
                                 {isLoading ? (
-                                    "Searching opportunities..."
+                                    t.searchingOpportunities
                                 ) : (
-                                    `${resultsCount.toLocaleString()} opportunities found`
+                                    `${resultsCount.toLocaleString()} ${t.opportunitiesFound}`
                                 )}
                             </span>
                         </div>
@@ -337,7 +343,7 @@ export default function OpportunityFilters({
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                             <Filter className="h-5 w-5" />
-                            Advanced Filters
+                            {t.advancedFilters}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -346,7 +352,7 @@ export default function OpportunityFilters({
                             <div className="space-y-3">
                                 <Label className="text-sm font-medium flex items-center gap-2">
                                     <MapPin className="h-4 w-4" />
-                                    Location
+                                    {t.location}
                                 </Label>
                                 <div className="space-y-2 max-h-40 overflow-y-auto">
                                     {SAUDI_CITIES.map((city) => (
@@ -368,7 +374,7 @@ export default function OpportunityFilters({
                             <div className="space-y-3">
                                 <Label className="text-sm font-medium flex items-center gap-2">
                                     <Building2 className="h-4 w-4" />
-                                    Industry
+                                    {t.industry}
                                 </Label>
                                 <div className="space-y-2 max-h-40 overflow-y-auto">
                                     {INDUSTRIES.map((industry) => (
@@ -390,7 +396,7 @@ export default function OpportunityFilters({
                             <div className="space-y-3">
                                 <Label className="text-sm font-medium flex items-center gap-2">
                                     <Briefcase className="h-4 w-4" />
-                                    Job Type
+                                    {t.jobType}
                                 </Label>
                                 <div className="space-y-2">
                                     {JOB_TYPES.map((type) => (
@@ -412,7 +418,7 @@ export default function OpportunityFilters({
                             <div className="space-y-3">
                                 <Label className="text-sm font-medium flex items-center gap-2">
                                     <Users className="h-4 w-4" />
-                                    Experience Level
+                                    {t.experienceLevel}
                                 </Label>
                                 <div className="space-y-2">
                                     {EXPERIENCE_LEVELS.map((level) => (
@@ -432,7 +438,7 @@ export default function OpportunityFilters({
 
                             {/* Work Style Filter */}
                             <div className="space-y-3">
-                                <Label className="text-sm font-medium">Work Style</Label>
+                                <Label className="text-sm font-medium">{t.workStyle}</Label>
                                 <div className="space-y-2">
                                     {WORK_STYLES.map((style) => (
                                         <div key={style} className="flex items-center space-x-2">
@@ -451,7 +457,7 @@ export default function OpportunityFilters({
 
                             {/* Company Size Filter */}
                             <div className="space-y-3">
-                                <Label className="text-sm font-medium">Company Size</Label>
+                                <Label className="text-sm font-medium">{t.companySize}</Label>
                                 <div className="space-y-2">
                                     {COMPANY_SIZES.map((size) => (
                                         <div key={size} className="flex items-center space-x-2">
@@ -473,7 +479,7 @@ export default function OpportunityFilters({
                         <div className="space-y-3">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <DollarSign className="h-4 w-4" />
-                                Salary Range (SAR per month)
+                                {t.salaryRange}
                             </Label>
                             <div className="space-y-4">
                                 <Slider

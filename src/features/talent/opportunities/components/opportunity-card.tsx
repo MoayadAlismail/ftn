@@ -19,6 +19,8 @@ import {
     Share2
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { opportunitiesTranslations } from "@/lib/language/opportunities";
 
 export interface Opportunity {
     id: string;
@@ -51,6 +53,8 @@ const OpportunityCard = memo(function OpportunityCard({
     onViewDetails,
     compact = false
 }: OpportunityCardProps) {
+    const { language } = useLanguage();
+    const t = opportunitiesTranslations[language];
     const [isSaved, setIsSaved] = useState(opportunity.isSaved || false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -100,7 +104,7 @@ const OpportunityCard = memo(function OpportunityCard({
 
     const postedTime = opportunity.created_at 
         ? formatDistanceToNow(new Date(opportunity.created_at), { addSuffix: true })
-        : 'Recently posted';
+        : t.recentlyPosted;
 
     if (compact) {
         return (
@@ -131,7 +135,7 @@ const OpportunityCard = memo(function OpportunityCard({
                             </Badge>
                             {opportunity.matchScore && (
                                 <Badge variant="default" className="bg-green-500 text-xs">
-                                    {opportunity.matchScore}% match
+                                    {opportunity.matchScore}% {t.match}
                                 </Badge>
                             )}
                         </div>
@@ -139,10 +143,10 @@ const OpportunityCard = memo(function OpportunityCard({
                         <div className="flex gap-2">
                             <Button onClick={handleViewDetails} variant="outline" size="sm" className="flex-1">
                                 <Eye className="h-4 w-4 mr-2" />
-                                View Details
+                                {t.viewDetails}
                             </Button>
                             <Button onClick={handleApply} size="sm" className="flex-1">
-                                Apply Now
+                                {t.applyNow}
                             </Button>
                             <Button
                                 variant={isSaved ? "default" : "outline"}
@@ -189,7 +193,7 @@ const OpportunityCard = memo(function OpportunityCard({
                             <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                                 {opportunity.matchScore && (
                                     <Badge variant="default" className="bg-green-500">
-                                        {opportunity.matchScore}% match
+                                        {opportunity.matchScore}% {t.match}
                                     </Badge>
                                 )}
                                 <Button
@@ -250,7 +254,7 @@ const OpportunityCard = memo(function OpportunityCard({
                                 <div className="flex items-center gap-2 ml-4">
                                     {opportunity.matchScore && (
                                         <Badge variant="default" className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-                                            {opportunity.matchScore}% match
+                                            {opportunity.matchScore}% {t.match}
                                         </Badge>
                                     )}
                                     <Button
@@ -262,12 +266,12 @@ const OpportunityCard = memo(function OpportunityCard({
                                         {isSaved ? (
                                             <>
                                                 <Heart className="h-4 w-4 fill-current sm:mr-2" />
-                                                <span className="hidden sm:inline">Saved</span>
+                                                <span className="hidden sm:inline">{t.saved}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <Heart className="h-4 w-4 sm:mr-2" />
-                                                <span className="hidden sm:inline">Save</span>
+                                                <span className="hidden sm:inline">{t.save}</span>
                                             </>
                                         )}
                                     </Button>
@@ -297,7 +301,7 @@ const OpportunityCard = memo(function OpportunityCard({
                 {/* Skills */}
                 {opportunity.skills && opportunity.skills.length > 0 && (
                     <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Required Skills</h4>
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">{t.requiredSkills}</h4>
                         <div className="flex flex-wrap gap-2">
                             {opportunity.skills.slice(0, 6).map((skill, index) => (
                                 <Badge key={index} variant="outline" className="text-xs">
@@ -306,7 +310,7 @@ const OpportunityCard = memo(function OpportunityCard({
                             ))}
                             {opportunity.skills.length > 6 && (
                                 <Badge variant="outline" className="text-xs">
-                                    +{opportunity.skills.length - 6} more
+                                    +{opportunity.skills.length - 6} {t.moreSkills}
                                 </Badge>
                             )}
                         </div>
@@ -318,16 +322,16 @@ const OpportunityCard = memo(function OpportunityCard({
                     {/* Mobile Layout - Stack vertically */}
                     <div className="flex flex-col sm:hidden space-y-3">
                         <Button onClick={handleApply} size="sm" className="w-full">
-                            Apply Now
+                            {t.applyNow}
                         </Button>
                         <div className="flex items-center gap-2">
                             <Button onClick={handleViewDetails} variant="outline" size="sm" className="flex-1">
                                 <Eye className="h-4 w-4 mr-2" />
-                                View Details
+                                {t.viewDetails}
                             </Button>
                             <Button onClick={handleShare} variant="ghost" size="sm" className="flex-1">
                                 <Share2 className="h-4 w-4 mr-2" />
-                                Share
+                                {t.share}
                             </Button>
                         </div>
                     </div>
@@ -337,17 +341,17 @@ const OpportunityCard = memo(function OpportunityCard({
                         <div className="flex items-center gap-3">
                             <Button onClick={handleViewDetails} variant="outline" size="sm">
                                 <Eye className="h-4 w-4 mr-2" />
-                                View Details
+                                {t.viewDetails}
                             </Button>
                             <Button onClick={handleShare} variant="ghost" size="sm">
                                 <Share2 className="h-4 w-4 mr-2" />
-                                Share
+                                {t.share}
                             </Button>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <Button onClick={handleApply} size="sm">
-                                Apply Now
+                                {t.applyNow}
                             </Button>
                         </div>
                     </div>
