@@ -7,8 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { contactTranslations } from "@/lib/language/contact";
 
 export default function ContactUs() {
+  const { language } = useLanguage();
+  const t = contactTranslations[language];
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -32,10 +37,10 @@ export default function ContactUs() {
     // Simulate form submission
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("Message sent successfully! We'll get back to you soon.");
+      toast.success(t.successMessage);
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      toast.error("Failed to send message. Please try again.");
+      toast.error(t.errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -46,10 +51,10 @@ export default function ContactUs() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Get in Touch
+            {t.getInTouch}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Have questions or need support? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            {t.subtitle}
           </p>
         </div>
 
@@ -58,33 +63,33 @@ export default function ContactUs() {
           <Card className="border-border">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold text-foreground">
-                Send us a Message
+                {t.sendMessage}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name *</Label>
+                    <Label htmlFor="name">{t.nameLabel}</Label>
                     <Input
                       id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      placeholder="Your full name"
+                      placeholder={t.namePlaceholder}
                       required
                       className="border-border"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">{t.emailLabel}</Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="your.email@example.com"
+                      placeholder={t.emailPlaceholder}
                       required
                       className="border-border"
                     />
@@ -92,26 +97,26 @@ export default function ContactUs() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject *</Label>
+                  <Label htmlFor="subject">{t.subjectLabel}</Label>
                   <Input
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    placeholder="What is this about?"
+                    placeholder={t.subjectPlaceholder}
                     required
                     className="border-border"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message *</Label>
+                  <Label htmlFor="message">{t.messageLabel}</Label>
                   <Textarea
                     id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
-                    placeholder="Tell us more about your inquiry..."
+                    placeholder={t.messagePlaceholder}
                     required
                     className="border-border min-h-[120px]"
                   />
@@ -122,7 +127,7 @@ export default function ContactUs() {
                   className="w-full" 
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  {isSubmitting ? t.sendingButton : t.sendButton}
                 </Button>
               </form>
             </CardContent>
@@ -135,10 +140,10 @@ export default function ContactUs() {
                 <div className="flex items-start space-x-4">
                   <div className="text-2xl">📧</div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Email Support</h3>
-                    <p className="text-muted-foreground">support@ftnfind.com</p>
+                    <h3 className="font-semibold text-foreground mb-2">{t.emailSupport}</h3>
+                    <p className="text-muted-foreground">{t.emailAddress}</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      We typically respond within 24 hours
+                      {t.responseTime}
                     </p>
                   </div>
                 </div>
@@ -150,10 +155,10 @@ export default function ContactUs() {
                 <div className="flex items-start space-x-4">
                   <div className="text-2xl">💬</div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Live Chat</h3>
-                    <p className="text-muted-foreground">Available 24/7 for immediate assistance</p>
+                    <h3 className="font-semibold text-foreground mb-2">{t.liveChat}</h3>
+                    <p className="text-muted-foreground">{t.liveChatDesc}</p>
                     <Button variant="outline" className="mt-2" size="sm">
-                      Start Chat
+                      {t.startChat}
                     </Button>
                   </div>
                 </div>
@@ -165,10 +170,10 @@ export default function ContactUs() {
                 <div className="flex items-start space-x-4">
                   <div className="text-2xl">📚</div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Help Center</h3>
-                    <p className="text-muted-foreground">Browse our comprehensive documentation</p>
+                    <h3 className="font-semibold text-foreground mb-2">{t.helpCenter}</h3>
+                    <p className="text-muted-foreground">{t.helpCenterDesc}</p>
                     <Button variant="outline" className="mt-2" size="sm">
-                      Visit Help Center
+                      {t.visitHelpCenter}
                     </Button>
                   </div>
                 </div>
@@ -180,9 +185,9 @@ export default function ContactUs() {
                 <div className="flex items-start space-x-4">
                   <div className="text-2xl">🌍</div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">Global Reach</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t.globalReach}</h3>
                     <p className="text-muted-foreground">
-                      Serving talent and employers worldwide across all time zones
+                      {t.globalReachDesc}
                     </p>
                   </div>
                 </div>
@@ -194,7 +199,7 @@ export default function ContactUs() {
         {/* Additional Contact Options */}
         <div className="mt-16 text-center">
           <h3 className="text-xl font-semibold text-foreground mb-4">
-            Follow Us
+            {t.followUs}
           </h3>
           <div className="flex justify-center space-x-6">
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">

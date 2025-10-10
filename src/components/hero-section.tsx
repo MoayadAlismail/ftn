@@ -11,6 +11,9 @@ import OpportunitiesSection from "./opportunities-section";
 import { ShineBorder } from "@/components/magicui/shine-border";
 import { useAuth } from "@/contexts/AuthContext";
 import { Role } from "@/constants/enums";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { homeTranslations } from "@/lib/language/home";
+import LanguageSelector from "./language-selector";
 
 const FloatingCard = ({
   children,
@@ -78,6 +81,8 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isAuthenticated, userRole, isLoading } = useAuth();
+  const { language } = useLanguage();
+  const t = homeTranslations[language];
 
   // Resume upload state
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -152,8 +157,8 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   // Helper function for employer button content (when not authenticated)
   const getEmployerButtonContent = () => {
     return {
-      text: "Recruiter? Login here ↗",
-      mobileText: "Recruiter",
+      text: t.recruiterLogin,
+      mobileText: t.recruiterLoginMobile,
       href: "/auth/employer/login"
     };
   };
@@ -161,8 +166,8 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   // Helper function for student button content (when not authenticated)
   const getStudentButtonContent = () => {
     return {
-      text: "Login",
-      mobileText: "Student",
+      text: t.studentLogin,
+      mobileText: t.studentLoginMobile,
       href: "/auth/talent/login"
     };
   };
@@ -179,6 +184,11 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-64 h-64 sm:w-96 sm:h-96 bg-primary/8 rounded-full blur-3xl" />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] bg-gradient-radial from-primary/3 to-transparent rounded-full" />
+        </div>
+
+        {/* Language Selector */}
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 sm:top-12 z-50 pointer-events-auto">
+          <LanguageSelector />
         </div>
 
         {/* Navigation Buttons - Show both when not authenticated, single dashboard when authenticated */}
@@ -225,8 +235,8 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                   className="bg-primary hover:bg-primary/90 text-white shadow-lg cursor-pointer relative pointer-events-auto text-xs sm:text-sm"
                   disabled={isLoading}
                 >
-                  <span className="hidden sm:inline">Go to Dashboard</span>
-                  <span className="sm:hidden">Dashboard</span>
+                  <span className="hidden sm:inline">{t.dashboard}</span>
+                  <span className="sm:hidden">{t.dashboardMobile}</span>
                 </Button>
               </Link>
             </div>
@@ -238,9 +248,9 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           {/* Top left */}
           <OpportunityCard
             icon={Briefcase}
-            title="Senior Software Engineer"
-            company="TechCorp Inc."
-            match="95% Match"
+            title={t.seniorSoftwareEngineer}
+            company={t.techCorp}
+            match={`95% ${t.match}`}
             className="absolute top-32 left-16 xl:left-20"
             delay={0.2}
           />
@@ -248,9 +258,9 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           {/* Top right */}
           <OpportunityCard
             icon={GraduationCap}
-            title="Data Science Internship"
-            company="AI Startup"
-            match="89% Match"
+            title={t.dataScienceInternship}
+            company={t.aiStartup}
+            match={`89% ${t.match}`}
             className="absolute top-40 right-20 xl:right-24"
             delay={0.4}
           />
@@ -258,9 +268,9 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           {/* Bottom left */}
           <OpportunityCard
             icon={Trophy}
-            title="Product Design Bootcamp"
-            company="Design Academy"
-            match="92% Match"
+            title={t.productDesignBootcamp}
+            company={t.designAcademy}
+            match={`92% ${t.match}`}
             className="absolute bottom-40 left-20 xl:left-24"
             delay={0.6}
           />
@@ -268,9 +278,9 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
           {/* Bottom right */}
           <OpportunityCard
             icon={Target}
-            title="Blockchain Hackathon"
-            company="CryptoLabs"
-            match="87% Match"
+            title={t.blockchainHackathon}
+            company={t.cryptoLabs}
+            match={`87% ${t.match}`}
             className="absolute bottom-32 right-16 xl:right-20"
             delay={0.8}
           />
@@ -312,16 +322,16 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             className="text-center max-w-4xl mx-auto mb-8 sm:mb-12"
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-4">
-              Finally, career opportunities
+              {t.heroTitle1}
               <br className="hidden sm:block" />
               <span className="sm:hidden"> </span>
-              <span className="text-primary">that deserve you.</span>
+              <span className="text-primary">{t.heroTitle2}</span>
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
-              Easily apply to jobs, internships, bootcamps, hackathons
+              {t.heroSubtitle1}
               <br className="hidden sm:block" />
               <span className="sm:hidden"> </span>
-              that match your interests.
+              {t.heroSubtitle2}
             </p>
           </motion.div>
 
@@ -443,15 +453,15 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                 </div>
 
                 <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mb-2">
-                  {uploadStatus === "success" ? "Resume Uploaded!" : "Upload your resume"}
+                  {uploadStatus === "success" ? t.resumeUploaded : t.uploadResume}
                 </h2>
 
                 <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-4 sm:mb-6 px-1 sm:px-2">
                   {uploadStatus === "success"
-                    ? "Ready to find your perfect matches"
+                    ? t.readyToMatch
                     : isDragging
-                      ? "Drop your PDF here"
-                      : "Drag and drop your PDF here, or click to browse"
+                      ? t.dropPdfHere
+                      : t.dragDropText
                   }
                 </p>
 
@@ -483,10 +493,10 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                         handleCardClick();
                       }}
                     >
-                      Choose File →
+                      {t.chooseFile}
                     </Button>
                     <p className="text-xs text-gray-500">
-                      Supported format: PDF (max 10MB)
+                      {t.supportedFormat}
                     </p>
                   </div>
                 ) : (
@@ -495,7 +505,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
                     className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg font-medium w-full sm:w-auto"
                     onClick={handleContinue}
                   >
-                    Continue →
+                    {t.continue}
                   </Button>
                 )}
               </div>
@@ -509,13 +519,13 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
             transition={{ duration: 0.6, delay: 1.0 }}
             className="mt-8 sm:mt-16 text-center px-4"
           >
-            <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">Trusted by students from</p>
+            <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">{t.trustedBy}</p>
             <div className="flex items-center justify-center gap-3 sm:gap-6 lg:gap-8 text-xs sm:text-sm font-semibold text-gray-600 flex-wrap">
-              <span>KFUPM</span>
-              <span className="hidden sm:inline">King Saud University</span>
-              <span className="sm:hidden">KSU</span>
-              <span className="hidden sm:inline">King Abdulaziz University</span>
-              <span className="sm:hidden">KAU</span>
+              <span>{t.kfupm}</span>
+              <span className="hidden sm:inline">{t.ksu}</span>
+              <span className="sm:hidden">{t.ksuMobile}</span>
+              <span className="hidden sm:inline">{t.kau}</span>
+              <span className="sm:hidden">{t.kauMobile}</span>
             </div>
           </motion.div>
         </div>

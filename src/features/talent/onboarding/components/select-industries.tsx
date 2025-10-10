@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { BriefcaseIcon } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { onboardingTranslations } from "@/lib/language/onboarding";
 
 const INDUSTRIES = [
   "Technology",
@@ -37,6 +39,8 @@ export default function SelectIndustries({
   next,
   prev,
 }: SelectIndustriesProps) {
+  const { language } = useLanguage();
+  const t = onboardingTranslations[language];
   const MAX_SELECTIONS = 3;
 
   const toggleIndustry = (industry: Industry) => {
@@ -53,8 +57,8 @@ export default function SelectIndustries({
         {/* Progress Indicator */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-xs sm:text-sm text-gray-600 mb-2">
-            <span>Step 2 of 4</span>
-            <span>{Math.round((2 / 4) * 100)}% Complete</span>
+            <span>{t.stepOf} 2 {t.of} 4</span>
+            <span>{Math.round((2 / 4) * 100)}% {t.complete}</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
@@ -70,10 +74,10 @@ export default function SelectIndustries({
             <BriefcaseIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           </div>
           <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1">
-            What are your top 3 target industries?
+            {t.industriesTitle}
           </h2>
           <p className="text-xs sm:text-sm text-gray-600">
-            Selected: {industryPreference.length}/{MAX_SELECTIONS}
+            {t.industriesDescription} {industryPreference.length}/{MAX_SELECTIONS}
           </p>
         </div>
 
@@ -105,7 +109,7 @@ export default function SelectIndustries({
         {/* Mobile Navigation */}
         <div className="block sm:hidden space-y-3 pt-4">
           <Button className="cursor-pointer w-full" variant="outline" onClick={prev}>
-            Back
+            {t.back}
           </Button>
           <div className="flex gap-2">
             <Button
@@ -114,14 +118,14 @@ export default function SelectIndustries({
               variant="ghost"
               onClick={next}
             >
-              Skip for now
+              {t.skipForNow}
             </Button>
             <Button
               className="cursor-pointer flex-1"
               onClick={next}
               disabled={industryPreference.length !== MAX_SELECTIONS}
             >
-              Next &rarr;
+              {t.next}
             </Button>
           </div>
         </div>
@@ -129,7 +133,7 @@ export default function SelectIndustries({
         {/* Desktop Navigation */}
         <div className="hidden sm:flex justify-between pt-4">
           <Button className="cursor-pointer" variant="outline" onClick={prev}>
-            Back
+            {t.back}
           </Button>
           <div className="flex items-center gap-2">
             <Button
@@ -138,14 +142,14 @@ export default function SelectIndustries({
               variant="ghost"
               onClick={next}
             >
-              Skip for now
+              {t.skipForNow}
             </Button>
             <Button
               className="cursor-pointer"
               onClick={next}
               disabled={industryPreference.length !== MAX_SELECTIONS}
             >
-              Next &rarr;
+              {t.next}
             </Button>
           </div>
         </div>

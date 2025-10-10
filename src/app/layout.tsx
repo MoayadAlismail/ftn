@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from '@vercel/analytics/next';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LoadingProvider } from "@/contexts/LoadingContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 import "./globals.css";
 
@@ -28,11 +29,13 @@ export default function RootLayout({
         className={`${sora.variable} antialiased font-sans`}
         suppressHydrationWarning={true}
       >
-        <LoadingProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </LoadingProvider>
+        <LanguageProvider>
+          <LoadingProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </LoadingProvider>
+        </LanguageProvider>
         <Analytics />
         <Toaster />
       </body>

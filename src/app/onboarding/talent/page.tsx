@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "@/contexts/LoadingContext";
 import { extractResumeText } from "@/lib/extract-resume";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { onboardingTranslations } from "@/lib/language/onboarding";
 
 // Import onboarding components
 import LocationPreference from "@/features/talent/onboarding/components/location-preference";
@@ -56,6 +58,8 @@ export default function TalentOnboarding() {
     const router = useRouter();
     const { user } = useAuth();
     const { startLoading, stopLoading } = useLoading();
+    const { language } = useLanguage();
+    const t = onboardingTranslations[language];
 
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({
@@ -165,7 +169,7 @@ export default function TalentOnboarding() {
 
     const completeOnboarding = async () => {
         if (!user) {
-            toast.error("User not authenticated");
+            toast.error(t.userNotAuthenticated);
             return;
         }
 
@@ -202,7 +206,7 @@ export default function TalentOnboarding() {
                             uploadAttempts++;
                             if (uploadAttempts >= maxAttempts) {
                                 console.error("Resume upload error after retries:", error);
-                                toast.error("Failed to upload resume after multiple attempts");
+                                toast.error(t.resumeUploadError);
                                 return;
                             }
                             // Wait before retry
@@ -267,7 +271,7 @@ export default function TalentOnboarding() {
 
                         if (dbAttempts >= maxDbAttempts) {
                             console.error("Error saving talent profile after retries:", error);
-                            toast.error("Failed to save profile after multiple attempts");
+                            toast.error(t.profileSaveError);
                             return;
                         }
                         // Wait before retry
@@ -285,12 +289,12 @@ export default function TalentOnboarding() {
 
                     if (verifyError || !verifyData) {
                         console.error("Profile verification failed:", verifyError);
-                        toast.error("Profile creation verification failed. Please try again.");
+                        toast.error(t.profileVerificationFailed);
                         return;
                     }
                 } catch (verifyError) {
                     console.error("Error verifying profile:", verifyError);
-                    toast.error("Profile creation verification failed. Please try again.");
+                    toast.error(t.profileVerificationFailed);
                     return;
                 }
 
@@ -319,14 +323,14 @@ export default function TalentOnboarding() {
             // Race between the operation and timeout
             await Promise.race([onboardingPromise(), timeoutPromise]);
 
-            toast.success("Profile created successfully!");
+            toast.success(t.profileCreatedSuccess);
             router.push("/talent/match-making");
         } catch (error) {
             console.error("Onboarding completion error:", error);
             if (error instanceof Error && error.message === 'Operation timed out') {
-                toast.error("The process is taking longer than expected. Please try again.");
+                toast.error(t.operationTimedOut);
             } else {
-                toast.error("An unexpected error occurred. Please try again.");
+                toast.error(t.unexpectedError);
             }
         } finally {
             stopLoading();
