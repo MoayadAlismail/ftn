@@ -11,6 +11,8 @@ import {
     LucideIcon,
 } from "lucide-react";
 import { useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { onboardingTranslations } from "@/lib/language/onboarding";
 
 type Opportunity = "full-time" | "internships" | "bootcamps" | "hackathons";
 
@@ -22,33 +24,6 @@ type SelectOpportunitiesProps = {
     prev: () => void;
 };
 
-const OPPORTUNITIES: {
-    id: Opportunity;
-    label: string;
-    icon: LucideIcon;
-}[] = [
-        {
-            id: "full-time",
-            label: "Full-time Jobs",
-            icon: Briefcase,
-        },
-        {
-            id: "internships",
-            label: "Internships",
-            icon: GraduationCap,
-        },
-        {
-            id: "bootcamps",
-            label: "Bootcamps",
-            icon: Trophy,
-        },
-        {
-            id: "hackathons",
-            label: "Hackathons",
-            icon: Target,
-        },
-    ];
-
 export default function SelectOpportunities({
     setResumeFile,
     workStylePreference,
@@ -56,6 +31,36 @@ export default function SelectOpportunities({
     next,
     prev,
 }: SelectOpportunitiesProps) {
+    const { language } = useLanguage();
+    const t = onboardingTranslations[language];
+    
+    const OPPORTUNITIES: {
+        id: Opportunity;
+        label: string;
+        icon: LucideIcon;
+    }[] = [
+        {
+            id: "full-time",
+            label: t.fullTimeLabel,
+            icon: Briefcase,
+        },
+        {
+            id: "internships",
+            label: t.internshipsLabel,
+            icon: GraduationCap,
+        },
+        {
+            id: "bootcamps",
+            label: t.bootcampsLabel,
+            icon: Trophy,
+        },
+        {
+            id: "hackathons",
+            label: t.hackathonsLabel,
+            icon: Target,
+        },
+    ];
+    
     useEffect(() => {
         // Get the stored resume file data
         const storedResumeData = localStorage.getItem("resumeFileBase64");
@@ -91,8 +96,8 @@ export default function SelectOpportunities({
                     {/* Progress indicator */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
-                            <span>Step 3 of 4</span>
-                            <span>75% Complete</span>
+                            <span>{t.stepOf} 3 {t.of} 4</span>
+                            <span>75% {t.complete}</span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-secondary">
                             <div className="h-full w-3/4 rounded-full bg-primary" />
@@ -103,9 +108,9 @@ export default function SelectOpportunities({
                     <div className="space-y-3 text-center">
                         <Target size={32} className="sm:w-8 sm:h-8 lg:w-10 lg:h-10 mx-auto text-primary" />
                         <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">
-                            What opportunities are you looking for?
+                            {t.opportunitiesTitle}
                         </h1>
-                        <p className="text-xs sm:text-sm text-muted-foreground">Select all that apply</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{t.opportunitiesDescription}</p>
                     </div>
 
                     {/* Opportunities grid */}
@@ -139,7 +144,7 @@ export default function SelectOpportunities({
                             variant="outline"
                             onClick={prev}
                         >
-                            Back
+                            {t.back}
                         </Button>
                         <div className="flex gap-2">
                             <Button
@@ -148,14 +153,14 @@ export default function SelectOpportunities({
                                 variant="ghost"
                                 onClick={next}
                             >
-                                Skip for now
+                                {t.skipForNow}
                             </Button>
                             <Button
                                 className="cursor-pointer flex-1"
                                 disabled={workStylePreference.length === 0}
                                 onClick={next}
                             >
-                                Next &rarr;
+                                {t.next}
                             </Button>
                         </div>
                     </div>
@@ -168,7 +173,7 @@ export default function SelectOpportunities({
                             variant="outline"
                             onClick={prev}
                         >
-                            Back
+                            {t.back}
                         </Button>
                         <div className="flex items-center gap-2">
                             <Button
@@ -177,14 +182,14 @@ export default function SelectOpportunities({
                                 variant="ghost"
                                 onClick={next}
                             >
-                                Skip for now
+                                {t.skipForNow}
                             </Button>
                             <Button
                                 className="cursor-pointer"
                                 disabled={workStylePreference.length === 0}
                                 onClick={next}
                             >
-                                Next &rarr;
+                                {t.next}
                             </Button>
                         </div>
                     </div>
