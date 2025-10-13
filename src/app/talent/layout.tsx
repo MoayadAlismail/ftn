@@ -3,7 +3,7 @@ import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { Button } from '@/components/ui/button';
 import { Role } from '@/constants/enums'
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Home, Mail, FileText, Menu, X, Settings, CreditCard, LogOut } from 'lucide-react';
+import { User, Home, Mail, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -77,6 +77,11 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
       icon: Mail,
       label: "Invitations",
       badge: pendingInvitations > 0 ? pendingInvitations : undefined
+    },
+    {
+      href: "/talent/services",
+      icon: Sparkles,
+      label: "Services"
     }
   ];
 
