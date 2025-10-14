@@ -26,6 +26,8 @@ import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import CandidateProfileModal from "@/features/employer/dashboard/components/candidate-profile-modal";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { employerTranslations } from "@/lib/language";
 
 const suggestions = [
   "Software engineer intern with Python and React skills",
@@ -49,6 +51,8 @@ interface Talent {
 
 export default function EmployerDashboardHomeContent() {
   const { user, authUser, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
   
   // Talent display states
   const [allTalents, setAllTalents] = useState<Talent[]>([]);
@@ -154,7 +158,7 @@ export default function EmployerDashboardHomeContent() {
       setDisplayedTalents(transformedTalents);
     } catch (error) {
       console.error('Error loading talents:', error);
-      toast.error('Failed to load talents');
+      toast.error(t.failedToLoadTalents);
     } finally {
       setLoading(false);
     }
@@ -236,7 +240,7 @@ export default function EmployerDashboardHomeContent() {
 
   const handleAISearch = useCallback(async () => {
     if (!prompt.trim()) {
-      toast.error("Please describe your ideal candidate");
+      toast.error(t.pleaseDescribeCandidate);
       return;
     }
 
@@ -277,16 +281,16 @@ export default function EmployerDashboardHomeContent() {
       setDisplayedTalents(transformedMatches);
       
       if (transformedMatches.length === 0) {
-        toast.info("No matching candidates found. Try a different search.");
+        toast.info(t.noMatchingCandidates);
       }
     } catch (error) {
       console.error("AI Search error:", error);
-      toast.error("AI search failed. Please try again.");
+      toast.error(t.aiSearchFailed);
       setIsAIMode(false);
     } finally {
       setLoading(false);
     }
-  }, [prompt]);
+  }, [prompt, t]);
 
   const handleClearAISearch = () => {
     setprompt("");
@@ -310,9 +314,9 @@ export default function EmployerDashboardHomeContent() {
         .from("saved_candidates")
         .insert({ employer_id: employerId, talent_id: talentId });
       setSavedCandidatesIds((prev) => new Set(prev).add(talentId));
-      toast.success("Candidate saved");
+      toast.success(t.candidateSaved);
     } catch (e) {
-      toast.error("Unable to save candidate");
+      toast.error(t.unableToSaveCandidate);
     }
   };
 
@@ -339,7 +343,7 @@ export default function EmployerDashboardHomeContent() {
       const key = String(talentId);
       const message = (inviteMessages[key] || "").trim();
       if (!message) {
-        toast.error("Please enter a message");
+        toast.error(t.pleaseEnterMessage);
         return;
       }
       setInvitingId(key);
@@ -348,14 +352,14 @@ export default function EmployerDashboardHomeContent() {
         .from("invites")
         .insert([{ employer_id: employerId, talent_id: talentId, message }]);
       if (error) {
-        toast.error(error.message || "Failed to send invite");
+        toast.error(error.message || t.failedToSendInvite);
         return;
       }
       setInvitedIds((prev) => new Set(prev).add(key));
       setInviteOpenId(null);
-      toast.success("Invite sent");
+      toast.success(t.inviteSent);
     } catch (e) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t.somethingWentWrong);
     } finally {
       setInvitingId(null);
     }
@@ -367,10 +371,10 @@ export default function EmployerDashboardHomeContent() {
       <div className="space-y-4 md:space-y-0 md:flex md:items-start md:justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-            Find Talent
+            {t.findTalent}
           </h1>
           <p className="text-sm md:text-base text-gray-600 mt-1">
-            Find the perfect fit for any role
+            {t.findTalentSubtitle}
           </p>
         </div>
       </div>
@@ -381,7 +385,7 @@ export default function EmployerDashboardHomeContent() {
           <div className="flex-1 relative">
             <WandSparkles className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-violet-600" />
             <Input
-              placeholder="Describe your ideal candidate, and we'll find matching student profile."
+              placeholder={t.aiSearchPlaceholder}
               value={prompt}
               onChange={(e) => setprompt(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAISearch()}
@@ -398,7 +402,7 @@ export default function EmployerDashboardHomeContent() {
             ) : (
               <>
                 <Search className="w-4 h-4 md:mr-2" />
-                <span className="hidden md:inline">Search</span>
+                <span className="hidden md:inline">{t.search}</span>
               </>
             )}
           </Button>
@@ -409,7 +413,7 @@ export default function EmployerDashboardHomeContent() {
               onClick={handleClearAISearch}
               className="h-12 md:h-12"
             >
-              Clear
+              {t.clear}
               </Button>
           )}
           </div>
@@ -419,7 +423,7 @@ export default function EmployerDashboardHomeContent() {
           <div className="mt-4 space-y-2">
             <div className="flex items-center gap-2 text-xs text-gray-600">
               <WandSparkles className="w-3.5 h-3.5 text-violet-600" />
-              <span className="font-medium">Or try a sample search:</span>
+              <span className="font-medium">{t.orTrySampleSearch}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s, i) => (
@@ -444,7 +448,7 @@ export default function EmployerDashboardHomeContent() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">
-                  Search Candidates
+                  {t.searchCandidates}
                 </label>
                 <Button
                   variant="ghost"
@@ -452,13 +456,13 @@ export default function EmployerDashboardHomeContent() {
                   onClick={() => setShowFilters(!showFilters)}
                 >
                   <Filter className="h-4 w-4 mr-2" />
-                  Filters
+                  {t.filters}
                 </Button>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search by name, email, bio, or skills..."
+                  placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 h-10"
@@ -475,17 +479,17 @@ export default function EmployerDashboardHomeContent() {
                 >
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
-                      Location
+                      {t.location}
                     </label>
                     <Select
                       value={locationFilter}
                       onValueChange={setLocationFilter}
                     >
                       <SelectTrigger className="h-10">
-                        <SelectValue placeholder="All locations" />
+                        <SelectValue placeholder={t.allLocations} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All locations</SelectItem>
+                        <SelectItem value="all">{t.allLocations}</SelectItem>
                         {getUniqueLocations().map((location) => (
                           <SelectItem key={location} value={location}>
                             {location}
@@ -497,17 +501,17 @@ export default function EmployerDashboardHomeContent() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
-                      Industry
+                      {t.industry}
                     </label>
                     <Select
                       value={industryFilter}
                       onValueChange={setIndustryFilter}
                     >
                       <SelectTrigger className="h-10">
-                        <SelectValue placeholder="All industries" />
+                        <SelectValue placeholder={t.allIndustries} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All industries</SelectItem>
+                        <SelectItem value="all">{t.allIndustries}</SelectItem>
                         {getUniqueIndustries().map((industry) => (
                           <SelectItem key={industry} value={industry}>
                             {industry}
@@ -519,17 +523,17 @@ export default function EmployerDashboardHomeContent() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
-                      Work Style
+                      {t.workStyle}
                     </label>
                     <Select
                       value={workStyleFilter}
                       onValueChange={setWorkStyleFilter}
                     >
                       <SelectTrigger className="h-10">
-                        <SelectValue placeholder="All work styles" />
+                        <SelectValue placeholder={t.allWorkStyles} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All work styles</SelectItem>
+                        <SelectItem value="all">{t.allWorkStyles}</SelectItem>
                         {getUniqueWorkStyles().map((workStyle) => (
                           <SelectItem key={workStyle} value={workStyle}>
                             {workStyle}
@@ -556,13 +560,13 @@ export default function EmployerDashboardHomeContent() {
             <Users2 className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
               {allTalents.length === 0
-                ? "No candidates yet"
-                : "No candidates match your filters"}
+                ? t.noCandidatesYet
+                : t.noCandidatesMatchFilters}
             </h3>
             <p className="text-sm md:text-base text-gray-600">
               {allTalents.length === 0
                 ? ""
-                : "Try adjusting your search or filters to see more results."}
+                : t.tryAdjustingFilters}
             </p>
           </CardContent>
         </Card>
@@ -571,10 +575,10 @@ export default function EmployerDashboardHomeContent() {
           {/* Results Header */}
           <div className="flex items-center justify-between pb-2 border-b border-gray-200">
             <h2 className="text-lg md:text-xl font-semibold text-gray-900">
-              Matching Talents
+              {t.matchingTalents}
             </h2>
             <span className="text-sm text-gray-600">
-              {displayedTalents.length} {displayedTalents.length === 1 ? 'candidate' : 'candidates'}
+              {displayedTalents.length} {displayedTalents.length === 1 ? t.candidate : t.candidates}
             </span>
           </div>
 
@@ -619,7 +623,7 @@ export default function EmployerDashboardHomeContent() {
                   {/* Work Style */}
                   <div className="space-y-2">
                     <div className="text-xs font-medium text-gray-500">
-                      Work Style
+                      {t.workStyleLabel}
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {talent.work_style_pref.map((pref, i) => (
@@ -644,7 +648,7 @@ export default function EmployerDashboardHomeContent() {
                       }}
                       disabled={invitedIds.has(String(talent.id))}
                     >
-                      {invitedIds.has(String(talent.id)) ? "Invited" : "Invite"}
+                      {invitedIds.has(String(talent.id)) ? t.invited : t.invite}
                     </Button>
                     <Button
                       variant="outline"
@@ -657,8 +661,8 @@ export default function EmployerDashboardHomeContent() {
                       disabled={savedCandidatesIds.has(String(talent.id))}
                     >
                       {savedCandidatesIds.has(String(talent.id))
-                        ? "Saved"
-                        : "Save"}
+                        ? t.saved
+                        : t.save}
                     </Button>
                   </div>
                 </div>
@@ -689,8 +693,8 @@ export default function EmployerDashboardHomeContent() {
                         disabled={savedCandidatesIds.has(String(talent.id))}
                               >
                                 {savedCandidatesIds.has(String(talent.id))
-                                  ? "Saved"
-                                  : "Save"}
+                                  ? t.saved
+                                  : t.save}
                               </Button>
                               <Button
                                 size="sm"
@@ -702,8 +706,8 @@ export default function EmployerDashboardHomeContent() {
                                 disabled={invitedIds.has(String(talent.id))}
                               >
                                 {invitedIds.has(String(talent.id))
-                                  ? "Invited"
-                                  : "Invite"}
+                                  ? t.invited
+                                  : t.invite}
                               </Button>
                             </div>
                           </div>
@@ -718,7 +722,7 @@ export default function EmployerDashboardHomeContent() {
                               <Users2 className="w-4 h-4 text-gray-400 mt-1" />
                               <div>
                                 <div className="text-xs font-medium text-gray-500 mb-1">
-                                  Work Style
+                                  {t.workStyleLabel}
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   {talent.work_style_pref.map((pref, i) => (
@@ -739,7 +743,7 @@ export default function EmployerDashboardHomeContent() {
                           {inviteOpenId === talent.id && (
                             <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
                               <div className="text-xs font-medium text-gray-500 mb-2">
-                                Message to candidate
+                                {t.messageToCandidate}
                               </div>
                               <Textarea
                                 placeholder={`Hi ${
@@ -758,7 +762,7 @@ export default function EmployerDashboardHomeContent() {
                         className="w-full sm:w-auto cursor-pointer"
                                   onClick={() => setInviteOpenId(null)}
                                 >
-                                  Cancel
+                                  {t.cancel}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -769,7 +773,7 @@ export default function EmployerDashboardHomeContent() {
                                   {invitingId === String(talent.id) ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
-                                    "Send Invite"
+                                    t.sendInvite
                                   )}
                                 </Button>
                               </div>
