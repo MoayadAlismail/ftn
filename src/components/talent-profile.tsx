@@ -26,6 +26,8 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { talentTranslations } from "@/lib/language";
 
 // Constants for onboarding preferences
 const INDUSTRIES = [
@@ -70,6 +72,8 @@ interface TalentProfile {
 
 export default function TalentProfile() {
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = talentTranslations[language];
   const [profile, setProfile] = useState<TalentProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +97,7 @@ export default function TalentProfile() {
 
       if (error) {
         console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile");
+        toast.error(t.failedToLoadProfile);
         return;
       }
 
@@ -101,7 +105,7 @@ export default function TalentProfile() {
       setEditForm(data);
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Something went wrong");
+      toast.error(t.somethingWentWrong);
     } finally {
       setIsLoading(false);
     }
@@ -136,16 +140,16 @@ export default function TalentProfile() {
 
       if (error) {
         console.error("Error updating profile:", error);
-        toast.error("Failed to update profile");
+        toast.error(t.failedToUpdateProfile);
         return;
       }
 
       setProfile({ ...profile, ...editForm });
       setIsEditing(false);
-      toast.success("Profile updated successfully!");
+      toast.success(t.profileUpdated);
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Something went wrong");
+      toast.error(t.somethingWentWrong);
     } finally {
       setIsSaving(false);
     }
@@ -186,7 +190,7 @@ export default function TalentProfile() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-gray-600">Loading your profile...</p>
+          <p className="text-gray-600">{t.loadingProfile}</p>
         </div>
       </div>
     );
@@ -196,8 +200,8 @@ export default function TalentProfile() {
     return (
       <div className="text-center py-12">
         <User className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
-        <p className="text-gray-600">We couldn't find your profile information.</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">{t.profileNotFound}</h2>
+        <p className="text-gray-600">{t.profileNotFoundDescription}</p>
       </div>
     );
   }
@@ -207,13 +211,13 @@ export default function TalentProfile() {
       {/* Header - Mobile Optimized */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Profile</h1>
-          <p className="text-sm text-gray-600 mt-1">Manage your professional information</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.yourProfile}</h1>
+          <p className="text-sm text-gray-600 mt-1">{t.manageProfessionalInfo}</p>
         </div>
         {!isEditing ? (
           <Button onClick={handleEdit} className="flex items-center gap-2 w-full sm:w-auto">
             <Edit2 size={16} />
-            Edit Profile
+            {t.editProfile}
           </Button>
         ) : (
           <div className="flex items-center gap-2">
@@ -224,7 +228,7 @@ export default function TalentProfile() {
               className="flex-1 sm:flex-none"
             >
               <X size={16} className="mr-2" />
-              Cancel
+              {t.cancel}
             </Button>
             <Button 
               onClick={handleSave} 
@@ -236,7 +240,7 @@ export default function TalentProfile() {
               ) : (
                 <Save size={16} className="mr-2" />
               )}
-              Save Changes
+              {t.saveChanges}
             </Button>
           </div>
         )}
@@ -258,7 +262,7 @@ export default function TalentProfile() {
                     value={editForm.full_name || ""}
                     onChange={(e) => handleInputChange("full_name", e.target.value)}
                     className="text-xl font-semibold mb-2"
-                    placeholder="Your full name"
+                    placeholder={t.namePlaceholder}
                   />
                 ) : (
                   <h2 className="text-2xl font-bold text-gray-900 truncate">{profile.full_name}</h2>
@@ -273,34 +277,34 @@ export default function TalentProfile() {
 
           {/* About Section */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.about}</h3>
             {isEditing ? (
               <Textarea
                 value={editForm.bio || ""}
                 onChange={(e) => handleInputChange("bio", e.target.value)}
-                placeholder="Tell us about yourself, your skills, and career goals..."
+                placeholder={t.aboutPlaceholder}
                 className="min-h-32"
               />
             ) : (
               <p className="text-sm text-gray-700 leading-relaxed">
-                {profile.bio || "No bio provided yet."}
+                {profile.bio || t.noBioProvided}
               </p>
             )}
           </Card>
 
           {/* Preferences Card - Full Width */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Preferences</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.preferences}</h3>
             <div className="space-y-6">
 
               {/* Work Style */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Work Style Preferences
+                  {t.workStylePreferences}
                 </label>
                 {isEditing ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-gray-500">Select the types of opportunities you're interested in:</p>
+                    <p className="text-xs text-gray-500">{t.workStyleHelpText}</p>
                     <div className="grid grid-cols-1 gap-2">
                       {WORK_STYLES.map((workStyle) => {
                         const isSelected = editForm.work_style_pref?.includes(workStyle.id) || false;
@@ -344,11 +348,11 @@ export default function TalentProfile() {
               {/* Industries */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Industry Preferences
+                  {t.industryPreferences}
                 </label>
                 {isEditing ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-gray-500">Select up to 3 industries that interest you most:</p>
+                    <p className="text-xs text-gray-500">{t.industryHelpText}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {INDUSTRIES.map((industry) => {
                         const isSelected = editForm.industry_pref?.includes(industry) || false;
@@ -396,18 +400,18 @@ export default function TalentProfile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Location */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Location Preference</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.locationPreference}</h3>
               {isEditing ? (
                 <Input
                   value={editForm.location_pref || ""}
                   onChange={(e) => handleInputChange("location_pref", e.target.value)}
-                  placeholder="e.g., Riyadh, Jeddah, Remote"
+                  placeholder={t.locationPlaceholder}
                 />
               ) : (
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin size={16} className="flex-shrink-0" />
                   <span className="text-sm">
-                    {profile.location_pref || "Not specified"}
+                    {profile.location_pref || t.notSpecified}
                   </span>
                 </div>
               )}
@@ -415,10 +419,10 @@ export default function TalentProfile() {
 
             {/* Account Info */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Account</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.account}</h3>
               <div className="flex items-center gap-2 text-gray-600">
                 <Calendar size={16} className="flex-shrink-0" />
-                <span className="text-sm">Joined {new Date(profile.created_at).toLocaleDateString()}</span>
+                <span className="text-sm">{t.joined} {new Date(profile.created_at).toLocaleDateString()}</span>
               </div>
             </Card>
           </div>
@@ -427,28 +431,28 @@ export default function TalentProfile() {
         {/* Right Sidebar - Resume */}
         <div className="lg:col-span-1">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.resume}</h3>
             {profile.resume_url ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                   <FileText className="text-green-600 flex-shrink-0" size={20} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-green-800">Resume Uploaded</p>
-                    <p className="text-xs text-green-600 truncate">Last updated: {new Date(profile.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium text-green-800">{t.resumeUploaded}</p>
+                    <p className="text-xs text-green-600 truncate">{t.lastUpdated} {new Date(profile.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="w-full">
                   <Upload size={14} className="mr-2" />
-                  Update Resume
+                  {t.updateResume}
                 </Button>
               </div>
             ) : (
               <div className="text-center py-6">
                 <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm text-gray-600 mb-4">No resume uploaded</p>
+                <p className="text-sm text-gray-600 mb-4">{t.noResume}</p>
                 <Button size="sm" className="w-full">
                   <Upload size={14} className="mr-2" />
-                  Upload Resume
+                  {t.uploadResume}
                 </Button>
               </div>
             )}

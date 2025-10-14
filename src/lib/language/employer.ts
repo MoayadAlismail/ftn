@@ -144,6 +144,73 @@ export const employerTranslations = {
     view: "View",
     edit: "Edit",
     delete: "Delete",
+
+    // Candidates Page
+    candidatesAndInvitations: "Candidates & Invitations",
+    manageSavedCandidates: "Manage your saved candidates and track sent invitations",
+    savedCandidatesTab: "Saved Candidates",
+    sentInvitationsTab: "Sent Invitations",
+    searchCandidatesPlaceholder: "Search by name, email, bio, location, or industry...",
+    filterBy: "Filter by...",
+    allCandidates: "All Candidates",
+    recentlySaved: "Recently Saved",
+    withResume: "With Resume",
+    remoteWorkers: "Remote Workers",
+    exportCsv: "Export CSV",
+    noSavedCandidatesYet: "No saved candidates yet",
+    startSavingCandidates: "Start saving interesting candidates from search results to build your talent pipeline.",
+    findCandidates: "Find Candidates",
+    noCandidatesMatchSearch: "No candidates match your search",
+    tryAdjustingSearch: "Try adjusting your search terms or filters.",
+    
+    // Invitations Stats
+    totalSent: "Total Sent",
+    pending: "Pending",
+    accepted: "Accepted",
+    rejected: "Rejected",
+    
+    // Invitations Filters
+    searchInvitationsPlaceholder: "Search by talent name, email, or message...",
+    allStatuses: "All Statuses",
+    
+    // Invitations Empty States
+    noInvitationsSent: "No invitations sent yet",
+    noInvitationsMatchFilters: "No invitations match your filters",
+    startSendingInvitations: "Start sending invitations to talents to see them here.",
+    
+    // Invitation Card
+    sent: "Sent",
+    ago: "ago",
+    yourMessage: "Your Message:",
+    
+    // Toast Messages - Candidates
+    loginToViewSaved: "Please log in to view saved candidates",
+    failedToLoadSavedCandidates: "Failed to load saved candidates",
+    failedToLoadCandidateDetails: "Failed to load candidate details",
+    errorLoadingCandidates: "An error occurred while loading candidates",
+    failedToLoadSentInvitations: "Failed to load sent invitations",
+    errorLoadingSentInvitations: "An error occurred while loading sent invitations",
+    dataRefreshed: "Data refreshed successfully",
+    candidateListExported: "Candidate list exported successfully",
+    loadingCandidatesAndInvitations: "Loading candidates and invitations...",
+
+    // Settings Page
+    settingsTitle: "Settings",
+    settingsSubtitle: "Manage your profile, notifications, and security.",
+    profile: "Profile",
+    fullNamePlaceholderSettings: "Full name",
+    companyRolePlaceholder: "Company role",
+    companyNameSettingsPlaceholder: "Company name",
+    companyWebsitePlaceholder: "Company website",
+    companyDescriptionPlaceholder: "Company description",
+    saveChanges: "Save changes",
+    notifications: "Notifications",
+    emailMeWhenCandidatesApply: "Email me when candidates apply to my opportunity",
+    productUpdatesAndTips: "Product updates and tips",
+    security: "Security",
+    newPasswordPlaceholder: "New password",
+    confirmPasswordPlaceholder: "Confirm password",
+    updatePassword: "Update password",
   },
   ar: {
     // Navigation
@@ -290,6 +357,73 @@ export const employerTranslations = {
     view: "عرض",
     edit: "تعديل",
     delete: "حذف",
+
+    // Candidates Page
+    candidatesAndInvitations: "المرشحون والدعوات",
+    manageSavedCandidates: "إدارة المرشحين المحفوظين وتتبع الدعوات المرسلة",
+    savedCandidatesTab: "المرشحون المحفوظون",
+    sentInvitationsTab: "الدعوات المرسلة",
+    searchCandidatesPlaceholder: "ابحث بالاسم، البريد الإلكتروني، السيرة الذاتية، الموقع، أو الصناعة...",
+    filterBy: "تصفية حسب...",
+    allCandidates: "جميع المرشحين",
+    recentlySaved: "المحفوظة مؤخراً",
+    withResume: "مع السيرة الذاتية",
+    remoteWorkers: "العاملون عن بُعد",
+    exportCsv: "تصدير CSV",
+    noSavedCandidatesYet: "لا يوجد مرشحون محفوظون بعد",
+    startSavingCandidates: "ابدأ بحفظ المرشحين المثيرين للاهتمام من نتائج البحث لبناء مجموعة المواهب الخاصة بك.",
+    findCandidates: "البحث عن مرشحين",
+    noCandidatesMatchSearch: "لا يوجد مرشحون مطابقون للبحث",
+    tryAdjustingSearch: "حاول تعديل مصطلحات البحث أو الفلاتر.",
+    
+    // Invitations Stats
+    totalSent: "إجمالي المرسل",
+    pending: "قيد الانتظار",
+    accepted: "مقبولة",
+    rejected: "مرفوضة",
+    
+    // Invitations Filters
+    searchInvitationsPlaceholder: "ابحث باسم الموهبة، البريد الإلكتروني، أو الرسالة...",
+    allStatuses: "جميع الحالات",
+    
+    // Invitations Empty States
+    noInvitationsSent: "لم يتم إرسال دعوات بعد",
+    noInvitationsMatchFilters: "لا توجد دعوات مطابقة للفلاتر",
+    startSendingInvitations: "ابدأ بإرسال الدعوات للمواهب لرؤيتها هنا.",
+    
+    // Invitation Card
+    sent: "تم الإرسال",
+    ago: "منذ",
+    yourMessage: "رسالتك:",
+    
+    // Toast Messages - Candidates
+    loginToViewSaved: "يرجى تسجيل الدخول لعرض المرشحين المحفوظين",
+    failedToLoadSavedCandidates: "فشل تحميل المرشحين المحفوظين",
+    failedToLoadCandidateDetails: "فشل تحميل تفاصيل المرشح",
+    errorLoadingCandidates: "حدث خطأ أثناء تحميل المرشحين",
+    failedToLoadSentInvitations: "فشل تحميل الدعوات المرسلة",
+    errorLoadingSentInvitations: "حدث خطأ أثناء تحميل الدعوات المرسلة",
+    dataRefreshed: "تم تحديث البيانات بنجاح",
+    candidateListExported: "تم تصدير قائمة المرشحين بنجاح",
+    loadingCandidatesAndInvitations: "تحميل المرشحين والدعوات...",
+
+    // Settings Page
+    settingsTitle: "الإعدادات",
+    settingsSubtitle: "إدارة ملفك الشخصي، الإشعارات، والأمان.",
+    profile: "الملف الشخصي",
+    fullNamePlaceholderSettings: "الاسم الكامل",
+    companyRolePlaceholder: "الدور في الشركة",
+    companyNameSettingsPlaceholder: "اسم الشركة",
+    companyWebsitePlaceholder: "موقع الشركة الإلكتروني",
+    companyDescriptionPlaceholder: "وصف الشركة",
+    saveChanges: "حفظ التغييرات",
+    notifications: "الإشعارات",
+    emailMeWhenCandidatesApply: "أرسل لي بريد إلكتروني عندما يتقدم المرشحون لفرصتي",
+    productUpdatesAndTips: "تحديثات المنتج والنصائح",
+    security: "الأمان",
+    newPasswordPlaceholder: "كلمة مرور جديدة",
+    confirmPasswordPlaceholder: "تأكيد كلمة المرور",
+    updatePassword: "تحديث كلمة المرور",
   },
 };
 
