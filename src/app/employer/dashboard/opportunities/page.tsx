@@ -31,6 +31,8 @@ import LoadingAnimation from "@/components/loadingAnimation";
 import { OpportunityCard, type Opportunity } from "../my-opportunities/opportunity-card";
 import { toast } from "sonner";
 import { INDUSTRIES, SAUDI_CITIES, COMMON_SKILLS } from "@/constants/job-data";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { employerTranslations } from "@/lib/language";
 
 const workStyles = [
   "Full Time",
@@ -62,6 +64,8 @@ const initialFormData: OpportunityFormData = {
 
 function OpportunitiesPageContent() {
   const { user, authUser, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -107,7 +111,7 @@ function OpportunitiesPageContent() {
         
       if (employerError || !employerData) {
         console.error("Employer profile not found:", employerError);
-        if (!showRefreshToast) toast.error("Employer profile not found");
+        if (!showRefreshToast) toast.error(t.employerProfileNotFound);
         return;
       }
 
@@ -121,7 +125,7 @@ function OpportunitiesPageContent() {
 
       if (error) {
         console.error("Error fetching opportunities:", error);
-        if (!showRefreshToast) toast.error("Failed to load opportunities");
+        if (!showRefreshToast) toast.error(t.failedToLoadOpportunities);
         return;
       }
 
@@ -133,9 +137,9 @@ function OpportunitiesPageContent() {
       setOpportunities(transformedData || []);
     } catch (error) {
       console.error("Error loading opportunities:", error);
-      if (!showRefreshToast) toast.error("An error occurred while loading opportunities");
+      if (!showRefreshToast) toast.error(t.errorLoadingOpportunities);
     }
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   // Initial data load
   useEffect(() => {
@@ -162,7 +166,7 @@ function OpportunitiesPageContent() {
     setRefreshing(true);
     await loadOpportunities(true);
     setRefreshing(false);
-    toast.success("Opportunities refreshed successfully");
+    toast.success(t.opportunitiesRefreshed);
   };
 
   // Post opportunity handlers
@@ -214,7 +218,7 @@ function OpportunitiesPageContent() {
         formData.workstyle.length === 0 ||
         !formData.location
       ) {
-        throw new Error("Please fill in all required fields");
+        throw new Error(t.fillRequiredFields);
       }
 
       const user_data = await supabase.auth.getUser();
@@ -228,7 +232,7 @@ function OpportunitiesPageContent() {
         .single();
         
       if (employerError || !employerData) {
-        throw new Error("Employer profile not found. Please complete your onboarding first.");
+        throw new Error(t.completeOnboardingFirst);
       }
 
       const dataToInsert = {
@@ -249,7 +253,7 @@ function OpportunitiesPageContent() {
         throw error;
       }
       
-      toast.success("Opportunity posted successfully");
+      toast.success(t.opportunityPosted);
       
       // Reset form
       setFormData(initialFormData);
@@ -262,7 +266,7 @@ function OpportunitiesPageContent() {
       
     } catch (error: any) {
       console.error("Error posting opportunity:", error);
-      toast.error(error.message || "Failed to post opportunity");
+      toast.error(error.message || t.failedToPostOpportunity);
     } finally {
       setIsSubmitting(false);
     }
@@ -280,7 +284,7 @@ function OpportunitiesPageContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this opportunity?")) {
+    if (confirm(t.confirmDelete)) {
       try {
         const { error } = await supabase
           .from("opportunities")
@@ -292,10 +296,10 @@ function OpportunitiesPageContent() {
         }
 
         setOpportunities(prev => prev.filter(opp => opp.id !== id));
-        toast.success("Opportunity deleted successfully");
+        toast.success(t.opportunityDeleted);
       } catch (error) {
         console.error("Error deleting opportunity:", error);
-        toast.error("Failed to delete opportunity");
+        toast.error(t.failedToDeleteOpportunity);
       }
     }
   };
@@ -338,7 +342,7 @@ function OpportunitiesPageContent() {
       setApplicants(talents || []);
     } catch (error) {
       console.error("Error loading applicants:", error);
-      toast.error("Failed to load applicants");
+      toast.error(t.failedToLoadApplicants);
     } finally {
       setApplicantsLoading(false);
     }
@@ -347,7 +351,7 @@ function OpportunitiesPageContent() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <LoadingAnimation size="md" text="Loading opportunities..." />
+        <LoadingAnimation size="md" text={t.loadingOpportunities} />
       </div>
     );
   }
@@ -357,9 +361,9 @@ function OpportunitiesPageContent() {
       {/* Header - Mobile Optimized */}
       <div className="space-y-4 sm:space-y-0 sm:flex sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Opportunities</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t.opportunitiesTitle}</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">
-            Post new opportunities and manage your existing job postings
+            {t.opportunitiesSubtitle}
           </p>
         </div>
         <Button
@@ -374,7 +378,7 @@ function OpportunitiesPageContent() {
           ) : (
             <RefreshCw className="h-4 w-4 mr-2" />
           )}
-          Refresh
+          {t.refresh}
         </Button>
       </div>
 
@@ -382,13 +386,13 @@ function OpportunitiesPageContent() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="post" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
             <PlusCircle size={14} className="sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Post New Opportunity</span>
-            <span className="sm:hidden">Post New</span>
+            <span className="hidden sm:inline">{t.postNewOpportunity}</span>
+            <span className="sm:hidden">{t.postNew}</span>
           </TabsTrigger>
           <TabsTrigger value="manage" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
             <Briefcase size={14} className="sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">My Opportunities ({opportunities.length})</span>
-            <span className="sm:hidden">My Jobs ({opportunities.length})</span>
+            <span className="hidden sm:inline">{t.myOpportunities} ({opportunities.length})</span>
+            <span className="sm:hidden">{t.myJobs} ({opportunities.length})</span>
           </TabsTrigger>
         </TabsList>
 
@@ -398,10 +402,10 @@ function OpportunitiesPageContent() {
             <div className="space-y-4 sm:space-y-6">
               <div>
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-                  Create New Job Posting
+                  {t.createNewJobPosting}
                 </h2>
                 <p className="text-sm sm:text-base text-gray-600">
-                  Fill in the details below to post a new opportunity and attract talented candidates.
+                  {t.createJobDescription}
                 </p>
               </div>
 
@@ -410,11 +414,11 @@ function OpportunitiesPageContent() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Job Title *
+                      {t.jobTitle} *
                     </label>
                     <Input
                       name="title"
-                      placeholder="e.g. Senior Software Engineer"
+                      placeholder={t.jobTitlePlaceholder}
                       value={formData.title}
                       onChange={handleInputChange}
                       className="w-full"
@@ -423,11 +427,11 @@ function OpportunitiesPageContent() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Name *
+                      {t.companyNameLabel} *
                     </label>
                     <Input
                       name="company_name"
-                      placeholder="Your company name"
+                      placeholder={t.companyNameOpportunityPlaceholder}
                       value={formData.company_name}
                       onChange={handleInputChange}
                       className="w-full"
@@ -436,27 +440,27 @@ function OpportunitiesPageContent() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Work Style *
+                      {t.workStyleRequired} *
                     </label>
                     <MultiSelect
                       options={workStyles.map(style => ({ label: style, value: style }))}
                       selected={formData.workstyle}
                       onChange={handleWorkStyleChange}
-                      placeholder="Select work styles..."
+                      placeholder={t.selectWorkStyles}
                       className="w-full"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Location *
+                      {t.locationRequired} *
                     </label>
                     <Select
                       value={formData.location}
                       onValueChange={handleLocationChange}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select location..." />
+                        <SelectValue placeholder={t.locationPlaceholder} />
                       </SelectTrigger>
                       <SelectContent>
                         {SAUDI_CITIES.map((city) => (
@@ -473,37 +477,37 @@ function OpportunitiesPageContent() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Industry
+                      {t.industryLabel}
                     </label>
                     <MultiSelect
                       options={INDUSTRIES.map(industry => ({ label: industry, value: industry }))}
                       selected={formData.industry}
                       onChange={handleIndustryChange}
-                      placeholder="Select industries..."
+                      placeholder={t.industryOpportunityPlaceholder}
                       className="w-full"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Required Skills
+                      {t.requiredSkills}
                     </label>
                     <MultiSelect
                       options={COMMON_SKILLS.map(skill => ({ label: skill, value: skill }))}
                       selected={formData.skills}
                       onChange={handleSkillsChange}
-                      placeholder="Select required skills..."
+                      placeholder={t.skillsPlaceholder}
                       className="w-full"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Job Description
+                      {t.jobDescription}
                     </label>
                     <Textarea
                       name="description"
-                      placeholder="Describe the role, responsibilities, and requirements..."
+                      placeholder={t.jobDescriptionPlaceholder}
                       value={formData.description}
                       onChange={handleInputChange}
                       rows={6}
@@ -520,7 +524,7 @@ function OpportunitiesPageContent() {
                   disabled={isSubmitting}
                   className="w-full sm:w-auto"
                 >
-                  Reset Form
+                  {t.resetForm}
                 </Button>
                 <Button
                   onClick={handleSubmit}
@@ -530,12 +534,12 @@ function OpportunitiesPageContent() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Posting...
+                      {t.posting}
                     </>
                   ) : (
                     <>
                       <CirclePlus className="h-4 w-4 mr-2" />
-                      Post Opportunity
+                      {t.postOpportunity}
                     </>
                   )}
                 </Button>
@@ -552,15 +556,15 @@ function OpportunitiesPageContent() {
                 <Briefcase size={36} className="sm:w-12 sm:h-12 mx-auto" />
               </div>
               <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
-                No opportunities posted yet
+                {t.noOpportunitiesPosted}
               </h3>
               <p className="text-sm sm:text-base text-gray-600 mb-6">
-                Create your first job posting to start attracting talented candidates.
+                {t.noOpportunitiesDescription}
               </p>
               <Button onClick={() => setActiveTab("post")} className="w-full sm:w-auto">
                 <PlusCircle className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Post Your First Opportunity</span>
-                <span className="sm:hidden">Post First Job</span>
+                <span className="hidden sm:inline">{t.postYourFirst}</span>
+                <span className="sm:hidden">{t.postFirstJob}</span>
               </Button>
             </div>
           ) : (
@@ -587,10 +591,10 @@ function OpportunitiesPageContent() {
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b">
               <div className="min-w-0 flex-1">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
-                  Applicants{selectedOpp ? ` for ${selectedOpp.title}` : ""}
+                  {t.applicantsFor}{selectedOpp ? ` ${selectedOpp.title}` : ""}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500">
-                  Found {applicants.length} applicant{applicants.length === 1 ? "" : "s"}
+                  {t.foundApplicants} {applicants.length} {applicants.length === 1 ? t.applicant : t.applicants}
                 </p>
               </div>
               <Button 
@@ -606,11 +610,11 @@ function OpportunitiesPageContent() {
             <div className="flex-1 overflow-y-auto p-4 sm:p-5">
               {applicantsLoading ? (
                 <div className="flex justify-center py-10">
-                  <LoadingAnimation size="md" text="Loading applicants" />
+                  <LoadingAnimation size="md" text={t.loadingApplicants} />
                 </div>
               ) : applicants.length === 0 ? (
                 <div className="text-center text-gray-600 py-12">
-                  No applicants yet.
+                  {t.noApplicantsYet}
                 </div>
               ) : (
                 <ul className="divide-y">
@@ -655,7 +659,7 @@ function OpportunitiesPageContent() {
                         </div>
                         <div className="flex-shrink-0">
                           <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
-                            <a href={`mailto:${talent.email}`}>Contact</a>
+                            <a href={`mailto:${talent.email}`}>{t.contact}</a>
                           </Button>
                         </div>
                       </div>
@@ -666,7 +670,7 @@ function OpportunitiesPageContent() {
             </div>
             <div className="px-4 sm:px-5 py-3 sm:py-4 border-t flex justify-end">
               <Button onClick={() => setIsApplicantsOpen(false)} className="w-full sm:w-auto">
-                Close
+                {t.close}
               </Button>
             </div>
           </div>
@@ -676,13 +680,20 @@ function OpportunitiesPageContent() {
   );
 }
 
+function OpportunitiesPageWrapper() {
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
+  
+  return (
+    <div className="flex justify-center py-12">
+      <LoadingAnimation size="md" text={t.loading} />
+    </div>
+  );
+}
+
 export default function OpportunitiesPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center py-12">
-        <LoadingAnimation size="md" text="Loading..." />
-      </div>
-    }>
+    <Suspense fallback={<OpportunitiesPageWrapper />}>
       <OpportunitiesPageContent />
     </Suspense>
   );
