@@ -37,6 +37,8 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import LoadingAnimation from "@/components/loadingAnimation";
 import CandidateCard from "@/features/employer/dashboard/components/candidate-card";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { employerTranslations } from "@/lib/language";
 
 interface SavedCandidate {
   id: string;
@@ -69,6 +71,8 @@ interface SentInvitation {
 
 function CandidatesPageContent() {
   const { user, authUser, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
   const router = useRouter();
   
   // Shared states
@@ -94,7 +98,7 @@ function CandidatesPageContent() {
       const employerId = user!.id;
       
       if (!employerId) {
-        toast.error("Please log in to view saved candidates");
+        toast.error(t.loginToViewSaved);
         return;
       }
 
@@ -107,7 +111,7 @@ function CandidatesPageContent() {
 
       if (savesError) {
         console.error("Error fetching saves:", savesError);
-        if (!showRefreshToast) toast.error("Failed to load saved candidates");
+        if (!showRefreshToast) toast.error(t.failedToLoadSavedCandidates);
         return;
       }
 
@@ -127,7 +131,7 @@ function CandidatesPageContent() {
 
       if (talentsError) {
         console.error("Error fetching talents:", talentsError);
-        if (!showRefreshToast) toast.error("Failed to load candidate details");
+        if (!showRefreshToast) toast.error(t.failedToLoadCandidateDetails);
         return;
       }
 
@@ -169,9 +173,9 @@ function CandidatesPageContent() {
       setFilteredSavedCandidates(enrichedCandidates);
     } catch (error) {
       console.error("Error loading candidates:", error);
-      if (!showRefreshToast) toast.error("An error occurred while loading candidates");
+      if (!showRefreshToast) toast.error(t.errorLoadingCandidates);
     }
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   // Load sent invitations
   const loadInvitations = useCallback(async (showRefreshToast = false) => {
@@ -184,7 +188,7 @@ function CandidatesPageContent() {
 
       if (error) {
         console.error("Error fetching sent invitations:", error);
-        if (!showRefreshToast) toast.error("Failed to load sent invitations");
+        if (!showRefreshToast) toast.error(t.failedToLoadSentInvitations);
         return;
       }
 
@@ -192,9 +196,9 @@ function CandidatesPageContent() {
       setFilteredInvitations(invitationsData || []);
     } catch (error) {
       console.error("Error loading sent invitations:", error);
-      if (!showRefreshToast) toast.error("An error occurred while loading sent invitations");
+      if (!showRefreshToast) toast.error(t.errorLoadingSentInvitations);
     }
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   // Initial data load
   useEffect(() => {
@@ -289,7 +293,7 @@ function CandidatesPageContent() {
       loadInvitations(true)
     ]);
     setRefreshing(false);
-    toast.success("Data refreshed successfully");
+    toast.success(t.dataRefreshed);
   };
 
   const handleCandidateUnsave = (candidateId: string) => {
@@ -334,7 +338,7 @@ function CandidatesPageContent() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast.success("Candidate list exported successfully");
+    toast.success(t.candidateListExported);
   };
 
   // Helper functions for invitations
@@ -374,7 +378,7 @@ function CandidatesPageContent() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <LoadingAnimation size="md" text="Loading candidates and invitations..." />
+        <LoadingAnimation size="md" text={t.loadingCandidatesAndInvitations} />
       </div>
     );
   }
@@ -384,9 +388,9 @@ function CandidatesPageContent() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Candidates & Invitations</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t.candidatesAndInvitations}</h1>
           <p className="text-gray-600 mt-1">
-            Manage your saved candidates and track sent invitations
+            {t.manageSavedCandidates}
           </p>
         </div>
         <Button
@@ -400,7 +404,7 @@ function CandidatesPageContent() {
           ) : (
             <RefreshCw className="h-4 w-4 mr-2" />
           )}
-          Refresh
+          {t.refresh}
         </Button>
       </div>
 
@@ -408,11 +412,11 @@ function CandidatesPageContent() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="saved" className="flex items-center gap-2">
             <BookmarkCheck size={16} />
-            Saved Candidates ({savedCandidates.length})
+            {t.savedCandidatesTab} ({savedCandidates.length})
           </TabsTrigger>
           <TabsTrigger value="invitations" className="flex items-center gap-2">
             <Send size={16} />
-            Sent Invitations ({invitations.length})
+            {t.sentInvitationsTab} ({invitations.length})
           </TabsTrigger>
         </TabsList>
 
@@ -423,7 +427,7 @@ function CandidatesPageContent() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search by name, email, bio, location, or industry..."
+                placeholder={t.searchCandidatesPlaceholder}
                 value={savedSearchQuery}
                 onChange={(e) => setSavedSearchQuery(e.target.value)}
                 className="pl-10"
@@ -433,19 +437,19 @@ function CandidatesPageContent() {
               <Filter className="h-4 w-4 text-gray-500" />
               <Select value={savedFilterBy} onValueChange={setSavedFilterBy}>
                 <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Filter by..." />
+                  <SelectValue placeholder={t.filterBy} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Candidates</SelectItem>
-                  <SelectItem value="recent">Recently Saved</SelectItem>
-                  <SelectItem value="with-resume">With Resume</SelectItem>
-                  <SelectItem value="remote">Remote Workers</SelectItem>
+                  <SelectItem value="all">{t.allCandidates}</SelectItem>
+                  <SelectItem value="recent">{t.recentlySaved}</SelectItem>
+                  <SelectItem value="with-resume">{t.withResume}</SelectItem>
+                  <SelectItem value="remote">{t.remoteWorkers}</SelectItem>
                 </SelectContent>
               </Select>
               {filteredSavedCandidates.length > 0 && (
                 <Button variant="outline" onClick={handleExportSaved} size="sm">
                   <Download className="h-4 w-4 mr-2" />
-                  Export CSV
+                  {t.exportCsv}
                 </Button>
               )}
             </div>
@@ -456,24 +460,23 @@ function CandidatesPageContent() {
             <div className="text-center py-16">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No saved candidates yet
+                {t.noSavedCandidatesYet}
               </h3>
               <p className="text-gray-600 mb-6">
-                Start saving interesting candidates from search results to build
-                your talent pipeline.
+                {t.startSavingCandidates}
               </p>
               <Button onClick={() => router.push("/employer/dashboard/home")}>
-                Find Candidates
+                {t.findCandidates}
               </Button>
             </div>
           ) : filteredSavedCandidates.length === 0 ? (
             <div className="text-center py-12">
               <Search className="h-8 w-8 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No candidates match your search
+                {t.noCandidatesMatchSearch}
               </h3>
               <p className="text-gray-600">
-                Try adjusting your search terms or filters.
+                {t.tryAdjustingSearch}
               </p>
             </div>
           ) : (
@@ -505,7 +508,7 @@ function CandidatesPageContent() {
                     <Mail className="text-blue-600" size={24} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Sent</p>
+                    <p className="text-sm font-medium text-gray-600">{t.totalSent}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {invitationStats.total}
                     </p>
@@ -521,7 +524,7 @@ function CandidatesPageContent() {
                     <Clock className="text-yellow-600" size={24} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Pending</p>
+                    <p className="text-sm font-medium text-gray-600">{t.pending}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {invitationStats.pending}
                     </p>
@@ -537,7 +540,7 @@ function CandidatesPageContent() {
                     <CheckCircle className="text-green-600" size={24} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Accepted</p>
+                    <p className="text-sm font-medium text-gray-600">{t.accepted}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {invitationStats.accepted}
                     </p>
@@ -553,7 +556,7 @@ function CandidatesPageContent() {
                     <XCircle className="text-red-600" size={24} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Rejected</p>
+                    <p className="text-sm font-medium text-gray-600">{t.rejected}</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {invitationStats.rejected}
                     </p>
@@ -571,7 +574,7 @@ function CandidatesPageContent() {
                 size={16}
               />
               <Input
-                placeholder="Search by talent name, email, or message..."
+                placeholder={t.searchInvitationsPlaceholder}
                 value={invitationsSearchTerm}
                 onChange={(e) => setInvitationsSearchTerm(e.target.value)}
                 className="pl-10"
@@ -580,13 +583,13 @@ function CandidatesPageContent() {
             <Select value={invitationsStatusFilter} onValueChange={setInvitationsStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
                 <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t.filterBy} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="accepted">Accepted</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="all">{t.allStatuses}</SelectItem>
+                <SelectItem value="pending">{t.pending}</SelectItem>
+                <SelectItem value="accepted">{t.accepted}</SelectItem>
+                <SelectItem value="rejected">{t.rejected}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -598,13 +601,13 @@ function CandidatesPageContent() {
                 <Mail className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {invitations.length === 0
-                    ? "No invitations sent yet"
-                    : "No invitations match your filters"}
+                    ? t.noInvitationsSent
+                    : t.noInvitationsMatchFilters}
                 </h3>
                 <p className="text-gray-600">
                   {invitations.length === 0
-                    ? "Start sending invitations to talents to see them here."
-                    : "Try adjusting your search terms or filters."}
+                    ? t.startSendingInvitations
+                    : t.tryAdjustingSearch}
                 </p>
               </CardContent>
             </Card>
@@ -632,11 +635,11 @@ function CandidatesPageContent() {
                             </p>
                             <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                               <Calendar size={12} />
-                              Sent{" "}
+                              {t.sent}{" "}
                               {formatDistanceToNow(
                                 new Date(invitation.created_at)
                               )}{" "}
-                              ago
+                              {t.ago}
                             </p>
                           </div>
                         </div>
@@ -666,7 +669,7 @@ function CandidatesPageContent() {
                           <MessageSquare className="text-blue-400 mt-1" size={16} />
                           <div>
                             <p className="text-sm font-medium text-blue-700 mb-1">
-                              Your Message:
+                              {t.yourMessage}
                             </p>
                             <p className="text-sm text-blue-600">
                               {invitation.message}
@@ -679,10 +682,9 @@ function CandidatesPageContent() {
                       {invitation.status !== "pending" && (
                         <div className="text-sm text-gray-500 flex items-center gap-1">
                           <Clock size={12} />
-                          {invitation.status.charAt(0).toUpperCase() +
-                            invitation.status.slice(1)}{" "}
+                          {invitation.status === "accepted" ? t.accepted : t.rejected}{" "}
                           {formatDistanceToNow(new Date(invitation.updated_at))}{" "}
-                          ago
+                          {t.ago}
                         </div>
                       )}
                     </div>
@@ -697,13 +699,20 @@ function CandidatesPageContent() {
   );
 }
 
+function CandidatesPageWrapper() {
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
+  
+  return (
+    <div className="flex justify-center py-12">
+      <LoadingAnimation size="md" text={t.loading} />
+    </div>
+  );
+}
+
 export default function CandidatesPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center py-12">
-        <LoadingAnimation size="md" text="Loading..." />
-      </div>
-    }>
+    <Suspense fallback={<CandidatesPageWrapper />}>
       <CandidatesPageContent />
     </Suspense>
   );

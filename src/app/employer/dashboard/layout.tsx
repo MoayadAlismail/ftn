@@ -8,6 +8,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users, Menu, X, User } from "lucide-react";
 import Link from "next/link";
 import SignOutButton from "@/features/auth/SignOutButton";
+import LanguageSelector from "@/components/language-selector";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { employerTranslations } from "@/lib/language";
 
 interface NavigationItem {
   id: string;
@@ -20,36 +23,38 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems: NavigationItem[] = [
     {
       id: "dashboard",
-      label: "Home",
+      label: t.navHome,
       icon: LayoutDashboard,
       href: "/employer/dashboard/home"
     },
     {
       id: "opportunities",
-      label: "Opportunities",
+      label: t.navOpportunities,
       icon: TableOfContents,
       href: "/employer/dashboard/opportunities"
     },
     {
       id: "candidates",
-      label: "Candidates",
+      label: t.navCandidates,
       icon: Users,
       href: "/employer/dashboard/candidates"
     },
     {
       id: "billing",
-      label: "Billing",
+      label: t.navBilling,
       icon: CreditCard,
       href: "/employer/dashboard/billing"
     },
     {
       id: "settings",
-      label: "Settings",
+      label: t.navSettings,
       icon: Settings,
       href: "/employer/dashboard/settings"
     }
@@ -70,7 +75,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
               <img src="/logo.svg" alt="Ftn" className="w-6 h-6 lg:w-7 lg:h-7 object-contain" />
               <span className="hidden sm:inline">Ftn</span>
             </Link>
-            <span className="text-xs lg:text-sm text-gray-500 border-l border-gray-300 pl-2 lg:pl-3">Employer</span>
+            <span className="text-xs lg:text-sm text-gray-500 border-l border-gray-300 pl-2 lg:pl-3">{t.employer}</span>
           </div>
 
           {/* Desktop navigation */}
@@ -98,6 +103,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
 
           {/* Desktop user section */}
           <div className="hidden lg:flex items-center gap-2">
+            <LanguageSelector />
             <SignOutButton />
           </div>
 
@@ -142,7 +148,8 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
                   <User size={18} />
                   <span className="font-medium">{user?.user_metadata?.company_name || user?.email}</span>
                 </Link>
-                <div className="px-3 py-2">
+                <div className="px-3 py-2 flex items-center gap-2">
+                  <LanguageSelector />
                   <SignOutButton />
                 </div>
               </div>

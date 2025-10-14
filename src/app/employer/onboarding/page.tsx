@@ -17,6 +17,8 @@ import { Building2, Globe, Users, Briefcase, Loader2, User, ArrowRight } from "l
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { employerTranslations } from "@/lib/language";
 
 // Loading skeleton for onboarding page
 function OnboardingSkeleton() {
@@ -60,6 +62,8 @@ const companySizes = [
 
 function EmployerOnboardingContent() {
   const { user, authUser, isLoading, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const t = employerTranslations[language];
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
@@ -120,7 +124,7 @@ function EmployerOnboardingContent() {
       const userId = userData?.user?.id;
 
       if (userError || !userId) {
-        alert("User not authenticated. Please log in.");
+        alert(t.userNotAuthenticated);
         return;
       }
 
@@ -140,7 +144,7 @@ function EmployerOnboardingContent() {
       const { error } = await supabase.from("employers").insert([employerData]);
 
       if (error) {
-        alert("Error creating employer profile: " + error.message);
+        alert(t.errorCreatingProfile + " " + error.message);
       } else {
         // Update user metadata to mark as onboarded
         const { error: metadataError } = await supabase.auth.updateUser({
@@ -215,7 +219,7 @@ function EmployerOnboardingContent() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-4xl font-bold text-gray-900 mb-4"
             >
-              Welcome to Ftn
+              {t.welcomeToFtn}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
@@ -223,7 +227,7 @@ function EmployerOnboardingContent() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="text-lg text-gray-600 max-w-2xl mx-auto"
             >
-              Let&apos;s set up your company profile to start finding exceptional talent.
+              {t.onboardingSubtitle}
             </motion.p>
           </div>
 
@@ -240,20 +244,20 @@ function EmployerOnboardingContent() {
                     <User size={24} className="text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-900">Personal Information</h2>
-                    <p className="text-gray-600">Tell us about yourself</p>
+                    <h2 className="text-2xl font-semibold text-gray-900">{t.personalInformation}</h2>
+                    <p className="text-gray-600">{t.personalInformationDescription}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium text-gray-700">
-                      Full Name
+                      {t.fullName}
                     </label>
                     <Input
                       id="name"
                       name="name"
-                      placeholder="Enter your full name"
+                      placeholder={t.fullNamePlaceholder}
                       value={formData.name}
                       onChange={handleChange}
                       className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
@@ -262,12 +266,12 @@ function EmployerOnboardingContent() {
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="role" className="text-sm font-medium text-gray-700">
-                      Your Role
+                      {t.yourRole}
                     </label>
                     <Input
                       id="role"
                       name="role"
-                      placeholder="e.g., Talent Acquisition Manager"
+                      placeholder={t.yourRolePlaceholder}
                       value={formData.role}
                       onChange={handleChange}
                       className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
@@ -290,8 +294,8 @@ function EmployerOnboardingContent() {
                     <Briefcase size={24} className="text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-900">Company Details</h2>
-                    <p className="text-gray-600">Share information about your organization</p>
+                    <h2 className="text-2xl font-semibold text-gray-900">{t.companyDetails}</h2>
+                    <p className="text-gray-600">{t.companyDetailsDescription}</p>
                   </div>
                 </div>
 
@@ -299,12 +303,12 @@ function EmployerOnboardingContent() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
                       <label htmlFor="companyName" className="text-sm font-medium text-gray-700">
-                        Company Name
+                        {t.companyName}
                       </label>
                       <Input
                         id="companyName"
                         name="companyName"
-                        placeholder="Enter company name"
+                        placeholder={t.companyNamePlaceholder}
                         value={formData.companyName}
                         onChange={handleChange}
                         className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
@@ -313,7 +317,7 @@ function EmployerOnboardingContent() {
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="companyWebsite" className="text-sm font-medium text-gray-700">
-                        Company Website
+                        {t.companyWebsite}
                       </label>
                       <div className="relative">
                         <Globe size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -321,7 +325,7 @@ function EmployerOnboardingContent() {
                           id="companyWebsite"
                           name="companyWebsite"
                           type="url"
-                          placeholder="https://company.com"
+                          placeholder={t.companyWebsitePlaceholder}
                           value={formData.companyWebsite}
                           onChange={handleChange}
                           className="h-12 pl-11 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
@@ -334,7 +338,7 @@ function EmployerOnboardingContent() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
                       <label htmlFor="companySize" className="text-sm font-medium text-gray-700">
-                        Company Size
+                        {t.companySize}
                       </label>
                       <div className="relative">
                         <Users size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />
@@ -343,7 +347,7 @@ function EmployerOnboardingContent() {
                           onValueChange={handleSelectChange}
                         >
                           <SelectTrigger className="h-12 pl-11 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl">
-                            <SelectValue placeholder="Select company size" />
+                            <SelectValue placeholder={t.companySizePlaceholder} />
                           </SelectTrigger>
                           <SelectContent>
                             {companySizes.map((size) => (
@@ -357,12 +361,12 @@ function EmployerOnboardingContent() {
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="companyIndustry" className="text-sm font-medium text-gray-700">
-                        Industry
+                        {t.industry}
                       </label>
                       <Input
                         id="companyIndustry"
                         name="companyIndustry"
-                        placeholder="e.g., Technology, Healthcare"
+                        placeholder={t.industryPlaceholder}
                         value={formData.companyIndustry}
                         onChange={handleChange}
                         className="h-12 bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl"
@@ -373,12 +377,12 @@ function EmployerOnboardingContent() {
 
                   <div className="space-y-2">
                     <label htmlFor="companyDescription" className="text-sm font-medium text-gray-700">
-                      Company Description
+                      {t.companyDescription}
                     </label>
                     <Textarea
                       id="companyDescription"
                       name="companyDescription"
-                      placeholder="Briefly describe your company, culture, and what makes it unique..."
+                      placeholder={t.companyDescriptionPlaceholder}
                       className="min-h-[120px] bg-white border-gray-200 focus:border-primary focus:ring-primary rounded-xl resize-none"
                       value={formData.companyDescription}
                       onChange={handleChange}
@@ -405,11 +409,11 @@ function EmployerOnboardingContent() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Setting up your profile...
+                    {t.settingUpProfile}
                   </>
                 ) : (
                   <>
-                    Complete Profile
+                    {t.completeProfile}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}

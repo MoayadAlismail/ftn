@@ -10,6 +10,8 @@ import { Loader2, User, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { onboardingTranslations } from "@/lib/language/onboarding";
 
 interface AboutYourselfProps {
   bio: string;
@@ -34,6 +36,8 @@ export default function AboutYourself({
   prev,
   onComplete,
 }: AboutYourselfProps) {
+  const { language } = useLanguage();
+  const t = onboardingTranslations[language];
   const minCharacters = 10;
   const [isCompleting, setIsCompleting] = useState(false);
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
@@ -42,7 +46,7 @@ export default function AboutYourself({
   const handleGenerateBio = async () => {
     // Use pre-extracted resume text for fast bio generation
     if (!resumeText) {
-      toast.error("Resume text not available. Please try refreshing the page.");
+      toast.error(t.resumeNotAvailable);
       return;
     }
 
@@ -59,13 +63,13 @@ export default function AboutYourself({
 
       if (result.success && result.bio) {
         setBio(result.bio);
-        toast.success("Bio generated successfully!");
+        toast.success(t.bioGeneratedSuccess);
       } else {
-        toast.error(result.error || "Failed to generate bio");
+        toast.error(result.error || t.bioGeneratedError);
       }
     } catch (error) {
       console.error("Error generating bio:", error);
-      toast.error("An error occurred while generating the bio");
+      toast.error(t.bioGenerationError);
     } finally {
       setIsGeneratingBio(false);
     }
@@ -89,8 +93,8 @@ export default function AboutYourself({
         {/* Progress indicator */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs sm:text-sm text-gray-600">
-            <span>Step 4 of 4</span>
-            <span>100% Complete</span>
+            <span>{t.stepOf} 4 {t.of} 4</span>
+            <span>100% {t.complete}</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full w-full bg-primary rounded-full" />
@@ -102,9 +106,9 @@ export default function AboutYourself({
           {/* Icon */}
           <div className="space-y-2 flex flex-col items-center justify-center">
             <User size={32} className="sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-primary" />
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold">Tell us about yourself</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold">{t.aboutTitle}</h1>
             <p className="text-xs sm:text-sm text-gray-600">
-              Write a brief bio to help us match you better
+              {t.aboutDescription}
             </p>
           </div>
 
@@ -113,7 +117,7 @@ export default function AboutYourself({
               <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="I'm a computer science student passionate about AI and machine learning. I enjoy building projects that solve real-world problems..."
+                placeholder={t.aboutPlaceholder}
                 className="w-full h-24 sm:h-28 lg:h-32 text-sm sm:text-base resize-none flex-1"
               />
               <div className="flex sm:flex-col gap-2">
@@ -130,17 +134,17 @@ export default function AboutYourself({
                   ) : (
                     <Sparkles className="h-4 w-4" />
                   )}
-                  {isGeneratingBio ? "Generating..." : "AI Generate"}
+                  {isGeneratingBio ? t.generating : t.aiGenerate}
                 </Button>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-xs sm:text-sm text-gray-600">
-                {bio.length} characters (minimum {minCharacters})
+                {bio.length} {t.characters} ({t.minimum} {minCharacters})
               </p>
               {localStorage.getItem("resumeFileBase64") && (
                 <p className="text-xs text-blue-600">
-                  Resume uploaded ✓
+                  {t.resumeUploaded}
                 </p>
               )}
             </div>
@@ -150,7 +154,7 @@ export default function AboutYourself({
         {/* Mobile Navigation */}
         <div className="block sm:hidden space-y-3 pt-4">
           <Button className="cursor-pointer w-full" variant="outline" onClick={prev}>
-            Back
+            {t.back}
           </Button>
           <div className="flex gap-2">
             <Button
@@ -160,7 +164,7 @@ export default function AboutYourself({
               onClick={handleSkip}
               disabled={isCompleting}
             >
-              Skip for now
+              {t.skipForNow}
             </Button>
             <Button
               className="cursor-pointer flex-1 flex items-center justify-center gap-2"
@@ -168,7 +172,7 @@ export default function AboutYourself({
               disabled={bio.length < minCharacters || isCompleting}
             >
               {isCompleting && <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />}
-              <span className="text-xs sm:text-sm">Complete Setup</span>
+              <span className="text-xs sm:text-sm">{t.completeSetup}</span>
             </Button>
           </div>
         </div>
@@ -176,7 +180,7 @@ export default function AboutYourself({
         {/* Desktop Navigation */}
         <div className="hidden sm:flex justify-between pt-4">
           <Button className="cursor-pointer" variant="outline" onClick={prev}>
-            Back
+            {t.back}
           </Button>
           <div className="flex items-center gap-2">
             <Button
@@ -186,7 +190,7 @@ export default function AboutYourself({
               onClick={handleSkip}
               disabled={isCompleting}
             >
-              Skip for now
+              {t.skipForNow}
             </Button>
             <Button
               className="cursor-pointer flex items-center gap-2"
@@ -194,7 +198,7 @@ export default function AboutYourself({
               disabled={bio.length < minCharacters || isCompleting}
             >
               {isCompleting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Complete Setup &rarr;
+              {t.completeSetupArrow}
             </Button>
           </div>
         </div>

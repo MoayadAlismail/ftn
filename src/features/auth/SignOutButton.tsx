@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { employerTranslations } from "@/lib/language"
 
 interface SignOutButtonProps {
     className?: string
@@ -9,6 +11,8 @@ interface SignOutButtonProps {
 
 export default function SignOutButton({ className }: SignOutButtonProps) {
     const { signOut } = useAuth()
+    const { language } = useLanguage()
+    const t = employerTranslations[language]
 
     return (
         <Button
@@ -16,7 +20,7 @@ export default function SignOutButton({ className }: SignOutButtonProps) {
             onClick={signOut}
             className={className}
         >
-            Sign Out
+            {t.signOut}
         </Button>
     )
 }

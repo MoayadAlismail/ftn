@@ -9,9 +9,14 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { ProfileMenu } from '@/components/profile-menu';
+import LanguageSelector from '@/components/language-selector';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { talentTranslations } from '@/lib/language';
 
 export default function TalentLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
+  const { language } = useLanguage();
+  const t = talentTranslations[language];
   const pathname = usePathname();
   const [pendingInvitations, setPendingInvitations] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -64,18 +69,18 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
     {
       href: "/talent/opportunities",
       icon: Home,
-      label: "Home",
-      description: "AI-powered job recommendations"
+      label: t.navHome,
+      description: t.navHomeDescription
     },
     {
       href: "/talent/applications",
       icon: FileText,
-      label: "Applications"
+      label: t.navApplications
     },
     {
       href: "/talent/invitations",
       icon: Mail,
-      label: "Invitations",
+      label: t.navInvitations,
       badge: pendingInvitations > 0 ? pendingInvitations : undefined
     },
     {
@@ -99,8 +104,8 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                 className="w-6 h-6 md:w-8 md:h-8 mr-2 object-contain"
               />
               <h1 className="text-lg md:text-xl font-bold text-gray-900">
-                <span className="hidden sm:inline">Talent Dashboard</span>
-                <span className="sm:hidden">Dashboard</span>
+                <span className="hidden sm:inline">{t.talentDashboard}</span>
+                <span className="sm:hidden">{t.dashboard}</span>
               </h1>
             </div>
 
@@ -129,6 +134,11 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
 
             {/* Right side - User info and mobile menu */}
             <div className="flex items-center gap-2">
+              {/* Desktop Language Selector */}
+              <div className="hidden lg:block">
+                <LanguageSelector />
+              </div>
+              
               {/* Desktop Profile Dropdown */}
               <div className="hidden lg:block">
                 <ProfileMenu 
@@ -193,18 +203,22 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                       className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer"
                     >
                       <User size={18} />
-                      <span>Personal Info</span>
+                      <span>{t.personalInfo}</span>
                     </Link>
                     
                     <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-400 rounded-lg mx-2 cursor-not-allowed">
                       <CreditCard size={18} />
-                      <span>My Payments</span>
+                      <span>{t.myPayments}</span>
                     </div>
                     
                     <div className="mx-2 my-2 border-t border-gray-200"></div>
                     
                     <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Settings
+                      {t.settings}
+                    </div>
+                    
+                    <div className="px-3 py-2 mx-2">
+                      <LanguageSelector />
                     </div>
                     
                     <button
@@ -215,7 +229,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                       className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer w-full"
                     >
                       <LogOut size={18} />
-                      <span>Sign Out</span>
+                      <span>{t.signOut}</span>
                     </button>
                   </div>
                 </div>

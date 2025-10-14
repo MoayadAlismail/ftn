@@ -23,6 +23,8 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { applicationsTranslations } from "@/lib/language";
 
 interface Opportunity {
   id: string;
@@ -56,6 +58,8 @@ export default function OpportunityDetailModal({
   hasApplied = false,
 }: OpportunityDetailModalProps) {
   const { user } = useAuth();
+  const { language } = useLanguage();
+  const t = applicationsTranslations[language];
   const router = useRouter();
   const [isApplyingLocal, setIsApplyingLocal] = useState(false);
 
@@ -92,13 +96,13 @@ export default function OpportunityDetailModal({
           .insert([{ user_id: user.id, opp_id: opportunity.id }]);
 
         if (error) {
-          toast.error(error.message || "Failed to apply.");
+          toast.error(error.message || t.failedToApply);
           return;
         }
 
-        toast.success("Applied successfully");
+        toast.success(t.appliedSuccessfully);
       } catch (e) {
-        toast.error("Something went wrong. Please try again.");
+        toast.error(t.somethingWentWrong);
       } finally {
         setIsApplyingLocal(false);
       }
@@ -198,7 +202,7 @@ export default function OpportunityDetailModal({
                           ? "bg-green-100 text-green-700"
                           : "bg-primary/15 text-primary"
                         }`}>
-                        {Math.round(opportunity.similarity)}% Match
+                        {Math.round(opportunity.similarity)}% {t.modalMatch}
                       </span>
                     )}
                     <span className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-blue-100 text-blue-700 rounded-full">
@@ -207,7 +211,7 @@ export default function OpportunityDetailModal({
                     {opportunity.created_at && (
                       <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
                         <Calendar size={12} className="sm:w-4 sm:h-4" />
-                        <span className="whitespace-nowrap">Posted {new Date(opportunity.created_at).toLocaleDateString()}</span>
+                        <span className="whitespace-nowrap">{t.modalPosted} {new Date(opportunity.created_at).toLocaleDateString()}</span>
                       </div>
                     )}
                   </div>
@@ -220,7 +224,7 @@ export default function OpportunityDetailModal({
                   {/* Job Description */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      Job Description
+                      {t.jobDescription}
                     </h3>
                     <div className="prose prose-sm max-w-none">
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -233,7 +237,7 @@ export default function OpportunityDetailModal({
                   {opportunity.skills && opportunity.skills.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        Required Skills
+                        {t.requiredSkills}
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {opportunity.skills.map((skill, index) => (
@@ -251,35 +255,35 @@ export default function OpportunityDetailModal({
                   {/* Company Information */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      About {opportunity.company_name}
+                      {t.aboutCompany} {opportunity.company_name}
                     </h3>
                     <div className="bg-gray-50 rounded-xl p-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex items-center gap-3">
                           <Building2 size={20} className="text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Company</p>
+                            <p className="text-sm font-medium text-gray-900">{t.company}</p>
                             <p className="text-sm text-gray-600">{opportunity.company_name}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <Globe size={20} className="text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Industry</p>
+                            <p className="text-sm font-medium text-gray-900">{t.industry}</p>
                             <p className="text-sm text-gray-600">{opportunity.industry}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <MapPin size={20} className="text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Location</p>
+                            <p className="text-sm font-medium text-gray-900">{t.location}</p>
                             <p className="text-sm text-gray-600">{opportunity.location}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <Clock size={20} className="text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Work Type</p>
+                            <p className="text-sm font-medium text-gray-900">{t.workType}</p>
                             <p className="text-sm text-gray-600">{opportunity.workstyle}</p>
                           </div>
                         </div>
@@ -290,27 +294,27 @@ export default function OpportunityDetailModal({
                   {/* Application Tips & Services */}
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      Boost Your Application Success
+                      {t.boostApplicationSuccess}
                     </h3>
 
                     {/* Free Tips */}
                     <div className="bg-primary/5 rounded-xl p-4 mb-4">
-                      <h4 className="font-medium text-gray-900 mb-2">Free Tips</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">{t.freeTips}</h4>
                       <ul className="space-y-2 text-sm text-gray-700">
                         <li className="flex items-start gap-2">
                           <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-                          <span>Tailor your application to highlight relevant skills mentioned in the job description</span>
+                          <span>{t.freeTip1}</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-                          <span>Research the company culture and values before applying</span>
+                          <span>{t.freeTip2}</span>
                         </li>
                       </ul>
                     </div>
 
                     {/* Professional Services */}
                     <div className="space-y-3">
-                      <h4 className="font-medium text-gray-900">Get Professional Help</h4>
+                      <h4 className="font-medium text-gray-900">{t.getProfessionalHelp}</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {/* Resume Building Service */}
                         <div className="bg-white border border-primary/20 rounded-lg p-3 sm:p-4 hover:border-primary/40 transition-colors">
@@ -319,12 +323,12 @@ export default function OpportunityDetailModal({
                               <FileText size={16} className="text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">Resume Builder</h5>
+                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.resumeBuilder}</h5>
                               <p className="text-xs text-primary font-medium">SAR 79</p>
                             </div>
                           </div>
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                            Professional resume review and optimization by industry experts
+                            {t.resumeBuilderDescription}
                           </p>
                           <Button
                             size="sm"
@@ -333,10 +337,10 @@ export default function OpportunityDetailModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               // TODO: Navigate to resume service
-                              toast.success("Resume service coming soon!");
+                              toast.success(t.resumeServiceComingSoon);
                             }}
                           >
-                            Get Started
+                            {t.getStarted}
                           </Button>
                         </div>
 
@@ -347,12 +351,12 @@ export default function OpportunityDetailModal({
                               <Globe size={16} className="text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">LinkedIn Pro</h5>
+                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.linkedInPro}</h5>
                               <p className="text-xs text-primary font-medium">SAR 39</p>
                             </div>
                           </div>
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                            Optimize your LinkedIn profile to attract recruiters and opportunities
+                            {t.linkedInProDescription}
                           </p>
                           <Button
                             size="sm"
@@ -361,10 +365,10 @@ export default function OpportunityDetailModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               // TODO: Navigate to LinkedIn service
-                              toast.success("LinkedIn service coming soon!");
+                              toast.success(t.linkedInServiceComingSoon);
                             }}
                           >
-                            Get Started
+                            {t.getStarted}
                           </Button>
                         </div>
 
@@ -375,12 +379,12 @@ export default function OpportunityDetailModal({
                               <Users size={16} className="text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">Mock Interview</h5>
+                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.mockInterview}</h5>
                               <p className="text-xs text-primary font-medium">SAR 99</p>
                             </div>
                           </div>
                           <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                            Practice with industry professionals and get personalized feedback
+                            {t.mockInterviewDescription}
                           </p>
                           <Button
                             size="sm"
@@ -389,10 +393,10 @@ export default function OpportunityDetailModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               // TODO: Navigate to interview service
-                              toast.success("Interview service coming soon!");
+                              toast.success(t.interviewServiceComingSoon);
                             }}
                           >
-                            Book Session
+                            {t.bookSession}
                           </Button>
                         </div>
                       </div>
@@ -412,11 +416,11 @@ export default function OpportunityDetailModal({
                           {(isApplying || isApplyingLocal) ? (
                             <>
                               <Loader2 size={20} className="animate-spin mr-2" />
-                              Applying...
+                              {t.applying}
                             </>
                           ) : (
                             <>
-                              Apply Now
+                              {t.applyNow}
                               <span className="ml-2 text-lg">→</span>
                             </>
                           )}
@@ -428,7 +432,7 @@ export default function OpportunityDetailModal({
                           size="lg"
                         >
                           <span className="mr-2 text-lg">✓</span>
-                          Applied
+                          {t.applied}
                         </Button>
                       )}
                     </div>
