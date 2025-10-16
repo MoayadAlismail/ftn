@@ -17,7 +17,6 @@ interface AboutYourselfProps {
   bio: string;
   setBio: (bio: string) => void;
   resumeFile: File | null;
-  resumeText: string | null; // Add pre-extracted resume text
   workStylePreference: string[];
   industryPreference: string[];
   locationPreference: string[];
@@ -28,7 +27,6 @@ interface AboutYourselfProps {
 export default function AboutYourself({
   bio,
   resumeFile,
-  resumeText,
   workStylePreference,
   industryPreference,
   locationPreference,
@@ -44,23 +42,37 @@ export default function AboutYourself({
   const router = useRouter();
 
   const handleGenerateBio = async () => {
-    // Use pre-extracted resume text for fast bio generation
-    if (!resumeText) {
-      toast.error(t.resumeNotAvailable);
-      return;
+    let file = resumeFile;
+    if (!file) {
+      const resumeData = localStorage.getItem("resumeFileBase64");
+      const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
+      if (!resumeData || !resumeTimestamp) {
+        toast.error("No resume found. Please upload your resume first.");
+        return;
+      }
+      // Convert base64 to File
+      const base64Response = resumeData.split(',')[1];
+      const binaryString = window.atob(base64Response);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      file = new File([blob], 'resume.pdf', { type: 'application/pdf' });
     }
-
     setIsGeneratingBio(true);
-    
     try {
-      // Generate bio using AI
+      const resumeText = await extractResumeText(file);
+      if (!resumeText) {
+        toast.error("Failed to extract text from resume");
+        return;
+      }
       const result = await generateBioFromResume({
         resumeText,
         workStylePreference,
         industryPreference,
         locationPreference,
       });
-
       if (result.success && result.bio) {
         setBio(result.bio);
         toast.success(t.bioGeneratedSuccess);

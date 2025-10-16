@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "@/contexts/LoadingContext";
-import { extractResumeText } from "@/lib/extract-resume";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { onboardingTranslations } from "@/lib/language/onboarding";
@@ -47,7 +46,6 @@ const ONBOARDING_STEPS = [
 
 interface OnboardingData {
     resumeFile: File | null;
-    resumeText: string | null; // Add extracted resume text
     locationPreference: string[];
     industryPreference: string[];
     workStylePreference: string[];
@@ -64,7 +62,6 @@ export default function TalentOnboarding() {
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({
         resumeFile: null,
-        resumeText: null,
         locationPreference: [],
         industryPreference: [],
         workStylePreference: [],
@@ -74,59 +71,6 @@ export default function TalentOnboarding() {
     useEffect(() => {
         // Auth is handled by middleware - user is guaranteed to be authenticated
     }, [user, router]);
-
-    useEffect(() => {
-        // Get existing resume data from localStorage and extract text immediately
-        const extractResumeOnStart = async () => {
-            const resumeData = localStorage.getItem("resumeFileBase64");
-            const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
-
-            if (resumeData && resumeTimestamp) {
-                // Check if resume data is not expired (1 hour)
-                const now = Date.now();
-                const uploadTime = parseInt(resumeTimestamp);
-                const isExpired = (now - uploadTime) > 3600000; // 1 hour
-
-                if (!isExpired) {
-                    try {
-                        // Convert base64 back to file
-                        const byteCharacters = atob(resumeData.split(',')[1]);
-                        const byteNumbers = new Array(byteCharacters.length);
-                        for (let i = 0; i < byteCharacters.length; i++) {
-                            byteNumbers[i] = byteCharacters.charCodeAt(i);
-                        }
-                        const byteArray = new Uint8Array(byteNumbers);
-                        const file = new File([byteArray], "resume.pdf", { type: "application/pdf" });
-
-                        // Extract text from resume immediately
-                        const resumeText = await extractResumeText(file);
-                        
-                        if (resumeText) {
-                            console.log("✅ Resume text extracted successfully, length:", resumeText.length);
-                            setOnboardingData(prev => ({ 
-                                ...prev, 
-                                resumeFile: file,
-                                resumeText: resumeText 
-                            }));
-                        } else {
-                            console.error("❌ Failed to extract resume text");
-                            setOnboardingData(prev => ({ ...prev, resumeFile: file }));
-                        }
-                    } catch (error) {
-                        console.error("Error parsing resume data:", error);
-                        localStorage.removeItem("resumeFileBase64");
-                        localStorage.removeItem("resumeUploadTimestamp");
-                    }
-                } else {
-                    // Remove expired data
-                    localStorage.removeItem("resumeFileBase64");
-                    localStorage.removeItem("resumeUploadTimestamp");
-                }
-            }
-        };
-
-        extractResumeOnStart();
-    }, []);
 
     const updateOnboardingData = useCallback((field: keyof OnboardingData, value: any) => {
         setOnboardingData(prev => ({
@@ -402,7 +346,6 @@ export default function TalentOnboarding() {
                                 bio={onboardingData.bio}
                                 setBio={setBio}
                                 resumeFile={onboardingData.resumeFile}
-                                resumeText={onboardingData.resumeText}
                                 workStylePreference={onboardingData.workStylePreference}
                                 industryPreference={onboardingData.industryPreference}
                                 locationPreference={onboardingData.locationPreference}
