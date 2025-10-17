@@ -15,6 +15,7 @@ import LocationPreference from "@/features/talent/onboarding/components/location
 import SelectIndustries from "@/features/talent/onboarding/components/select-industries";
 import SelectOpportunities from "@/features/talent/onboarding/components/select-opportunities";
 import AboutYourself from "@/features/talent/onboarding/components/about-yourself";
+import { LoadingSpinner } from "@/components/ui/loading-states";
 
 // Define the onboarding steps
 const ONBOARDING_STEPS = [
@@ -67,6 +68,7 @@ export default function TalentOnboarding() {
         workStylePreference: [],
         bio: ''
     });
+    const [isFinalizing, setIsFinalizing] = useState(false);
 
     useEffect(() => {
         // Auth is handled by middleware - user is guaranteed to be authenticated
@@ -116,7 +118,7 @@ export default function TalentOnboarding() {
             toast.error(t.userNotAuthenticated);
             return;
         }
-
+        setIsFinalizing(true);
         startLoading();
 
         try {
@@ -223,25 +225,6 @@ export default function TalentOnboarding() {
                     }
                 }
 
-                // Verify profile was created by checking it exists
-                try {
-                    const { data: verifyData, error: verifyError } = await supabase
-                        .from('talents')
-                        .select('id, user_id')
-                        .eq('user_id', user.id)
-                        .maybeSingle();
-
-                    if (verifyError || !verifyData) {
-                        console.error("Profile verification failed:", verifyError);
-                        toast.error(t.profileVerificationFailed);
-                        return;
-                    }
-                } catch (verifyError) {
-                    console.error("Error verifying profile:", verifyError);
-                    toast.error(t.profileVerificationFailed);
-                    return;
-                }
-
                 // Update user metadata to mark as onboarded (non-blocking but important)
                 try {
                     const { error: metadataError } = await supabase.auth.updateUser({
@@ -303,73 +286,81 @@ export default function TalentOnboarding() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
             <div className="max-w-4xl mx-auto px-4 py-8">
-                <AnimatePresence mode="wait" custom={1}>
-                    <motion.div
-                        key={currentStep}
-                        custom={1}
-                        variants={stepVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.2 }
-                        }}
-                    >
-                        {currentStepConfig.id === 'location' && (
-                            <LocationPreference
-                                locationPreference={onboardingData.locationPreference[0] || ''}
-                                setLocationPreference={setLocationPreference}
-                                next={nextStep}
-                                {...(currentStep > 0 && { prev: prevStep })}
-                            />
-                        )}
-                        {currentStepConfig.id === 'industries' && (
-                            <SelectIndustries
-                                industryPreference={onboardingData.industryPreference}
-                                setIndustryPreference={setIndustryPreference}
-                                next={nextStep}
-                                prev={prevStep}
-                            />
-                        )}
-                        {currentStepConfig.id === 'opportunities' && (
-                            <SelectOpportunities
-                                setResumeFile={setResumeFile}
-                                workStylePreference={onboardingData.workStylePreference}
-                                setWorkStylePreference={setWorkStylePreference}
-                                next={nextStep}
-                                prev={prevStep}
-                            />
-                        )}
-                        {currentStepConfig.id === 'about' && (
-                            <AboutYourself
-                                bio={onboardingData.bio}
-                                setBio={setBio}
-                                resumeFile={onboardingData.resumeFile}
-                                workStylePreference={onboardingData.workStylePreference}
-                                industryPreference={onboardingData.industryPreference}
-                                locationPreference={onboardingData.locationPreference}
-                                prev={prevStep}
-                                onComplete={completeOnboarding}
-                            />
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-
-                {/* Step Navigation */}
-                <div className="flex justify-center mt-8 space-x-2">
-                    {ONBOARDING_STEPS.map((_, index) => (
-                        <div
-                            key={index}
-                            className={`w-3 h-3 rounded-full transition-colors duration-200 ${index === currentStep
-                                ? 'bg-blue-500'
-                                : index < currentStep
-                                    ? 'bg-green-500'
-                                    : 'bg-gray-300'
-                                }`}
-                        />
-                    ))}
-                </div>
+                {isFinalizing ? (
+                    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                        <LoadingSpinner size="lg" className="mb-4 text-primary" />
+                        <p className="text-lg text-gray-700">{t.finalizingProfile}</p>
+                    </div>
+                ) : (
+                    <>
+                        <AnimatePresence mode="wait" custom={1}>
+                            <motion.div
+                                key={currentStep}
+                                custom={1}
+                                variants={stepVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{
+                                    x: { type: "spring", stiffness: 300, damping: 30 },
+                                    opacity: { duration: 0.2 }
+                                }}
+                            >
+                                {currentStepConfig.id === 'location' && (
+                                    <LocationPreference
+                                        locationPreference={onboardingData.locationPreference[0] || ''}
+                                        setLocationPreference={setLocationPreference}
+                                        next={nextStep}
+                                        {...(currentStep > 0 && { prev: prevStep })}
+                                    />
+                                )}
+                                {currentStepConfig.id === 'industries' && (
+                                    <SelectIndustries
+                                        industryPreference={onboardingData.industryPreference}
+                                        setIndustryPreference={setIndustryPreference}
+                                        next={nextStep}
+                                        prev={prevStep}
+                                    />
+                                )}
+                                {currentStepConfig.id === 'opportunities' && (
+                                    <SelectOpportunities
+                                        setResumeFile={setResumeFile}
+                                        workStylePreference={onboardingData.workStylePreference}
+                                        setWorkStylePreference={setWorkStylePreference}
+                                        next={nextStep}
+                                        prev={prevStep}
+                                    />
+                                )}
+                                {currentStepConfig.id === 'about' && (
+                                    <AboutYourself
+                                        bio={onboardingData.bio}
+                                        setBio={setBio}
+                                        resumeFile={onboardingData.resumeFile}
+                                        workStylePreference={onboardingData.workStylePreference}
+                                        industryPreference={onboardingData.industryPreference}
+                                        locationPreference={onboardingData.locationPreference}
+                                        prev={prevStep}
+                                        onComplete={completeOnboarding}
+                                    />
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                        {/* Step Navigation */}
+                        <div className="flex justify-center mt-8 space-x-2">
+                            {ONBOARDING_STEPS.map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`w-3 h-3 rounded-full transition-colors duration-200 ${index === currentStep
+                                        ? 'bg-blue-500'
+                                        : index < currentStep
+                                            ? 'bg-green-500'
+                                            : 'bg-gray-300'
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
