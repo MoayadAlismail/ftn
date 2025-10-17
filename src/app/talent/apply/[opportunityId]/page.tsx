@@ -19,6 +19,8 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type { Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { applicationsTranslations } from "@/lib/language";
 
 // Mock data - in real app, this would come from API
 const MOCK_OPPORTUNITY: Opportunity = {
@@ -50,6 +52,9 @@ export default function TalentApplicationPage() {
     const [portfolioUrl, setPortfolioUrl] = useState('');
     const [availability, setAvailability] = useState('');
 
+    const { language } = useLanguage();
+    const t = applicationsTranslations[language];
+
     useEffect(() => {
         loadOpportunity();
     }, [opportunityId]);
@@ -62,7 +67,7 @@ export default function TalentApplicationPage() {
             setOpportunity(MOCK_OPPORTUNITY);
         } catch (error) {
             console.error('Error loading opportunity:', error);
-            toast.error('Failed to load opportunity details');
+            toast.error(t.failedToLoadOpportunityToast);
         } finally {
             setLoading(false);
         }
@@ -71,7 +76,7 @@ export default function TalentApplicationPage() {
 
     const handleSubmitApplication = async () => {
         if (!coverLetter.trim()) {
-            toast.error('Please write a cover letter');
+            toast.error(t.coverLetterMissingToast);
             return;
         }
 
@@ -80,9 +85,9 @@ export default function TalentApplicationPage() {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             setStep('confirmation');
-            toast.success('Application submitted successfully!');
+            toast.success(t.applicationSubmissionSuccessToast);
         } catch (error) {
-            toast.error('Failed to submit application');
+            toast.error(t.applicationSubmissionFailToast);
         } finally {
             setProcessing(false);
         }
@@ -95,7 +100,7 @@ export default function TalentApplicationPage() {
 
         // After a short delay, show success message
         setTimeout(() => {
-            toast.success('Meeting scheduling opened! Please complete your booking.');
+            toast.success(t.meetingSchedulingToast);
         }, 1000);
     };
 
@@ -111,11 +116,9 @@ export default function TalentApplicationPage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-xl font-semibold text-gray-900">Opportunity not found</h2>
-                    <p className="text-gray-600 mt-2">The opportunity you're looking for doesn't exist.</p>
-                    <Button onClick={() => router.back()} className="mt-4">
-                        Go Back
-                    </Button>
+                    <h2 className="text-xl font-semibold text-gray-900">{t.notFoundTitle}</h2>
+                    <p className="text-gray-600 mt-2">{t.notFoundDesc}</p>
+                    <Button onClick={() => router.back()} className="mt-4">{t.goBack}</Button>
                 </div>
             </div>
         );
@@ -125,12 +128,9 @@ export default function TalentApplicationPage() {
         <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-4 md:space-y-6">
             {/* Header - Mobile Optimized */}
             <div className="space-y-3 md:space-y-0 md:flex md:items-center md:gap-4">
-                <Button variant="ghost" onClick={() => router.back()} className="w-fit">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
-                </Button>
+                <Button variant="ghost" onClick={() => router.back()} className="w-fit">{t.goBack}</Button>
                 <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Apply for Position</h1>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{t.applyForPosition}</h1>
                     <p className="text-sm md:text-base text-gray-600 mt-1">
                         {opportunity.title} at {opportunity.company_name}
                     </p>
@@ -143,8 +143,8 @@ export default function TalentApplicationPage() {
                     {/* Mobile Layout - Stacked */}
                     <div className="block md:hidden space-y-4">
                         {[
-                            { key: 'application', label: 'Application', icon: Info },
-                            { key: 'confirmation', label: 'Confirmation', icon: Check }
+                            { key: 'application', label: t.applicationStep, icon: Info },
+                            { key: 'confirmation', label: t.confirmationStep, icon: Check }
                         ].map((stepItem, index) => {
                             const Icon = stepItem.icon;
                             const isActive = step === stepItem.key;
@@ -163,12 +163,12 @@ export default function TalentApplicationPage() {
                                     </span>
                                     {isActive && (
                                         <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                            Current
+                                            {t.currentStep}
                                         </span>
                                     )}
                                     {isCompleted && (
                                         <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                            ✓ Done
+                                            ✓ {t.doneStep}
                                         </span>
                                     )}
                                 </div>
@@ -179,8 +179,8 @@ export default function TalentApplicationPage() {
                     {/* Desktop Layout - Horizontal */}
                     <div className="hidden md:flex items-center justify-between">
                         {[
-                            { key: 'application', label: 'Application', icon: Info },
-                            { key: 'confirmation', label: 'Confirmation', icon: Check }
+                            { key: 'application', label: t.applicationStep, icon: Info },
+                            { key: 'confirmation', label: t.confirmationStep, icon: Check }
                         ].map((stepItem, index) => {
                             const Icon = stepItem.icon;
                             const isActive = step === stepItem.key;
@@ -219,14 +219,14 @@ export default function TalentApplicationPage() {
                         >
                             <Card>
                                 <CardHeader className="pb-4">
-                                    <CardTitle className="text-lg md:text-xl">Application Details</CardTitle>
+                                    <CardTitle className="text-lg md:text-xl">{t.applicationDetails}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <Label htmlFor="coverLetter" className="text-sm font-medium">Cover Letter *</Label>
+                                        <Label htmlFor="coverLetter" className="text-sm font-medium">{t.coverLetter}</Label>
                                         <Textarea
                                             id="coverLetter"
-                                            placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+                                            placeholder={t.coverLetterPlaceholder}
                                             value={coverLetter}
                                             onChange={(e) => setCoverLetter(e.target.value)}
                                             className="min-h-[120px] md:min-h-[150px] mt-2 text-sm"
@@ -234,11 +234,11 @@ export default function TalentApplicationPage() {
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="portfolio" className="text-sm font-medium">Portfolio/Website URL</Label>
+                                        <Label htmlFor="portfolio" className="text-sm font-medium">{t.portfolioLabel}</Label>
                                         <Input
                                             id="portfolio"
                                             type="url"
-                                            placeholder="https://yourportfolio.com"
+                                            placeholder={t.portfolioPlaceholder}
                                             value={portfolioUrl}
                                             onChange={(e) => setPortfolioUrl(e.target.value)}
                                             className="mt-2 text-sm"
@@ -246,10 +246,10 @@ export default function TalentApplicationPage() {
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="availability" className="text-sm font-medium">When can you start?</Label>
+                                        <Label htmlFor="availability" className="text-sm font-medium">{t.availabilityLabel}</Label>
                                         <Input
                                             id="availability"
-                                            placeholder="e.g., Immediately, 2 weeks notice, etc."
+                                            placeholder={t.availabilityPlaceholder}
                                             value={availability}
                                             onChange={(e) => setAvailability(e.target.value)}
                                             className="mt-2 text-sm"
@@ -262,7 +262,7 @@ export default function TalentApplicationPage() {
                                         className="w-full h-12"
                                         size="lg"
                                     >
-                                        {processing ? 'Submitting...' : 'Submit Application'}
+                                        {processing ? t.submitting : t.submitApplication}
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -281,29 +281,20 @@ export default function TalentApplicationPage() {
                                         <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <Check className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
                                         </div>
-                                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight">
-                                            Application Submitted Successfully!
-                                        </h2>
-                                        <p className="text-sm md:text-base text-gray-600 px-4">
-                                            Your application has been sent to {opportunity.company_name}.
-                                            You'll receive updates via email.
-                                        </p>
+                                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight">{t.applicationSubmittedTitle}</h2>
+                                        <p className="text-sm md:text-base text-gray-600 px-4">{t.applicationSubmittedDesc.replace('{company}', opportunity.company_name)}</p>
                                     </div>
 
                                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 mb-6">
-                                        <h3 className="text-base md:text-lg font-semibold text-blue-900 mb-2">
-                                            Schedule Your Consultation
-                                        </h3>
-                                        <p className="text-sm md:text-base text-blue-800 mb-4">
-                                            Book a free 30-minute consultation with our career experts to maximize your chances of success.
-                                        </p>
+                                        <h3 className="text-base md:text-lg font-semibold text-blue-900 mb-2">{t.scheduleConsultation}</h3>
+                                        <p className="text-sm md:text-base text-blue-800 mb-4">{t.scheduleConsultationDesc}</p>
                                         <Button
                                             onClick={handleScheduleCalendly}
                                             className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
                                             size="lg"
                                         >
                                             <Calendar className="h-4 w-4 mr-2" />
-                                            Schedule Meeting
+                                            {t.scheduleMeeting}
                                         </Button>
                                     </div>
 
@@ -313,13 +304,13 @@ export default function TalentApplicationPage() {
                                             onClick={() => router.push('/talent/opportunities')}
                                             className="w-full md:w-auto"
                                         >
-                                            Browse More Jobs
+                                            {t.browseMoreJobs}
                                         </Button>
                                         <Button
                                             onClick={() => router.push('/talent/opportunities')}
                                             className="w-full md:w-auto"
                                         >
-                                            View More Jobs
+                                            {t.viewMoreJobs}
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -333,7 +324,7 @@ export default function TalentApplicationPage() {
                     {/* Opportunity Summary */}
                     <Card>
                         <CardHeader className="pb-4">
-                            <CardTitle className="text-base md:text-lg">Position Summary</CardTitle>
+                            <CardTitle className="text-base md:text-lg">{t.applicationDetails}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
@@ -365,7 +356,7 @@ export default function TalentApplicationPage() {
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                                         <span className="text-xs md:text-sm font-medium text-green-800">
-                                            {opportunity.matchScore}% Match
+                                            {opportunity.matchScore}% {t.match}
                                         </span>
                                     </div>
                                 </div>
@@ -377,10 +368,8 @@ export default function TalentApplicationPage() {
                     <Card>
                         <CardContent className="pt-4 md:pt-6">
                             <div className="text-center text-sm text-gray-600">
-                                <p className="mb-2">Need help?</p>
-                                <Button variant="link" className="text-sm p-0 h-auto text-blue-600 hover:text-blue-800">
-                                    Contact Support
-                                </Button>
+                                <p className="mb-2">{t.needHelp}</p>
+                                <Button variant="link" className="text-sm p-0 h-auto text-blue-600 hover:text-blue-800">{t.contactSupport}</Button>
                             </div>
                         </CardContent>
                     </Card>

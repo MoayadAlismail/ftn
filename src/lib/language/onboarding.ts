@@ -48,6 +48,7 @@ export const onboardingTranslations = {
     profileVerificationFailed: "Profile creation verification failed. Please try again.",
     operationTimedOut: "The process is taking longer than expected. Please try again.",
     unexpectedError: "An unexpected error occurred. Please try again.",
+    finalizingProfile: "Finalizing your profile... Please wait.",
     
     // Opportunity labels (for display, not database values)
     fullTimeLabel: "Full-time Jobs",
@@ -104,6 +105,7 @@ export const onboardingTranslations = {
     profileVerificationFailed: "فشل التحقق من إنشاء الملف الشخصي. يرجى المحاولة مرة أخرى.",
     operationTimedOut: "العملية تستغرق وقتًا أطول من المتوقع. يرجى المحاولة مرة أخرى.",
     unexpectedError: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+    finalizingProfile: "جارٍ إنهاء إعداد ملفك الشخصي... يرجى الانتظار.",
     
     // Opportunity labels (for display, not database values)
     fullTimeLabel: "وظائف بدوام كامل",
