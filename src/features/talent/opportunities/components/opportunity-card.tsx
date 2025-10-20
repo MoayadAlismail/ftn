@@ -229,7 +229,7 @@ const OpportunityCard = memo(function OpportunityCard({
                         </div>
 
                         <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
+                            <div className="space-y-3">
                                 <div className="flex-1">
                                     <h3 className="text-xl font-semibold text-gray-900 mb-1">
                                         {opportunity.title}
@@ -251,7 +251,7 @@ const OpportunityCard = memo(function OpportunityCard({
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 ml-4">
+                                <div className="flex items-center gap-2">
                                     {opportunity.matchScore && (
                                         <Badge variant="default" className="bg-gradient-to-r from-green-500 to-green-600 text-white">
                                             {opportunity.matchScore}% {t.match}
@@ -265,13 +265,13 @@ const OpportunityCard = memo(function OpportunityCard({
                                     >
                                         {isSaved ? (
                                             <>
-                                                <Heart className="h-4 w-4 fill-current sm:mr-2" />
-                                                <span className="hidden sm:inline">{t.saved}</span>
+                                                <Heart className="h-4 w-4 fill-current mr-2" />
+                                                <span>{t.saved}</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Heart className="h-4 w-4 sm:mr-2" />
-                                                <span className="hidden sm:inline">{t.save}</span>
+                                                <Heart className="h-4 w-4 mr-2" />
+                                                <span>{t.save}</span>
                                             </>
                                         )}
                                     </Button>
@@ -317,10 +317,9 @@ const OpportunityCard = memo(function OpportunityCard({
                     </div>
                 )}
 
-                {/* Action Buttons - Mobile Responsive */}
-                <div className="pt-4 border-t space-y-3">
-                    {/* Mobile Layout - Stack vertically */}
-                    <div className="flex flex-col sm:hidden space-y-3">
+                {/* Action Buttons */}
+                <div className="pt-4 border-t">
+                    <div className="flex flex-col space-y-3">
                         <Button onClick={handleApply} size="sm" className="w-full">
                             {t.applyNow}
                         </Button>
@@ -332,26 +331,6 @@ const OpportunityCard = memo(function OpportunityCard({
                             <Button onClick={handleShare} variant="ghost" size="sm" className="flex-1">
                                 <Share2 className="h-4 w-4 mr-2" />
                                 {t.share}
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Desktop Layout - Horizontal */}
-                    <div className="hidden sm:flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <Button onClick={handleViewDetails} variant="outline" size="sm">
-                                <Eye className="h-4 w-4 mr-2" />
-                                {t.viewDetails}
-                            </Button>
-                            <Button onClick={handleShare} variant="ghost" size="sm">
-                                <Share2 className="h-4 w-4 mr-2" />
-                                {t.share}
-                            </Button>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button onClick={handleApply} size="sm">
-                                {t.applyNow}
                             </Button>
                         </div>
                     </div>
