@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, Users, Briefcase, Loader2, User, ArrowRight } from "lucide-react";
+import { Building2, Globe, Users, Briefcase, Loader2, User, ArrowRight, Upload, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { employerTranslations } from "@/lib/language";
+import { toast } from "sonner";
 
 // Loading skeleton for onboarding page
 function OnboardingSkeleton() {
@@ -67,6 +68,9 @@ function EmployerOnboardingContent() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -115,6 +119,36 @@ function EmployerOnboardingContent() {
     return <OnboardingSkeleton />;
   }
 
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(t.invalidFileType || 'Please upload an image file');
+        return;
+      }
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(t.fileTooLarge || 'File size must be less than 10MB');
+        return;
+      }
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     setIsSubmitting(true);
     e.preventDefault();
@@ -128,6 +162,27 @@ function EmployerOnboardingContent() {
         return;
       }
 
+      // Upload logo if provided
+      let logoUrl = null;
+      if (logoFile) {
+        const fileExt = logoFile.name.split('.').pop();
+        const filePath = `${userId}/company-logo.${fileExt}`;
+        
+        const { data: logoUpload, error: uploadError } = await supabase.storage
+          .from("company-logos")
+          .upload(filePath, logoFile, {
+            upsert: true,
+            contentType: logoFile.type
+          });
+        
+        if (uploadError) {
+          console.error("Logo upload error:", uploadError);
+          toast.error(t.logoUploadError || 'Failed to upload company logo');
+        } else {
+          logoUrl = logoUpload.path;
+        }
+      }
+
       // Prepare employer data
       const employerData = {
         user_id: userId,
@@ -138,6 +193,7 @@ function EmployerOnboardingContent() {
         company_size: formData.companySize,
         company_industry: formData.companyIndustry,
         description: formData.companyDescription,
+        company_logo_url: logoUrl,
       };
 
       // Insert into "employers" table
@@ -388,6 +444,57 @@ function EmployerOnboardingContent() {
                       onChange={handleChange}
                       required
                     />
+                  </div>
+
+                  {/* Company Logo Upload */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {t.companyLogo || 'Company Logo'} <span className="text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <div className="flex items-center gap-4">
+                      {logoPreview ? (
+                        <div className="relative">
+                          <img 
+                            src={logoPreview} 
+                            alt="Company logo preview" 
+                            className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRemoveLogo}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                          <ImageIcon size={32} className="text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoChange}
+                          className="hidden"
+                          id="logoUpload"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full sm:w-auto"
+                        >
+                          <Upload size={16} className="mr-2" />
+                          {logoPreview ? (t.changeLogo || 'Change Logo') : (t.uploadLogo || 'Upload Logo')}
+                        </Button>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {t.logoRequirements || 'PNG, JPG or SVG. Max 10MB.'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Card>
