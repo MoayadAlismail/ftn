@@ -25,11 +25,13 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { applicationsTranslations } from "@/lib/language";
+import { CompanyLogo } from "@/components/ui/company-logo";
 
 interface Opportunity {
   id: string;
   title: string;
   company_name: string;
+  company_logo_url?: string;
   description: string;
   location: string;
   industry: string;
@@ -165,15 +167,17 @@ export default function OpportunityDetailModal({
 
                 <div className="pr-10 sm:pr-12">
                   <div className="flex items-start gap-3 sm:gap-4 mb-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
-                      <Briefcase size={20} className="text-primary sm:w-6 sm:h-6" />
-                    </div>
+                    <CompanyLogo 
+                      logoUrl={opportunity.company_logo_url}
+                      companyName={opportunity.company_name}
+                      size="lg"
+                      className="flex-shrink-0"
+                    />
                     <div className="flex-1 min-w-0">
                       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 line-clamp-2">
                         {opportunity.title}
                       </h1>
                       <div className="flex items-center gap-2 mb-3">
-                        <Building2 size={16} className="text-gray-500 flex-shrink-0" />
                         <span className="text-base sm:text-lg font-semibold text-gray-700 truncate">
                           {opportunity.company_name}
                         </span>

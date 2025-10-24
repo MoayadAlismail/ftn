@@ -22,6 +22,7 @@ export interface Opportunity {
     title: string;
     company_name?: string;
     company?: string;
+    company_logo_url?: string;
     location: string;
     workstyle?: string;
     postedDate?: string;

@@ -227,7 +227,7 @@ function OpportunitiesPageContent() {
       // Get the employer record ID (not the auth user ID)
       const { data: employerData, error: employerError } = await supabase
         .from("employers")
-        .select("id")
+        .select("id, company_name, company_logo_url")
         .eq("user_id", auth_user_id)
         .single();
         
@@ -238,6 +238,7 @@ function OpportunitiesPageContent() {
       const dataToInsert = {
         ...formData,
         user_id: employerData.id, // Use employer ID, not auth user ID
+        company_logo_url: employerData.company_logo_url, // Include company logo
         workstyle: formData.workstyle.join(", "), // Join array for storage
         industry: formData.industry.join(", "), // Join array for storage
         skills: formData.skills, // Already an array

@@ -208,6 +208,23 @@ export const employerTranslations = {
     newPasswordPlaceholder: "New password",
     confirmPasswordPlaceholder: "Confirm password",
     updatePassword: "Update password",
+
+    // Company Logo
+    companyLogo: "Company Logo",
+    uploadLogo: "Upload Logo",
+    changeLogo: "Change Logo",
+    logoRequirements: "PNG, JPG or SVG. Max 10MB.",
+    invalidFileType: "Please upload an image file",
+    fileTooLarge: "File size must be less than 10MB",
+    logoUploadError: "Failed to upload company logo",
+    currentLogo: "Current logo",
+    uploadNewLogo: "Upload New Logo",
+    deleteLogo: "Delete Logo",
+    logoDeleted: "Logo deleted successfully",
+    failedToDeleteLogo: "Failed to delete logo",
+    failedToLoadData: "Failed to load settings",
+    settingsSaved: "Settings saved successfully",
+    failedToSaveSettings: "Failed to save settings",
   },
   ar: {
     // Navigation
@@ -418,6 +435,23 @@ export const employerTranslations = {
     newPasswordPlaceholder: "كلمة مرور جديدة",
     confirmPasswordPlaceholder: "تأكيد كلمة المرور",
     updatePassword: "تحديث كلمة المرور",
+
+    // Company Logo
+    companyLogo: "شعار الشركة",
+    uploadLogo: "تحميل الشعار",
+    changeLogo: "تغيير الشعار",
+    logoRequirements: "PNG، JPG أو SVG. حد أقصى 10 ميجابايت.",
+    invalidFileType: "يرجى تحميل ملف صورة",
+    fileTooLarge: "يجب أن يكون حجم الملف أقل من 10 ميجابايت",
+    logoUploadError: "فشل تحميل شعار الشركة",
+    currentLogo: "الشعار الحالي",
+    uploadNewLogo: "تحميل شعار جديد",
+    deleteLogo: "حذف الشعار",
+    logoDeleted: "تم حذف الشعار بنجاح",
+    failedToDeleteLogo: "فشل حذف الشعار",
+    failedToLoadData: "فشل تحميل الإعدادات",
+    settingsSaved: "تم حفظ الإعدادات بنجاح",
+    failedToSaveSettings: "فشل حفظ الإعدادات",
   },
 };
 

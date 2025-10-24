@@ -84,7 +84,7 @@ export default function PostOpp() {
       
       const { data: employerData, error: employerError } = await supabase
         .from("employers")
-        .select("id")
+        .select("id, company_name, company_logo_url")
         .eq("user_id", auth_user_id)
         .single();
         
@@ -95,6 +95,7 @@ export default function PostOpp() {
       const dataToInsert = { 
         ...formData, 
         user_id: employerData.id, // Use employer ID, not auth user ID
+        company_logo_url: employerData.company_logo_url, // Include company logo
         workstyle: formData.workstyle.join(", ") // Join array for storage
       };
       dataToInsert.skills = (dataToInsert.skills as string).split(",").map((skill) => skill.trim());

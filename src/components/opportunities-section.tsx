@@ -8,11 +8,13 @@ import { MapPin, Building2, Clock, Users, Calendar, ChevronRight } from "lucide-
 import { supabase } from "@/lib/supabase/client";
 import LoadingAnimation from "@/components/loadingAnimation";
 import OpportunityDetailModal from "@/components/opportunity-detail-modal";
+import { CompanyLogo } from "@/components/ui/company-logo";
 
 interface Opportunity {
   id: string;
   title: string;
   company_name: string;
+  company_logo_url?: string;
   description: string;
   location: string;
   industry: string;
@@ -46,13 +48,17 @@ const OpportunityCard = ({
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
-                {opportunity.title}
-              </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <Building2 size={16} className="text-gray-500" />
-                <span className="text-gray-600 font-medium">{opportunity.company_name}</span>
+            <div className="flex-1 flex items-start gap-3">
+              <CompanyLogo 
+                logoUrl={opportunity.company_logo_url}
+                companyName={opportunity.company_name}
+                size="md"
+              />
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                  {opportunity.title}
+                </h3>
+                <p className="text-gray-600 font-medium mt-1">{opportunity.company_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">

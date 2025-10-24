@@ -286,6 +286,7 @@ function TalentOpportunitiesContent() {
                 id: opp.id,
                 title: opp.title,
                 company_name: opp.company_name,
+                company_logo_url: opp.company_logo_url,
                 location: opp.location,
                 industry: opp.industry,
                 workstyle: opp.workstyle,
@@ -321,7 +322,7 @@ function TalentOpportunitiesContent() {
             const { data: opportunities, error } = await supabase
                 .from('opportunities')
                 .select(`
-                    id, title, company_name, location, industry, workstyle,
+                    id, title, company_name, company_logo_url, location, industry, workstyle,
                     skills, description, created_at
                 `)
                 .order('created_at', { ascending: false })
@@ -333,6 +334,7 @@ function TalentOpportunitiesContent() {
                 id: opp.id,
                 title: opp.title,
                 company_name: opp.company_name,
+                company_logo_url: opp.company_logo_url,
                 location: opp.location,
                 industry: opp.industry,
                 workstyle: opp.workstyle,

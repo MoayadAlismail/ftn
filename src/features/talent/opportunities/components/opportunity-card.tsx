@@ -21,11 +21,13 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { opportunitiesTranslations } from "@/lib/language/opportunities";
+import { CompanyLogo } from "@/components/ui/company-logo";
 
 export interface Opportunity {
     id: string;
     title: string;
     company_name: string;
+    company_logo_url?: string;
     location: string;
     industry: string;
     workstyle: string;
@@ -113,9 +115,12 @@ const OpportunityCard = memo(function OpportunityCard({
                     {/* Mobile Layout - Stack content */}
                     <div className="block sm:hidden space-y-3">
                         <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Building2 className="h-5 w-5 text-white" />
-                            </div>
+                            <CompanyLogo 
+                                logoUrl={opportunity.company_logo_url}
+                                companyName={opportunity.company_name}
+                                size="sm"
+                                className="flex-shrink-0"
+                            />
                             <div className="flex-1 min-w-0">
                                 <h3 className="font-semibold text-gray-900 truncate">{opportunity.title}</h3>
                                 <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
@@ -168,9 +173,12 @@ const OpportunityCard = memo(function OpportunityCard({
                         <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <Building2 className="h-5 w-5 text-white" />
-                                    </div>
+                                    <CompanyLogo 
+                                        logoUrl={opportunity.company_logo_url}
+                                        companyName={opportunity.company_name}
+                                        size="sm"
+                                        className="flex-shrink-0"
+                                    />
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-semibold text-gray-900 truncate">{opportunity.title}</h3>
                                         <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
@@ -224,9 +232,11 @@ const OpportunityCard = memo(function OpportunityCard({
             <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <Building2 className="h-6 w-6 text-white" />
-                        </div>
+                        <CompanyLogo 
+                            logoUrl={opportunity.company_logo_url}
+                            companyName={opportunity.company_name}
+                            size="md"
+                        />
 
                         <div className="flex-1 min-w-0">
                             <div className="space-y-3">
