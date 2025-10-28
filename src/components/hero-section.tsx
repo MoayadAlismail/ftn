@@ -90,18 +90,38 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   const [isDragging, setIsDragging] = useState(false);
 
   const processSelectedFile = (file: File | null) => {
-    setResumeFile(file);
     if (!file) return;
+    
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+    
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+    
+    setResumeFile(file);
+    setUploadStatus("uploading");
+    
     const reader = new FileReader();
     reader.onload = function (event) {
       if (event.target && typeof event.target.result === "string") {
         localStorage.setItem("resumeFileBase64", event.target.result);
         localStorage.setItem("resumeFileName", file.name);
         localStorage.setItem("resumeUploadTimestamp", Date.now().toString());
+        setUploadStatus("success");
       }
     };
+    reader.onerror = function () {
+      toast.error("Failed to read file. Please try again.");
+      setUploadStatus("idle");
+      setResumeFile(null);
+    };
     reader.readAsDataURL(file);
-    setUploadStatus("success");
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

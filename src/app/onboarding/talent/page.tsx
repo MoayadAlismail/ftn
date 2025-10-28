@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { onboardingTranslations } from "@/lib/language/onboarding";
 
 // Import onboarding components
+import ResumeUploadStep from "@/features/talent/onboarding/components/resume-upload-step";
 import LocationPreference from "@/features/talent/onboarding/components/location-preference";
 import SelectIndustries from "@/features/talent/onboarding/components/select-industries";
 import SelectOpportunities from "@/features/talent/onboarding/components/select-opportunities";
@@ -19,6 +20,12 @@ import { LoadingSpinner } from "@/components/ui/loading-states";
 
 // Define the onboarding steps
 const ONBOARDING_STEPS = [
+    {
+        id: 'resume',
+        title: 'Resume Upload (Optional)',
+        description: 'Upload your resume to enhance your profile',
+        component: ResumeUploadStep
+    },
     {
         id: 'location',
         title: 'Location Preferences',
@@ -72,6 +79,7 @@ export default function TalentOnboarding() {
 
     useEffect(() => {
         // Auth is handled by middleware - user is guaranteed to be authenticated
+        // Resume loading is handled by the ResumeUploadStep component
     }, [user, router]);
 
     const updateOnboardingData = useCallback((field: keyof OnboardingData, value: any) => {
@@ -242,6 +250,7 @@ export default function TalentOnboarding() {
 
                 // Clean up localStorage
                 localStorage.removeItem("resumeFileBase64");
+                localStorage.removeItem("resumeFileName");
                 localStorage.removeItem("resumeUploadTimestamp");
 
                 return true;
@@ -306,6 +315,13 @@ export default function TalentOnboarding() {
                                     opacity: { duration: 0.2 }
                                 }}
                             >
+                                {currentStepConfig.id === 'resume' && (
+                                    <ResumeUploadStep
+                                        resumeFile={onboardingData.resumeFile}
+                                        setResumeFile={setResumeFile}
+                                        next={nextStep}
+                                    />
+                                )}
                                 {currentStepConfig.id === 'location' && (
                                     <LocationPreference
                                         locationPreference={onboardingData.locationPreference[0] || ''}

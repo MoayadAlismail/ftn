@@ -57,13 +57,13 @@ export default function SelectIndustries({
         {/* Progress Indicator */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-xs sm:text-sm text-gray-600 mb-2">
-            <span>{t.stepOf} 2 {t.of} 4</span>
-            <span>{Math.round((2 / 4) * 100)}% {t.complete}</span>
+            <span>{t.stepOf} 3 {t.of} 5</span>
+            <span>{Math.round((3 / 5) * 100)}% {t.complete}</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
               className="h-full bg-primary rounded-full transition-all"
-              style={{ width: "50%" }}
+              style={{ width: "60%" }}
             />
           </div>
         </div>
