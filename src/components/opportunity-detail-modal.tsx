@@ -16,7 +16,8 @@ import {
   Mail,
   Phone,
   Loader2,
-  FileText
+  FileText,
+  UserCircle
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -24,8 +25,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { applicationsTranslations } from "@/lib/language";
+import { applicationsTranslations, opportunitiesTranslations } from "@/lib/language";
 import { CompanyLogo } from "@/components/ui/company-logo";
+import { useTalentProfile } from "@/hooks/useTalentProfile";
 
 interface Opportunity {
   id: string;
@@ -62,8 +64,10 @@ export default function OpportunityDetailModal({
   const { user } = useAuth();
   const { language } = useLanguage();
   const t = applicationsTranslations[language];
+  const opportunityT = opportunitiesTranslations[language];
   const router = useRouter();
   const [isApplyingLocal, setIsApplyingLocal] = useState(false);
+  const { hasResume, isLoading: profileLoading } = useTalentProfile();
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -84,6 +88,14 @@ export default function OpportunityDetailModal({
   const handleApply = async () => {
     if (!user?.id) {
       router.push("/auth/talent/signup");
+      return;
+    }
+
+    // Check if user has resume
+    if (!hasResume) {
+      toast.error(opportunityT.noResumeCannotApply);
+      onClose();
+      router.push("/talent/profile");
       return;
     }
 
@@ -409,26 +421,36 @@ export default function OpportunityDetailModal({
 
                   {/* Apply Button - Now inside scrollable area */}
                   <div className="border-t pt-6 pb-6 bg-white">
-                    <div className="flex items-center justify-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
                       {!hasApplied ? (
-                        <Button
-                          onClick={handleApply}
-                          disabled={isApplying || isApplyingLocal}
-                          className="px-8 py-3 font-bold bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                          size="lg"
-                        >
-                          {(isApplying || isApplyingLocal) ? (
-                            <>
-                              <Loader2 size={20} className="animate-spin mr-2" />
-                              {t.applying}
-                            </>
-                          ) : (
-                            <>
-                              {t.applyNow}
-                              <span className="ml-2 text-lg">→</span>
-                            </>
-                          )}
-                        </Button>
+                        <div className="w-full max-w-md space-y-3">
+                          <div className="relative group">
+                            <Button
+                              onClick={handleApply}
+                              disabled={isApplying || isApplyingLocal}
+                              className={`w-full px-8 py-3 font-bold bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${!hasResume ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              size="lg"
+                            >
+                              {(isApplying || isApplyingLocal) ? (
+                                <>
+                                  <Loader2 size={20} className="animate-spin mr-2" />
+                                  {t.applying}
+                                </>
+                              ) : (
+                                <>
+                                  {t.applyNow}
+                                  <span className="ml-2 text-lg">→</span>
+                                </>
+                              )}
+                            </Button>
+                            {!hasResume && (
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                                {opportunityT.uploadResumeToApply}
+                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       ) : (
                         <Button
                           disabled
