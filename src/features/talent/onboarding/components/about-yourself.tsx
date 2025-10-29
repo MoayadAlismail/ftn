@@ -72,7 +72,7 @@ export default function AboutYourself({
       const resumeData = localStorage.getItem("resumeFileBase64");
       const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
       if (!resumeData || !resumeTimestamp) {
-        toast.error("No resume found. Please upload your resume first.");
+        toast.error(t.noResumeFound);
         return;
       }
       // Convert base64 to File
@@ -176,7 +176,7 @@ export default function AboutYourself({
                   </Button>
                   {!hasResume && (
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
-                      Upload resume to make use of this button
+                      {t.uploadResumeTooltip}
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
                     </div>
                   )}
@@ -189,11 +189,11 @@ export default function AboutYourself({
               </p>
               {hasResume ? (
                 <p className="text-xs text-green-600 flex items-center gap-1">
-                  ✓ Resume uploaded
+                  {t.resumeUploaded}
                 </p>
               ) : (
                 <p className="text-xs text-gray-500">
-                  No resume uploaded
+                  {t.noResumeUploaded}
                 </p>
               )}
             </div>

@@ -14,6 +14,7 @@ import { Role } from "@/constants/enums";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { homeTranslations } from "@/lib/language/home";
 import LanguageSelector from "./language-selector";
+import { toast } from "sonner";
 
 const FloatingCard = ({
   children,
@@ -94,13 +95,13 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
     
     // Validate file type
     if (file.type !== "application/pdf") {
-      toast.error("Please upload a PDF file");
+      toast.error(t.pdfOnly);
       return;
     }
     
     // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("File size must be less than 10MB");
+      toast.error(t.fileSizeLimit);
       return;
     }
     
@@ -117,7 +118,7 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
       }
     };
     reader.onerror = function () {
-      toast.error("Failed to read file. Please try again.");
+      toast.error(t.fileReadError);
       setUploadStatus("idle");
       setResumeFile(null);
     };

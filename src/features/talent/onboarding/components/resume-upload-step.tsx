@@ -79,12 +79,12 @@ export default function ResumeUploadStep({
     if (!file) return;
     
     if (file.type !== "application/pdf") {
-      toast.error("Please upload a PDF file");
+      toast.error(t.pdfOnly);
       return;
     }
     
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("File size must be less than 10MB");
+      toast.error(t.fileSizeLimit);
       return;
     }
 
@@ -100,11 +100,11 @@ export default function ResumeUploadStep({
         setExistingResumeName(file.name);
         setExistingResumeDate(new Date().toLocaleString());
         setUploadStatus("success");
-        toast.success("Resume uploaded successfully");
+        toast.success(t.resumeUploadSuccess);
       }
     };
     reader.onerror = function () {
-      toast.error("Failed to read file. Please try again.");
+      toast.error(t.fileReadError);
       setUploadStatus("idle");
       setResumeFile(null);
     };
@@ -155,7 +155,7 @@ export default function ResumeUploadStep({
     localStorage.removeItem("resumeFileBase64");
     localStorage.removeItem("resumeFileName");
     localStorage.removeItem("resumeUploadTimestamp");
-    toast.success("Resume removed");
+    toast.success(t.resumeRemoved);
   };
 
   const handleKeepResume = () => {
@@ -186,10 +186,10 @@ export default function ResumeUploadStep({
           <div className="space-y-2 flex flex-col items-center justify-center">
             <FileText size={32} className="sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-primary" />
             <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold">
-              {t.uploadResumeTitle || "Upload Your Resume (Optional)"}
+              {t.uploadResumeTitle}
             </h1>
             <p className="text-xs sm:text-sm text-gray-600">
-              {t.uploadResumeDescription || "Uploading your resume helps us match you better with opportunities"}
+              {t.uploadResumeDescription}
             </p>
           </div>
 
@@ -213,10 +213,10 @@ export default function ResumeUploadStep({
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-base sm:text-lg font-medium text-gray-900">
-                    {isDragging ? "Drop your PDF here" : "Upload Resume"}
+                    {isDragging ? t.dropPdfHere : t.uploadResumeText}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    Drag and drop or click to browse
+                    {t.dragDropOrClick}
                   </p>
                 </div>
                 <Input
@@ -235,10 +235,10 @@ export default function ResumeUploadStep({
                     fileInputRef.current?.click();
                   }}
                 >
-                  Choose File
+                  {t.chooseFile}
                 </Button>
                 <p className="text-xs text-gray-400 mt-2">
-                  Supported format: PDF (max 10MB)
+                  {t.supportedFormatPdf}
                 </p>
               </div>
             </div>
@@ -251,11 +251,11 @@ export default function ResumeUploadStep({
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base sm:text-lg font-medium text-gray-900 truncate">
-                      {existingResumeName || resumeFile?.name || "Resume Uploaded"}
+                      {existingResumeName || resumeFile?.name || t.resumeUploadedStatus}
                     </h3>
                     {existingResumeDate && (
                       <p className="text-xs text-gray-500 mt-1">
-                        Uploaded: {existingResumeDate}
+                        {t.uploadedOn} {existingResumeDate}
                       </p>
                     )}
                   </div>
@@ -271,7 +271,7 @@ export default function ResumeUploadStep({
                   className="flex-1"
                 >
                   <Upload size={16} className="mr-2" />
-                  Replace
+                  {t.replace}
                 </Button>
                 <Button
                   type="button"
@@ -281,7 +281,7 @@ export default function ResumeUploadStep({
                   className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <X size={16} className="mr-2" />
-                  Remove
+                  {t.remove}
                 </Button>
               </div>
               
@@ -304,13 +304,13 @@ export default function ResumeUploadStep({
             onClick={handleSkip}
             className="cursor-pointer"
           >
-            {t.skipForNow || "Skip for now"}
+            {t.skipForNow}
           </Button>
           <Button
             onClick={uploadStatus === "success" ? handleKeepResume : handleSkip}
             className="cursor-pointer"
           >
-            {uploadStatus === "success" ? `${t.next || "Next"} →` : `${t.skip || "Skip"} →`}
+            {uploadStatus === "success" ? t.next : `${t.skip} →`}
           </Button>
         </div>
       </Card>
