@@ -3,11 +3,10 @@ import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { Button } from '@/components/ui/button';
 import { Role } from '@/constants/enums'
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Home, Mail, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
+import { User, Home, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { useState } from 'react';
 import { ProfileMenu } from '@/components/profile-menu';
 import LanguageSelector from '@/components/language-selector';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,52 +17,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
   const { language } = useLanguage();
   const t = talentTranslations[language];
   const pathname = usePathname();
-  const [pendingInvitations, setPendingInvitations] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Fetch pending invitations count
-  useEffect(() => {
-    const fetchPendingInvitations = async () => {
-      if (!user?.id) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("invites")
-          .select("id")
-          .eq("talent_id", user.id)
-          .eq("status", "pending");
-
-        if (!error && data) {
-          setPendingInvitations(data.length);
-        }
-      } catch (error) {
-        console.error("Error fetching pending invitations:", error);
-      }
-    };
-
-    fetchPendingInvitations();
-
-    // Set up real-time subscription for invitations
-    const subscription = supabase
-      .channel('invitations')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'invites',
-          filter: `talent_id=eq.${user?.id}`
-        },
-        () => {
-          fetchPendingInvitations();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [user]);
 
   const navigationItems = [
     {
@@ -76,12 +30,6 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
       href: "/talent/applications",
       icon: FileText,
       label: t.navApplications
-    },
-    {
-      href: "/talent/invitations",
-      icon: Mail,
-      label: t.navInvitations,
-      badge: pendingInvitations > 0 ? pendingInvitations : undefined
     },
     {
       href: "/talent/services",

@@ -71,10 +71,6 @@ export default function EmployerDashboardHomeContent() {
   const [showFilters, setShowFilters] = useState(false);
   
   // Shared states
-  const [inviteOpenId, setInviteOpenId] = useState<any | null>(null);
-  const [inviteMessages, setInviteMessages] = useState<Record<string, string>>({});
-  const [invitingId, setInvitingId] = useState<string | null>(null);
-  const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [savedCandidatesIds, setSavedCandidatesIds] = useState<Set<String>>(new Set());
   const [selectedCandidate, setSelectedCandidate] = useState<Talent | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -93,20 +89,6 @@ export default function EmployerDashboardHomeContent() {
       );
     };
     fetchSavedCandidates();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchInvitedCandidates = async () => {
-      if (!user?.id) return;
-
-      const { data, error } = await supabase
-        .from("invites")
-        .select("talent_id")
-        .eq("employer_id", user.id);
-      console.log("invited candidates:", data);
-      setInvitedIds(new Set(data?.map((item) => String(item.talent_id)) || []));
-    };
-    fetchInvitedCandidates();
   }, [user]);
 
   // Load all talents on mount
@@ -298,12 +280,6 @@ export default function EmployerDashboardHomeContent() {
     applyFilters(); // Go back to filtered view
   };
 
-  const handleOpenInvite = useCallback((talentId: any) => {
-    setInviteOpenId((prev: any | null) =>
-      prev === talentId ? null : talentId
-    );
-  }, []);
-
   const saveCandidate = async (talentId: string) => {
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -329,41 +305,6 @@ export default function EmployerDashboardHomeContent() {
     setIsProfileModalOpen(false);
     setSelectedCandidate(null);
   }, []);
-
-  const handleInviteMessageChange = useCallback(
-    (talentId: any, message: string) => {
-      const key = String(talentId);
-      setInviteMessages((prev) => ({ ...prev, [key]: message }));
-    },
-    []
-  );
-
-  const handleSendInvite = async (talentId: any) => {
-    try {
-      const key = String(talentId);
-      const message = (inviteMessages[key] || "").trim();
-      if (!message) {
-        toast.error(t.pleaseEnterMessage);
-        return;
-      }
-      setInvitingId(key);
-      const employerId = user!.id;
-      const { error } = await supabase
-        .from("invites")
-        .insert([{ employer_id: employerId, talent_id: talentId, message }]);
-      if (error) {
-        toast.error(error.message || t.failedToSendInvite);
-        return;
-      }
-      setInvitedIds((prev) => new Set(prev).add(key));
-      setInviteOpenId(null);
-      toast.success(t.inviteSent);
-    } catch (e) {
-      toast.error(t.somethingWentWrong);
-    } finally {
-      setInvitingId(null);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -640,17 +581,6 @@ export default function EmployerDashboardHomeContent() {
                   {/* Action Buttons - Mobile */}
                   <div className="flex flex-col gap-2">
                     <Button
-                      size="sm"
-                      className="w-full cursor-pointer bg-primary hover:bg-primary/90"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenInvite(talent.id);
-                      }}
-                      disabled={invitedIds.has(String(talent.id))}
-                    >
-                      {invitedIds.has(String(talent.id)) ? t.invited : t.invite}
-                    </Button>
-                    <Button
                       variant="outline"
                       size="sm"
                       className="w-full"
@@ -696,19 +626,6 @@ export default function EmployerDashboardHomeContent() {
                                   ? t.saved
                                   : t.save}
                               </Button>
-                              <Button
-                                size="sm"
-                                className="cursor-pointer bg-primary hover:bg-primary/90"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenInvite(talent.id);
-                        }}
-                                disabled={invitedIds.has(String(talent.id))}
-                              >
-                                {invitedIds.has(String(talent.id))
-                                  ? t.invited
-                                  : t.invite}
-                              </Button>
                             </div>
                           </div>
 
@@ -738,47 +655,6 @@ export default function EmployerDashboardHomeContent() {
                               </div>
                             </div>
                           </div>
-
-                {/* Invite Message Section - Works for both mobile and desktop */}
-                          {inviteOpenId === talent.id && (
-                            <div className="mt-4 border rounded-md p-3 bg-gray-50/50">
-                              <div className="text-xs font-medium text-gray-500 mb-2">
-                                {t.messageToCandidate}
-                              </div>
-                              <Textarea
-                                placeholder={`Hi ${
-                                  talent.name?.split(" ")[0] || "there"
-                                }, I think you'd be a great fit...`}
-                      className="min-h-[70px] sm:min-h-[90px] text-sm"
-                                value={inviteMessages[String(talent.id)] || ""}
-                                onChange={(e) =>
-                        handleInviteMessageChange(talent.id, e.target.value)
-                                }
-                              />
-                    <div className="mt-2 flex flex-col sm:flex-row items-center gap-2 justify-end">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                        className="w-full sm:w-auto cursor-pointer"
-                                  onClick={() => setInviteOpenId(null)}
-                                >
-                                  {t.cancel}
-                                </Button>
-                                <Button
-                                  size="sm"
-                        className="w-full sm:w-auto cursor-pointer bg-primary hover:bg-primary/90"
-                                  onClick={() => handleSendInvite(talent.id)}
-                                  disabled={invitingId === String(talent.id)}
-                                >
-                                  {invitingId === String(talent.id) ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    t.sendInvite
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                          )}
                       </Card>
                     </motion.div>
                   ))}
