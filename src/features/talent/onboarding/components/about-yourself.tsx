@@ -40,6 +40,31 @@ export default function AboutYourself({
   const [isCompleting, setIsCompleting] = useState(false);
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const router = useRouter();
+  
+  // Check if resume is available and not expired
+  const hasResume = (() => {
+    if (resumeFile) return true;
+    
+    const resumeData = localStorage.getItem("resumeFileBase64");
+    const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
+    
+    if (!resumeData || !resumeTimestamp) return false;
+    
+    // Check if resume is older than 1 hour (3600000 ms)
+    const now = Date.now();
+    const uploadTime = parseInt(resumeTimestamp);
+    const isExpired = now - uploadTime > 3600000;
+    
+    if (isExpired) {
+      // Clean up expired data
+      localStorage.removeItem("resumeFileBase64");
+      localStorage.removeItem("resumeFileName");
+      localStorage.removeItem("resumeUploadTimestamp");
+      return false;
+    }
+    
+    return true;
+  })();
 
   const handleGenerateBio = async () => {
     let file = resumeFile;
@@ -47,7 +72,7 @@ export default function AboutYourself({
       const resumeData = localStorage.getItem("resumeFileBase64");
       const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
       if (!resumeData || !resumeTimestamp) {
-        toast.error("No resume found. Please upload your resume first.");
+        toast.error(t.noResumeFound);
         return;
       }
       // Convert base64 to File
@@ -105,7 +130,7 @@ export default function AboutYourself({
         {/* Progress indicator */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs sm:text-sm text-gray-600">
-            <span>{t.stepOf} 4 {t.of} 4</span>
+            <span>{t.stepOf} 5 {t.of} 5</span>
             <span>100% {t.complete}</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -133,30 +158,42 @@ export default function AboutYourself({
                 className="w-full h-24 sm:h-28 lg:h-32 text-sm sm:text-base resize-none flex-1"
               />
               <div className="flex sm:flex-col gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerateBio}
-                  disabled={isGeneratingBio}
-                  className="flex items-center gap-2 whitespace-nowrap"
-                >
-                  {isGeneratingBio ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-4 w-4" />
+                <div className="relative group">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateBio}
+                    disabled={!hasResume || isGeneratingBio}
+                    className="flex items-center gap-2 whitespace-nowrap"
+                  >
+                    {isGeneratingBio ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                    {isGeneratingBio ? t.generating : t.aiGenerate}
+                  </Button>
+                  {!hasResume && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                      {t.uploadResumeTooltip}
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                    </div>
                   )}
-                  {isGeneratingBio ? t.generating : t.aiGenerate}
-                </Button>
+                </div>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-xs sm:text-sm text-gray-600">
                 {bio.length} {t.characters} ({t.minimum} {minCharacters})
               </p>
-              {localStorage.getItem("resumeFileBase64") && (
-                <p className="text-xs text-blue-600">
+              {hasResume ? (
+                <p className="text-xs text-green-600 flex items-center gap-1">
                   {t.resumeUploaded}
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500">
+                  {t.noResumeUploaded}
                 </p>
               )}
             </div>

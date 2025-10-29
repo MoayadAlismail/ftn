@@ -25,29 +25,6 @@ export default function TalentSignup() {
   const [isLoading, setIsLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
 
-  // Check if resume data exists and is not expired
-  const checkResumeData = () => {
-    const resumeData = localStorage.getItem("resumeFileBase64");
-    const resumeTimestamp = localStorage.getItem("resumeUploadTimestamp");
-
-    if (!resumeData || !resumeTimestamp) {
-      return false;
-    }
-
-    // Check if resume data is older than 1 hour (3600000 ms)
-    const now = Date.now();
-    const uploadTime = parseInt(resumeTimestamp);
-    const isExpired = now - uploadTime > 3600000; // 1 hour expiry
-
-    if (isExpired) {
-      localStorage.removeItem("resumeFileBase64");
-      localStorage.removeItem("resumeUploadTimestamp");
-      return false;
-    }
-
-    return true;
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -73,13 +50,6 @@ export default function TalentSignup() {
 
   const handleEmailSignup = async () => {
     if (!validateForm()) return;
-
-    // Check if resume data exists
-    if (!checkResumeData()) {
-      toast.error("No resume data or has expired. Please upload your resume.");
-      router.push("/");
-      return;
-    }
 
     setIsLoading(true);
     startLoading();
@@ -146,13 +116,6 @@ export default function TalentSignup() {
   const handleSocialLogin = async (
     provider: "google" | "github" | "linkedin_oidc"
   ) => {
-    // Check if resume data exists
-    if (!checkResumeData()) {
-      toast.error("Resume data has expired. Please upload your resume again.");
-      router.push("/");
-      return;
-    }
-
     startLoading();
 
     const { success, error } = await handleOAuthLogin(

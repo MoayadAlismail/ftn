@@ -12,9 +12,6 @@ function LandingContent() {
   const router = useRouter();
   
   const handleGetStarted = (skipResumeUpload?: boolean) => {
-    // Store resume upload timestamp for expiry checking
-    localStorage.setItem("resumeUploadTimestamp", Date.now().toString());
-
     // Navigate to talent signup using Next.js router
     router.push("/auth/talent/signup");
   };

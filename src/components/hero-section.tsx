@@ -14,6 +14,7 @@ import { Role } from "@/constants/enums";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { homeTranslations } from "@/lib/language/home";
 import LanguageSelector from "./language-selector";
+import { toast } from "sonner";
 
 const FloatingCard = ({
   children,
@@ -90,18 +91,38 @@ export default function HeroSection({ onGetStarted }: { onGetStarted: (skipResum
   const [isDragging, setIsDragging] = useState(false);
 
   const processSelectedFile = (file: File | null) => {
-    setResumeFile(file);
     if (!file) return;
+    
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      toast.error(t.pdfOnly);
+      return;
+    }
+    
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(t.fileSizeLimit);
+      return;
+    }
+    
+    setResumeFile(file);
+    setUploadStatus("uploading");
+    
     const reader = new FileReader();
     reader.onload = function (event) {
       if (event.target && typeof event.target.result === "string") {
         localStorage.setItem("resumeFileBase64", event.target.result);
         localStorage.setItem("resumeFileName", file.name);
         localStorage.setItem("resumeUploadTimestamp", Date.now().toString());
+        setUploadStatus("success");
       }
     };
+    reader.onerror = function () {
+      toast.error(t.fileReadError);
+      setUploadStatus("idle");
+      setResumeFile(null);
+    };
     reader.readAsDataURL(file);
-    setUploadStatus("success");
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

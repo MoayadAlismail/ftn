@@ -24,6 +24,11 @@ export const homeTranslations = {
     continue: "Continue →",
     supportedFormat: "Supported format: PDF (max 10MB)",
     
+    // Upload validation messages
+    pdfOnly: "Please upload a PDF file",
+    fileSizeLimit: "File size must be less than 10MB",
+    fileReadError: "Failed to read file. Please try again.",
+    
     // Trust indicators
     trustedBy: "Trusted by students from",
     ksu: "King Saud University",
@@ -67,6 +72,11 @@ export const homeTranslations = {
     chooseFile: "اختر ملف ←",
     continue: "متابعة ←",
     supportedFormat: "الصيغة المدعومة: PDF (حد أقصى 10 ميجابايت)",
+    
+    // Upload validation messages
+    pdfOnly: "يرجى رفع ملف PDF فقط",
+    fileSizeLimit: "حجم الملف يجب أن يكون أقل من 10 ميجابايت",
+    fileReadError: "فشل في قراءة الملف. يرجى المحاولة مرة أخرى.",
     
     // Trust indicators
     trustedBy: "موثوق به من قبل طلاب من",

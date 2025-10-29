@@ -96,11 +96,11 @@ export default function SelectOpportunities({
                     {/* Progress indicator */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
-                            <span>{t.stepOf} 3 {t.of} 4</span>
-                            <span>75% {t.complete}</span>
+                            <span>{t.stepOf} 4 {t.of} 5</span>
+                            <span>80% {t.complete}</span>
                         </div>
                         <div className="h-2 w-full rounded-full bg-secondary">
-                            <div className="h-full w-3/4 rounded-full bg-primary" />
+                            <div className="h-full w-4/5 rounded-full bg-primary" />
                         </div>
                     </div>
 

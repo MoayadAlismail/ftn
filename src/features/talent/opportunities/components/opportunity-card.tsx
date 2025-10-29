@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, memo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,12 +17,15 @@ import {
     Briefcase,
     Calendar,
     Eye,
-    Share2
+    Share2,
+    UserCircle
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { opportunitiesTranslations } from "@/lib/language/opportunities";
 import { CompanyLogo } from "@/components/ui/company-logo";
+import { useTalentProfile } from "@/hooks/useTalentProfile";
 
 export interface Opportunity {
     id: string;
@@ -55,10 +59,12 @@ const OpportunityCard = memo(function OpportunityCard({
     onViewDetails,
     compact = false
 }: OpportunityCardProps) {
+    const router = useRouter();
     const { language } = useLanguage();
     const t = opportunitiesTranslations[language];
     const [isSaved, setIsSaved] = useState(opportunity.isSaved || false);
     const [isLoading, setIsLoading] = useState(false);
+    const { hasResume, isLoading: profileLoading } = useTalentProfile();
 
     const handleSaveToggle = useCallback(async () => {
         setIsLoading(true);
@@ -78,8 +84,17 @@ const OpportunityCard = memo(function OpportunityCard({
     }, [isSaved, onUnsave, onSave, opportunity.id]);
 
     const handleApply = useCallback(() => {
+        if (!hasResume) {
+            toast.error(t.noResumeCannotApply);
+            router.push("/talent/profile");
+            return;
+        }
         onApply?.(opportunity);
-    }, [onApply, opportunity]);
+    }, [onApply, opportunity, hasResume, router, t.noResumeCannotApply]);
+
+    const handleGoToProfile = useCallback(() => {
+        router.push("/talent/profile");
+    }, [router]);
 
     const handleViewDetails = useCallback(() => {
         onViewDetails?.(opportunity);
@@ -150,9 +165,21 @@ const OpportunityCard = memo(function OpportunityCard({
                                 <Eye className="h-4 w-4 mr-2" />
                                 {t.viewDetails}
                             </Button>
-                            <Button onClick={handleApply} size="sm" className="flex-1">
-                                {t.applyNow}
-                            </Button>
+                            <div className="flex-1 relative group">
+                                <Button 
+                                    onClick={handleApply} 
+                                    size="sm" 
+                                    className={`w-full ${!hasResume ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    {t.applyNow}
+                                </Button>
+                                {!hasResume && (
+                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                                        {t.uploadResumeToApply}
+                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                                    </div>
+                                )}
+                            </div>
                             <Button
                                 variant={isSaved ? "default" : "outline"}
                                 size="sm"
@@ -330,9 +357,21 @@ const OpportunityCard = memo(function OpportunityCard({
                 {/* Action Buttons */}
                 <div className="pt-4 border-t">
                     <div className="flex flex-col space-y-3">
-                        <Button onClick={handleApply} size="sm" className="w-full">
-                            {t.applyNow}
-                        </Button>
+                        <div className="relative group">
+                            <Button 
+                                onClick={handleApply} 
+                                size="sm" 
+                                className={`w-full ${!hasResume ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {t.applyNow}
+                            </Button>
+                            {!hasResume && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
+                                    {t.uploadResumeToApply}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                                </div>
+                            )}
+                        </div>
                         <div className="flex items-center gap-2">
                             <Button onClick={handleViewDetails} variant="outline" size="sm" className="flex-1">
                                 <Eye className="h-4 w-4 mr-2" />

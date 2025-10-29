@@ -20,7 +20,9 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type { Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { applicationsTranslations } from "@/lib/language";
+import { applicationsTranslations, opportunitiesTranslations } from "@/lib/language";
+import { useTalentProfile } from "@/hooks/useTalentProfile";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock data - in real app, this would come from API
 const MOCK_OPPORTUNITY: Opportunity = {
@@ -41,6 +43,7 @@ export default function TalentApplicationPage() {
     const params = useParams();
     const router = useRouter();
     const opportunityId = params.opportunityId as string;
+    const { user } = useAuth();
 
     const [opportunity, setOpportunity] = useState<Opportunity | null>(null);
     const [loading, setLoading] = useState(true);
@@ -54,6 +57,16 @@ export default function TalentApplicationPage() {
 
     const { language } = useLanguage();
     const t = applicationsTranslations[language];
+    const opportunityT = opportunitiesTranslations[language];
+    const { hasResume, isLoading: profileLoading } = useTalentProfile();
+
+    // Check for resume requirement
+    useEffect(() => {
+        if (!profileLoading && !hasResume && user) {
+            toast.error(opportunityT.noResumeCannotApply);
+            router.push("/talent/profile");
+        }
+    }, [hasResume, profileLoading, user, router, opportunityT.noResumeCannotApply]);
 
     useEffect(() => {
         loadOpportunity();

@@ -34,13 +34,13 @@ export default function LocationPreference({
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         <div className="mb-3">
           <div className="flex items-center justify-between text-xs sm:text-sm text-gray-600 mb-2">
-            <span>{t.stepOf} 1 {t.of} 4</span>
-            <span>{Math.round((1 / 4) * 100)}% {t.complete}</span>
+            <span>{t.stepOf} 2 {t.of} 5</span>
+            <span>{Math.round((2 / 5) * 100)}% {t.complete}</span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full">
             <div
               className="h-full bg-primary rounded-full transition-all"
-              style={{ width: "25%" }}
+              style={{ width: "40%" }}
             />
           </div>
         </div>

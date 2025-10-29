@@ -60,6 +60,13 @@ export const opportunitiesTranslations = {
     match: "match",
     recentlyPosted: "Recently posted",
     
+    // Resume requirement
+    resumeRequired: "Resume Required",
+    uploadResumeToApply: "Please upload your resume to apply to opportunities",
+    goToProfile: "Go to Profile",
+    updateResume: "Update Resume",
+    noResumeCannotApply: "You need to upload a resume before applying to opportunities",
+    
     // Filters
     remoteOnly: "Remote Only",
     location: "Location",
@@ -147,6 +154,13 @@ export const opportunitiesTranslations = {
     moreSkills: "المزيد",
     match: "مطابقة",
     recentlyPosted: "نُشرت مؤخرًا",
+    
+    // Resume requirement
+    resumeRequired: "السيرة الذاتية مطلوبة",
+    uploadResumeToApply: "يرجى رفع سيرتك الذاتية للتقديم على الفرص",
+    goToProfile: "الذهاب إلى الملف الشخصي",
+    updateResume: "تحديث السيرة الذاتية",
+    noResumeCannotApply: "تحتاج إلى رفع سيرة ذاتية قبل التقديم على الفرص",
     
     // Filters
     remoteOnly: "عن بُعد فقط",
