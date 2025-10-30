@@ -64,7 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Create new request
         const request = (async () => {
             try {
-                console.log("Fetching enhanced user data...");
                 const { user: authUserData, error } = await getCurrentUser()
                 
                 if (error) {
@@ -72,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setAuthError(error || 'Failed to load user data')
                     return null
                 } else {
-                    console.log("Successfully fetched auth user:", authUserData?.role);
                     setAuthError(null)
                     return authUserData
                 }
@@ -110,16 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Skip if no meaningful change occurred
         if (currentUserId === previousUserId && currentAccessToken === previousAccessToken) {
-            console.log("Auth state change detected but no meaningful change, skipping");
             return
         }
-
-        console.log("Meaningful auth state change detected:", { 
-            event, 
-            previousUserId,
-            currentUserId,
-            tokenChanged: currentAccessToken !== previousAccessToken
-        });
 
         // Update session reference for future comparisons
         lastSessionRef.current = session
@@ -141,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const authUserData = await fetchCurrentUser()
                     setAuthUser(authUserData)
                 } else {
-                    console.log("No session user, clearing auth user");
                     setAuthUser(null)
                     // Cancel any ongoing request
                     currentUserRequestRef.current = null
@@ -167,7 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             )
             
             if (error) {
-                console.error("Session error:", error)
+                console.error("[AUTH_CONTEXT] Session error:", error)
                 setAuthError(error.message)
                 setSession(null)
                 setUser(null)
@@ -189,7 +178,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setAuthUser(null)
             }
         } catch (error) {
-            console.error("Auth initialization error:", error)
+            console.error("[AUTH_CONTEXT] Auth initialization error:", error)
             const errorMessage = error instanceof Error ? error.message : 'Failed to initialize authentication'
             setAuthError(errorMessage)
             setSession(null)
@@ -223,7 +212,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [handleAuthStateChange, initializeAuth])
 
     const signOut = useCallback(async () => {
-        console.log("🔓 signOut function called - starting sign out process");
         try {
             setIsLoading(true)
             setAuthError(null)
@@ -231,19 +219,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Cancel any ongoing requests
             currentUserRequestRef.current = null
             
-            console.log("🔓 Calling supabase.auth.signOut() with timeout");
             const { error } = await withTimeout(
                 supabase.auth.signOut(),
                 5000 // 5 second timeout for sign out
             )
 
             if (error) {
-                console.error('🔓 Supabase signOut error:', error)
+                console.error('Sign out error:', error)
                 setAuthError(error.message)
                 return
             }
 
-            console.log("🔓 Supabase signOut successful, updating context state");
             // Update context state immediately
             lastSessionRef.current = null
             setSession(null)
@@ -252,10 +238,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Clear welcome toast flag so user sees welcome message on next login
             sessionStorage.removeItem('welcome_toast_shown')
             stopLoading()
-            console.log("🔓 Context state cleared, redirecting to home using router");
-            console.log("🔓 Sign out process completed");
         } catch (error) {
-            console.error('🔓 Sign out error:', error)
+            console.error('Sign out error:', error)
             const errorMessage = error instanceof Error ? error.message : 'Failed to sign out'
             setAuthError(errorMessage)
         } finally {
@@ -263,7 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             stopLoading()
             router.push('/')
         }
-    }, [router])
+    }, [router, stopLoading])
 
     const refreshAuthUser = useCallback(async () => {
         if (user && !isLoading) {

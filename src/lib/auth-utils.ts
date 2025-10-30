@@ -30,8 +30,6 @@ export interface AuthResult {
  */
 async function checkOnboardingStatus(userId: string, role: Role): Promise<boolean> {
   try {
-    console.log(`Checking onboarding status for user ${userId} with role ${role}`);
-    
     if (role === Role.TALENT) {
       const { data, error } = await supabase
         .from('talents')
@@ -44,9 +42,7 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
         throw error;
       }
       
-      const isOnboarded = !!data;
-      console.log(`Talent onboarding status: ${isOnboarded}`);
-      return isOnboarded;
+      return !!data;
     } else if (role === Role.EMPLOYER) {
       const { data, error } = await supabase
         .from('employers')
@@ -59,16 +55,13 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
         throw error;
       }
       
-      const isOnboarded = !!data;
-      console.log(`Employer onboarding status: ${isOnboarded}`);
-      return isOnboarded;
+      return !!data;
     }
   } catch (error) {
     console.error('Error checking onboarding status:', error);
-    throw error; // Re-throw to let caller handle
+    throw error;
   }
   
-  console.log('Unknown role, defaulting to not onboarded');
   return false;
 }
 
@@ -77,7 +70,6 @@ async function checkOnboardingStatus(userId: string, role: Role): Promise<boolea
  */
 export async function getCurrentUser(): Promise<AuthResult> {
   try {
-    console.log("Getting user from Supabase auth...");
     const { data: { user }, error } = await withTimeout(
       supabase.auth.getUser(),
       8000 // 8 second timeout
@@ -88,8 +80,6 @@ export async function getCurrentUser(): Promise<AuthResult> {
       return { user: null, error: error?.message || 'No user found' };
     }
     
-    console.log("Got user from auth:", { id: user.id, email: user.email, metadata: user.user_metadata });
-    
     const role = user.user_metadata?.role as Role;
     
     if (!role) {
@@ -97,7 +87,6 @@ export async function getCurrentUser(): Promise<AuthResult> {
       return { user: null, error: 'User role not found' };
     }
     
-    console.log("Checking onboarding status for role:", role);
     let isOnboarded = false;
     
     try {
@@ -105,7 +94,6 @@ export async function getCurrentUser(): Promise<AuthResult> {
         checkOnboardingStatus(user.id, role),
         5000 // 5 second timeout for database check
       );
-      console.log("Onboarding status check result:", isOnboarded);
     } catch (onboardingError) {
       console.error("Failed to check onboarding status:", onboardingError);
       // Don't fail the entire function if onboarding check fails
@@ -121,8 +109,6 @@ export async function getCurrentUser(): Promise<AuthResult> {
       fullName: user.user_metadata?.full_name || user.user_metadata?.name,
       companyName: user.user_metadata?.company_name
     };
-    
-    console.log("Successfully created auth user:", authUser);
     
     return {
       user: authUser,
@@ -204,24 +190,6 @@ export async function handleOAuthLogin(
       success: false, 
       error: error instanceof Error ? error.message : 'OAuth login failed' 
     };
-  }
-}
-
-/**
- * Check for existing user with different role and handle appropriately
- */
-export async function checkExistingUserRole(email: string, intendedRole: Role): Promise<{
-  exists: boolean;
-  currentRole?: Role;
-  message?: string;
-}> {
-  try {
-    // This would require a custom database function or API endpoint
-    // For now, we'll handle this in the auth callback
-    return { exists: false };
-  } catch (error) {
-    console.error('Error checking existing user role:', error);
-    return { exists: false };
   }
 }
 
