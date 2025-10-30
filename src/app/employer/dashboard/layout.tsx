@@ -5,12 +5,13 @@ import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { CreditCard, LayoutDashboard, Settings, TableOfContents, Users, Menu, X, User } from "lucide-react";
+import { LayoutDashboard, TableOfContents, Users, Menu, X } from "lucide-react";
 import Link from "next/link";
-import SignOutButton from "@/features/auth/SignOutButton";
+import { EmployerProfileMenu } from "@/components/employer-profile-menu";
 import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { employerTranslations } from "@/lib/language";
+import { supabase } from "@/lib/supabase/client";
 
 interface NavigationItem {
   id: string;
@@ -45,20 +46,13 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
       label: t.navCandidates,
       icon: Users,
       href: "/employer/dashboard/candidates"
-    },
-    {
-      id: "billing",
-      label: t.navBilling,
-      icon: CreditCard,
-      href: "/employer/dashboard/billing"
-    },
-    {
-      id: "settings",
-      label: t.navSettings,
-      icon: Settings,
-      href: "/employer/dashboard/settings"
     }
   ];
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col overflow-scroll font-sans">
@@ -104,7 +98,12 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
           {/* Desktop user section */}
           <div className="hidden lg:flex items-center gap-2">
             <LanguageSelector />
-            <SignOutButton />
+            <EmployerProfileMenu 
+              userName={user?.user_metadata?.full_name}
+              companyName={user?.user_metadata?.company_name}
+              userEmail={user?.email}
+              onSignOut={handleSignOut}
+            />
           </div>
 
           {/* Mobile menu button */}
@@ -143,14 +142,15 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
               })}
               
               {/* Mobile user info and sign out */}
-              <div className="pt-4 mt-4 border-t border-gray-200">
-                <Link href="/employer/dashboard/settings" className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer">
-                  <User size={18} />
-                  <span className="font-medium">{user?.user_metadata?.company_name || user?.email}</span>
-                </Link>
-                <div className="px-3 py-2 flex items-center gap-2">
+              <div className="pt-4 mt-4 border-t border-gray-200 px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <EmployerProfileMenu 
+                    userName={user?.user_metadata?.full_name}
+                    companyName={user?.user_metadata?.company_name}
+                    userEmail={user?.email}
+                    onSignOut={handleSignOut}
+                  />
                   <LanguageSelector />
-                  <SignOutButton />
                 </div>
               </div>
             </div>
