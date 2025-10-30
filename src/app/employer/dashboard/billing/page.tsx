@@ -49,7 +49,6 @@ const plans: BillingPlan[] = [
     description: 'Perfect for small businesses starting their hiring journey',
     current: true,
     features: [
-      { name: 'Candidate invites', included: true, limit: '10 per month' },
       { name: 'AI-powered search', included: true },
       { name: 'Resume downloads', included: true, limit: '20 per month' },
       { name: 'Saved candidates', included: true, limit: '50 profiles' },
@@ -68,7 +67,6 @@ const plans: BillingPlan[] = [
     description: 'Ideal for growing companies with active hiring needs',
     recommended: true,
     features: [
-      { name: 'Candidate invites', included: true, limit: '50 per month' },
       { name: 'AI-powered search', included: true },
       { name: 'Resume downloads', included: true, limit: 'Unlimited' },
       { name: 'Saved candidates', included: true, limit: '500 profiles' },
@@ -86,7 +84,6 @@ const plans: BillingPlan[] = [
     interval: 'month',
     description: 'Comprehensive solution for large organizations',
     features: [
-      { name: 'Candidate invites', included: true, limit: 'Unlimited' },
       { name: 'AI-powered search', included: true },
       { name: 'Resume downloads', included: true, limit: 'Unlimited' },
       { name: 'Saved candidates', included: true, limit: 'Unlimited' },
@@ -101,7 +98,6 @@ const plans: BillingPlan[] = [
 export default function BillingPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentUsage, setCurrentUsage] = useState({
-    invites: 7,
     downloads: 15,
     savedCandidates: 23
   });
@@ -165,14 +161,6 @@ export default function BillingPage() {
               <h4 className="font-medium text-gray-900">Current Usage</h4>
 
               <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Candidate Invites</span>
-                    <span>{currentUsage.invites}/10 used</span>
-                  </div>
-                  <Progress value={(currentUsage.invites / 10) * 100} className="h-2" />
-                </div>
-
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span>Resume Downloads</span>
