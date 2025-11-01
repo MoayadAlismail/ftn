@@ -79,6 +79,8 @@ export default function CandidateProfileModal({
                 .from('talents')
                 .select(`
           id,
+          full_name,
+          email,
           bio,
           location_pref,
           industry_pref,
@@ -97,14 +99,7 @@ export default function CandidateProfileModal({
                 return;
             }
 
-            // Hide contact information until payment
-            const profileWithHiddenContact = {
-                ...data,
-                full_name: 'Candidate',
-                email: 'contact@hidden.com'
-            };
-
-            setFullProfile(profileWithHiddenContact);
+            setFullProfile(data);
         } catch (error) {
             console.error('Error loading profile:', error);
             toast.error('Failed to load profile');
@@ -269,10 +264,10 @@ export default function CandidateProfileModal({
                     
                     {/* Name and Info */}
                     <div className="space-y-2">
-                        <h2 className="text-lg font-bold text-gray-900 break-words blur-sm select-none">{profile.full_name}</h2>
+                        <h2 className="text-lg font-bold text-gray-900 break-words">{profile.full_name}</h2>
                         <div className="flex items-start text-gray-600 text-sm">
                             <Mail className="h-3 w-3 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="break-all blur-sm select-none">{profile.email}</span>
+                            <span className="break-all">{profile.email}</span>
                         </div>
                         {profile.created_at && (
                             <div className="flex items-center text-gray-500 text-xs">
@@ -290,10 +285,10 @@ export default function CandidateProfileModal({
                             <User className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 blur-sm select-none">{profile.full_name}</h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{profile.full_name}</h2>
                             <div className="flex items-center text-gray-600 mt-1">
                                 <Mail className="h-4 w-4 mr-2" />
-                                <span className="blur-sm select-none">{profile.email}</span>
+                                <span>{profile.email}</span>
                             </div>
                             {profile.created_at && (
                                 <div className="flex items-center text-gray-500 text-sm mt-1">

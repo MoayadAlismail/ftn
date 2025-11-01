@@ -1,0 +1,24 @@
+{
+  "name": "FTN - One Place For Opportunity Providers & Candidates",
+  "short_name": "FTN",
+  "description": "AI-Powered Talent Matching Platform connecting opportunity providers with qualified candidates",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#944ADB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en-US",
+  "dir": "auto",
+  "scope": "/",
+  "prefer_related_applications": false
+}
+
