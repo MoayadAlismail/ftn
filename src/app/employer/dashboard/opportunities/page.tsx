@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -13,6 +12,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Plus,
   Search,
@@ -68,33 +73,31 @@ function OpportunitiesPageContent() {
   const t = employerTranslations[language];
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  // Tab management
-  const [activeTab, setActiveTab] = useState(() => {
-    return searchParams.get("tab") === "post" ? "post" : "manage";
-  });
-  
+
+  // Modal state
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+
   // Shared states
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Post opportunity states
   const [formData, setFormData] = useState<OpportunityFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // My opportunities states
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [isApplicantsOpen, setIsApplicantsOpen] = useState(false);
   const [applicantsLoading, setApplicantsLoading] = useState(false);
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
-  const [applicants, setApplicants] = useState<Array<{ 
-    id: string; 
-    full_name: string; 
-    email: string; 
-    bio?: string; 
-    location_pref?: string; 
-    industry_pref?: string[]; 
-    work_style_pref?: string[] 
+  const [applicants, setApplicants] = useState<Array<{
+    id: string;
+    full_name: string;
+    email: string;
+    bio?: string;
+    location_pref?: string;
+    industry_pref?: string[];
+    work_style_pref?: string[]
   }>>([]);
 
   // Load opportunities
@@ -148,17 +151,17 @@ function OpportunitiesPageContent() {
       await loadOpportunities();
       setLoading(false);
     };
-    
+
     if (user?.id) {
       loadData();
     }
   }, [user?.id, loadOpportunities]);
 
-  // Handle tab change from URL params
+  // Handle modal open from URL params
   useEffect(() => {
     const tab = searchParams.get("tab");
     if (tab === "post") {
-      setActiveTab("post");
+      setIsPostModalOpen(true);
     }
   }, [searchParams]);
 
@@ -255,15 +258,15 @@ function OpportunitiesPageContent() {
       }
       
       toast.success(t.opportunityPosted);
-      
+
       // Reset form
       setFormData(initialFormData);
-      
+
       // Refresh opportunities list
       await loadOpportunities();
-      
-      // Switch to manage tab to see the new opportunity
-      setActiveTab("manage");
+
+      // Close modal
+      setIsPostModalOpen(false);
       
     } catch (error: any) {
       console.error("Error posting opportunity:", error);
@@ -367,223 +370,219 @@ function OpportunitiesPageContent() {
             {t.opportunitiesSubtitle}
           </p>
         </div>
-        <Button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          variant="outline"
-          size="sm"
-          className="w-full sm:w-auto"
-        >
-          {refreshing ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <RefreshCw className="h-4 w-4 mr-2" />
-          )}
-          {t.refresh}
-        </Button>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="post" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
-            <PlusCircle size={14} className="sm:w-4 sm:h-4" />
+        <div className="flex gap-2">
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            variant="outline"
+            size="sm"
+            className="flex-1 sm:flex-none"
+          >
+            {refreshing ? (
+              <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
+            ) : (
+              <RefreshCw className="h-4 w-4 sm:mr-2" />
+            )}
+            <span className="hidden sm:inline">{t.refresh}</span>
+          </Button>
+          <Button
+            onClick={() => setIsPostModalOpen(true)}
+            size="sm"
+            className="flex-1 sm:flex-none"
+          >
+            <Plus className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">{t.postNewOpportunity}</span>
             <span className="sm:hidden">{t.postNew}</span>
-          </TabsTrigger>
-          <TabsTrigger value="manage" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
-            <Briefcase size={14} className="sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">{t.myOpportunities} ({opportunities.length})</span>
-            <span className="sm:hidden">{t.myJobs} ({opportunities.length})</span>
-          </TabsTrigger>
-        </TabsList>
+          </Button>
+        </div>
+      </div>
 
-        {/* Post Opportunity Tab - Mobile Optimized */}
-        <TabsContent value="post" className="space-y-4 sm:space-y-6">
-          <Card className="p-4 sm:p-6">
-            <div className="space-y-4 sm:space-y-6">
-              <div>
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-                  {t.createNewJobPosting}
-                </h2>
-                <p className="text-sm sm:text-base text-gray-600">
-                  {t.createJobDescription}
-                </p>
-              </div>
+      {/* Opportunities List */}
+      {opportunities.length === 0 ? (
+        <div className="text-center py-12 sm:py-16 px-4">
+          <div className="text-gray-400 mb-4">
+            <Briefcase size={36} className="sm:w-12 sm:h-12 mx-auto" />
+          </div>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
+            {t.noOpportunitiesPosted}
+          </h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
+            {t.noOpportunitiesDescription}
+          </p>
+          <Button onClick={() => setIsPostModalOpen(true)} className="w-full sm:w-auto">
+            <PlusCircle className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">{t.postYourFirst}</span>
+            <span className="sm:hidden">{t.postFirstJob}</span>
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3 sm:space-y-4">
+          {opportunities.map((opportunity) => (
+            <OpportunityCard
+              key={opportunity.id}
+              opportunity={opportunity}
+              onEdit={handleEdit}
+              onView={handleView}
+              onDelete={handleDelete}
+              onViewApplicants={handleViewApplicants}
+            />
+          ))}
+        </div>
+      )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {/* Left Column */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.jobTitle} *
-                    </label>
-                    <Input
-                      name="title"
-                      placeholder={t.jobTitlePlaceholder}
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      className="w-full"
-                    />
-                  </div>
+      {/* Post Opportunity Modal */}
+      <Dialog open={isPostModalOpen} onOpenChange={(open) => {
+        setIsPostModalOpen(open);
+        if (!open) {
+          setFormData(initialFormData);
+        }
+      }}>
+        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+          <DialogHeader className="px-5 sm:px-6 md:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5 border-b shrink-0">
+            <DialogTitle className="text-xl sm:text-2xl">
+              {t.createNewJobPosting}
+            </DialogTitle>
+          </DialogHeader>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.companyNameLabel} *
-                    </label>
-                    <Input
-                      name="company_name"
-                      placeholder={t.companyNameOpportunityPlaceholder}
-                      value={formData.company_name}
-                      onChange={handleInputChange}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.workStyleRequired} *
-                    </label>
-                    <MultiSelect
-                      options={workStyles.map(style => ({ label: style, value: style }))}
-                      selected={formData.workstyle}
-                      onChange={handleWorkStyleChange}
-                      placeholder={t.selectWorkStyles}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.locationRequired} *
-                    </label>
-                    <Select
-                      value={formData.location}
-                      onValueChange={handleLocationChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t.locationPlaceholder} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SAUDI_CITIES.map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          <div className="overflow-y-auto flex-1 px-5 sm:px-6 md:px-8 py-5 sm:py-6 md:py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
+              {/* Left Column */}
+              <div className="space-y-5 sm:space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.jobTitle} *
+                  </label>
+                  <Input
+                    name="title"
+                    placeholder={t.jobTitlePlaceholder}
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="w-full h-11"
+                  />
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.industryLabel}
-                    </label>
-                    <MultiSelect
-                      options={INDUSTRIES.map(industry => ({ label: industry, value: industry }))}
-                      selected={formData.industry}
-                      onChange={handleIndustryChange}
-                      placeholder={t.industryOpportunityPlaceholder}
-                      className="w-full"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.companyNameLabel} *
+                  </label>
+                  <Input
+                    name="company_name"
+                    placeholder={t.companyNameOpportunityPlaceholder}
+                    value={formData.company_name}
+                    onChange={handleInputChange}
+                    className="w-full h-11"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.requiredSkills}
-                    </label>
-                    <MultiSelect
-                      options={COMMON_SKILLS.map(skill => ({ label: skill, value: skill }))}
-                      selected={formData.skills}
-                      onChange={handleSkillsChange}
-                      placeholder={t.skillsPlaceholder}
-                      className="w-full"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.workStyleRequired} *
+                  </label>
+                  <MultiSelect
+                    options={workStyles.map(style => ({ label: style, value: style }))}
+                    selected={formData.workstyle}
+                    onChange={handleWorkStyleChange}
+                    placeholder={t.selectWorkStyles}
+                    className="w-full"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t.jobDescription}
-                    </label>
-                    <Textarea
-                      name="description"
-                      placeholder={t.jobDescriptionPlaceholder}
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      rows={6}
-                      className="w-full resize-none"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.locationRequired} *
+                  </label>
+                  <Select
+                    value={formData.location}
+                    onValueChange={handleLocationChange}
+                  >
+                    <SelectTrigger className="w-full h-11">
+                      <SelectValue placeholder={t.locationPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SAUDI_CITIES.map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4 sm:pt-6 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => setFormData(initialFormData)}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto"
-                >
-                  {t.resetForm}
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto sm:min-w-32"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      {t.posting}
-                    </>
-                  ) : (
-                    <>
-                      <CirclePlus className="h-4 w-4 mr-2" />
-                      {t.postOpportunity}
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
+              {/* Right Column */}
+              <div className="space-y-5 sm:space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.industryLabel}
+                  </label>
+                  <MultiSelect
+                    options={INDUSTRIES.map(industry => ({ label: industry, value: industry }))}
+                    selected={formData.industry}
+                    onChange={handleIndustryChange}
+                    placeholder={t.industryOpportunityPlaceholder}
+                    className="w-full"
+                  />
+                </div>
 
-        {/* My Opportunities Tab - Mobile Optimized */}
-        <TabsContent value="manage" className="space-y-4 sm:space-y-6">
-          {opportunities.length === 0 ? (
-            <div className="text-center py-12 sm:py-16 px-4">
-              <div className="text-gray-400 mb-4">
-                <Briefcase size={36} className="sm:w-12 sm:h-12 mx-auto" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.requiredSkills}
+                  </label>
+                  <MultiSelect
+                    options={COMMON_SKILLS.map(skill => ({ label: skill, value: skill }))}
+                    selected={formData.skills}
+                    onChange={handleSkillsChange}
+                    placeholder={t.skillsPlaceholder}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                    {t.jobDescription}
+                  </label>
+                  <Textarea
+                    name="description"
+                    placeholder={t.jobDescriptionPlaceholder}
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={8}
+                    className="w-full resize-none"
+                  />
+                </div>
               </div>
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
-                {t.noOpportunitiesPosted}
-              </h3>
-              <p className="text-sm sm:text-base text-gray-600 mb-6">
-                {t.noOpportunitiesDescription}
-              </p>
-              <Button onClick={() => setActiveTab("post")} className="w-full sm:w-auto">
-                <PlusCircle className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t.postYourFirst}</span>
-                <span className="sm:hidden">{t.postFirstJob}</span>
-              </Button>
             </div>
-          ) : (
-            <div className="space-y-3 sm:space-y-4">
-              {opportunities.map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                  onEdit={handleEdit}
-                  onView={handleView}
-                  onDelete={handleDelete}
-                  onViewApplicants={handleViewApplicants}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          </div>
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 px-5 sm:px-6 md:px-8 py-4 sm:py-5 border-t bg-gray-50/50 shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setFormData(initialFormData)}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto h-11 px-6"
+            >
+              {t.resetForm}
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto h-11 px-8 min-w-[140px]"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  {t.posting}
+                </>
+              ) : (
+                <>
+                  <CirclePlus className="h-4 w-4 mr-2" />
+                  {t.postOpportunity}
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Applicants Modal - Mobile Optimized */}
       {isApplicantsOpen && (
