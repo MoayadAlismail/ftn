@@ -1,8 +1,6 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   X,
   MapPin,
@@ -10,14 +8,9 @@ import {
   Clock,
   Users,
   Calendar,
-  Briefcase,
-  DollarSign,
   Globe,
-  Mail,
-  Phone,
   Loader2,
-  FileText,
-  UserCircle
+  FileText
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -124,36 +117,36 @@ export default function OpportunityDetailModal({
   };
 
   const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      scale: 1,
-      transition: { type: "spring" as const, duration: 0.5 }
+      y: 0,
+      transition: { type: "spring" as const, stiffness: 300, damping: 30 }
     },
     exit: {
       opacity: 0,
-      scale: 0.8,
-      transition: { duration: 0.3 }
+      y: 20,
+      transition: { duration: 0.2 }
     }
   };
 
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 }
+    visible: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
           {/* Backdrop */}
           <motion.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40"
             onClick={onClose}
           />
 
@@ -163,22 +156,22 @@ export default function OpportunityDetailModal({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative w-full max-w-2xl lg:max-w-4xl h-[80vh] sm:h-[85vh] max-h-[80vh] sm:max-h-[85vh] min-h-[400px] mx-auto"
+            className="relative w-full max-w-3xl mx-auto sm:max-h-[90vh]"
           >
-            <Card className="bg-white rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full">
-              {/* Header */}
-              <div className="relative p-4 sm:p-6 bg-gradient-to-br from-primary/8 via-primary/6 to-primary/10 border-b flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/80 hover:bg-white hover:scale-110 hover:shadow-md transition-all duration-200 z-10"
-                  onClick={onClose}
-                >
-                  <X size={16} className="text-gray-600 hover:text-gray-800" />
-                </Button>
+            <div className="bg-white rounded-t-3xl sm:rounded-2xl border border-gray-200 shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden max-h-[90vh] sm:max-h-[90vh]">
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-lg bg-gray-50/80 backdrop-blur-sm border border-gray-200 hover:bg-gray-100 hover:border-gray-300 transition-all"
+              >
+                <X size={18} className="text-gray-600" />
+              </button>
 
-                <div className="pr-10 sm:pr-12">
-                  <div className="flex items-start gap-3 sm:gap-4 mb-4">
+              {/* Header */}
+              <div className="relative px-6 sm:px-8 pt-6 sm:pt-8 pb-6 border-b border-gray-100 flex-shrink-0">
+                <div className="pr-12">
+                  {/* Company and Title */}
+                  <div className="flex items-start gap-4 mb-5">
                     <CompanyLogo 
                       logoUrl={opportunity.company_logo_url}
                       companyName={opportunity.company_name}
@@ -186,48 +179,41 @@ export default function OpportunityDetailModal({
                       className="flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 line-clamp-2">
+                      <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-1.5 tracking-tight">
                         {opportunity.title}
                       </h1>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-base sm:text-lg font-semibold text-gray-700 truncate">
-                          {opportunity.company_name}
-                        </span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <MapPin size={14} className="flex-shrink-0" />
-                          <span className="truncate">{opportunity.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock size={14} className="flex-shrink-0" />
-                          <span>{opportunity.workstyle}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Globe size={14} className="flex-shrink-0" />
-                          <span className="truncate">{opportunity.industry}</span>
-                        </div>
-                      </div>
+                      <p className="text-base text-gray-600 font-medium mb-4">
+                        {opportunity.company_name}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Match Score & Status */}
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  {/* Metadata Pills */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm border border-gray-200">
+                      <MapPin size={14} />
+                      <span>{opportunity.location}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm border border-gray-200">
+                      <Clock size={14} />
+                      <span>{opportunity.workstyle}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-sm border border-gray-200">
+                      <Globe size={14} />
+                      <span>{opportunity.industry}</span>
+                    </div>
                     {opportunity.similarity && (
-                      <span className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-full ${opportunity.similarity >= 95
-                          ? "bg-green-100 text-green-700"
-                          : "bg-primary/15 text-primary"
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border ${opportunity.similarity >= 95
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-blue-50 text-blue-700 border-blue-200"
                         }`}>
                         {Math.round(opportunity.similarity)}% {t.modalMatch}
-                      </span>
+                      </div>
                     )}
-                    <span className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-blue-100 text-blue-700 rounded-full">
-                      {opportunity.workstyle}
-                    </span>
                     {opportunity.created_at && (
-                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
-                        <Calendar size={12} className="sm:w-4 sm:h-4" />
-                        <span className="whitespace-nowrap">{t.modalPosted} {new Date(opportunity.created_at).toLocaleDateString()}</span>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-500 text-sm">
+                        <Calendar size={14} />
+                        <span>{t.modalPosted} {new Date(opportunity.created_at).toLocaleDateString()}</span>
                       </div>
                     )}
                   </div>
@@ -235,94 +221,100 @@ export default function OpportunityDetailModal({
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-4 sm:p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="px-6 sm:px-8 py-6 space-y-8">
                   {/* Job Description */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <section>
+                    <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
                       {t.jobDescription}
-                    </h3>
+                    </h2>
                     <div className="prose prose-sm max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      <p className="text-[15px] text-gray-600 leading-relaxed whitespace-pre-wrap">
                         {opportunity.description}
                       </p>
                     </div>
-                  </div>
+                  </section>
 
                   {/* Required Skills */}
                   {opportunity.skills && opportunity.skills.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    <section>
+                      <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
                         {t.requiredSkills}
-                      </h3>
+                      </h2>
                       <div className="flex flex-wrap gap-2">
                         {opportunity.skills.map((skill, index) => (
                           <span
                             key={index}
-                            className="px-3 py-2 bg-primary/10 text-primary text-sm font-medium rounded-lg"
+                            className="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
                           >
                             {skill}
                           </span>
                         ))}
                       </div>
-                    </div>
+                    </section>
                   )}
 
                   {/* Company Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {t.aboutCompany} {opportunity.company_name}
-                    </h3>
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-3">
-                          <Building2 size={20} className="text-gray-500" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{t.company}</p>
-                            <p className="text-sm text-gray-600">{opportunity.company_name}</p>
-                          </div>
+                  <section>
+                    <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
+                      {t.aboutCompany}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 bg-gray-50/50">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
+                          <Building2 size={16} className="text-gray-600" />
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Globe size={20} className="text-gray-500" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{t.industry}</p>
-                            <p className="text-sm text-gray-600">{opportunity.industry}</p>
-                          </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{t.company}</p>
+                          <p className="text-sm text-gray-900 font-medium truncate">{opportunity.company_name}</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <MapPin size={20} className="text-gray-500" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{t.location}</p>
-                            <p className="text-sm text-gray-600">{opportunity.location}</p>
-                          </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 bg-gray-50/50">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
+                          <Globe size={16} className="text-gray-600" />
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Clock size={20} className="text-gray-500" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{t.workType}</p>
-                            <p className="text-sm text-gray-600">{opportunity.workstyle}</p>
-                          </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{t.industry}</p>
+                          <p className="text-sm text-gray-900 font-medium truncate">{opportunity.industry}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 bg-gray-50/50">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
+                          <MapPin size={16} className="text-gray-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{t.location}</p>
+                          <p className="text-sm text-gray-900 font-medium truncate">{opportunity.location}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 bg-gray-50/50">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
+                          <Clock size={16} className="text-gray-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{t.workType}</p>
+                          <p className="text-sm text-gray-900 font-medium truncate">{opportunity.workstyle}</p>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </section>
 
                   {/* Application Tips & Services */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <section>
+                    <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
                       {t.boostApplicationSuccess}
-                    </h3>
+                    </h2>
 
                     {/* Free Tips */}
-                    <div className="bg-primary/5 rounded-xl p-4 mb-4">
-                      <h4 className="font-medium text-gray-900 mb-2">{t.freeTips}</h4>
-                      <ul className="space-y-2 text-sm text-gray-700">
-                        <li className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-5">
+                      <h3 className="font-semibold text-gray-900 text-sm mb-3">{t.freeTips}</h3>
+                      <ul className="space-y-2.5 text-[15px] text-gray-600">
+                        <li className="flex items-start gap-2.5">
+                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                           <span>{t.freeTip1}</span>
                         </li>
-                        <li className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <li className="flex items-start gap-2.5">
+                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                           <span>{t.freeTip2}</span>
                         </li>
                       </ul>
@@ -330,142 +322,133 @@ export default function OpportunityDetailModal({
 
                     {/* Professional Services */}
                     <div className="space-y-3">
-                      <h4 className="font-medium text-gray-900">{t.getProfessionalHelp}</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <h3 className="font-semibold text-gray-900 text-sm">{t.getProfessionalHelp}</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {/* Resume Building Service */}
-                        <div className="bg-white border border-primary/20 rounded-lg p-3 sm:p-4 hover:border-primary/40 transition-colors">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <FileText size={16} className="text-primary" />
+                        <div className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all">
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 group-hover:border-gray-300 transition-colors">
+                              <FileText size={16} className="text-gray-700" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.resumeBuilder}</h5>
-                              <p className="text-xs text-primary font-medium">SAR 79</p>
+                              <h4 className="font-semibold text-sm text-gray-900 mb-0.5">{t.resumeBuilder}</h4>
+                              <p className="text-xs text-gray-500 font-medium">SAR 200</p>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                          <p className="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                             {t.resumeBuilderDescription}
                           </p>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
+                          <button
+                            className="w-full text-xs h-8 px-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors font-medium"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // TODO: Navigate to resume service
-                              toast.success(t.resumeServiceComingSoon);
+                              router.push("/services?service=resume");
                             }}
                           >
                             {t.getStarted}
-                          </Button>
+                          </button>
                         </div>
 
                         {/* LinkedIn Profile Service */}
-                        <div className="bg-white border border-primary/20 rounded-lg p-3 sm:p-4 hover:border-primary/40 transition-colors">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <Globe size={16} className="text-primary" />
+                        <div className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all">
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 group-hover:border-gray-300 transition-colors">
+                              <Globe size={16} className="text-gray-700" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.linkedInPro}</h5>
-                              <p className="text-xs text-primary font-medium">SAR 39</p>
+                              <h4 className="font-semibold text-sm text-gray-900 mb-0.5">{t.linkedInPro}</h4>
+                              <p className="text-xs text-gray-500 font-medium">SAR 200</p>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                          <p className="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                             {t.linkedInProDescription}
                           </p>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
+                          <button
+                            className="w-full text-xs h-8 px-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors font-medium"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // TODO: Navigate to LinkedIn service
-                              toast.success(t.linkedInServiceComingSoon);
+                              router.push("/services?service=linkedin");
                             }}
                           >
                             {t.getStarted}
-                          </Button>
+                          </button>
                         </div>
 
                         {/* Mock Interview Service */}
-                        <div className="bg-white border border-primary/20 rounded-lg p-3 sm:p-4 hover:border-primary/40 transition-colors">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <Users size={16} className="text-primary" />
+                        <div className="group bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all">
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 group-hover:border-gray-300 transition-colors">
+                              <Users size={16} className="text-gray-700" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-semibold text-sm text-gray-900 truncate">{t.mockInterview}</h5>
-                              <p className="text-xs text-primary font-medium">SAR 99</p>
+                              <h4 className="font-semibold text-sm text-gray-900 mb-0.5">{t.mockInterview}</h4>
+                              <p className="text-xs text-gray-500 font-medium">SAR 300</p>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                          <p className="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                             {t.mockInterviewDescription}
                           </p>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
+                          <button
+                            className="w-full text-xs h-8 px-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors font-medium"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // TODO: Navigate to interview service
-                              toast.success(t.interviewServiceComingSoon);
+                              router.push("/services?service=interview");
                             }}
                           >
                             {t.bookSession}
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Apply Button - Now inside scrollable area */}
-                  <div className="border-t pt-6 pb-6 bg-white">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      {!hasApplied ? (
-                        <div className="w-full max-w-md space-y-3">
-                          <div className="relative group">
-                            <Button
-                              onClick={handleApply}
-                              disabled={isApplying || isApplyingLocal}
-                              className={`w-full px-8 py-3 font-bold bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${!hasResume ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              size="lg"
-                            >
-                              {(isApplying || isApplyingLocal) ? (
-                                <>
-                                  <Loader2 size={20} className="animate-spin mr-2" />
-                                  {t.applying}
-                                </>
-                              ) : (
-                                <>
-                                  {t.applyNow}
-                                  <span className="ml-2 text-lg">→</span>
-                                </>
-                              )}
-                            </Button>
-                            {!hasResume && (
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
-                                {opportunityT.uploadResumeToApply}
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ) : (
-                        <Button
-                          disabled
-                          className="px-8 py-3 font-bold bg-green-600 hover:bg-green-600 text-white shadow-lg"
-                          size="lg"
-                        >
-                          <span className="mr-2 text-lg">✓</span>
-                          {t.applied}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+                  </section>
                 </div>
               </div>
-            </Card>
+
+              {/* Sticky Footer with Apply Button */}
+              <div className="flex-shrink-0 px-6 sm:px-8 py-4 border-t border-gray-200 bg-white/80 backdrop-blur-sm">
+                {!hasApplied ? (
+                  <div className="relative group">
+                    <button
+                      onClick={handleApply}
+                      disabled={isApplying || isApplyingLocal || !hasResume}
+                      className={`w-full h-11 px-6 rounded-lg font-semibold text-sm transition-all ${
+                        !hasResume 
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
+                          : 'bg-gray-900 text-white hover:bg-gray-800 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.1)]'
+                      }`}
+                    >
+                      {(isApplying || isApplyingLocal) ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 size={16} className="animate-spin" />
+                          {t.applying}
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          {t.applyNow}
+                          <span className="text-base">→</span>
+                        </span>
+                      )}
+                    </button>
+                    {!hasResume && (
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                        {opportunityT.uploadResumeToApply}
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full h-11 px-6 rounded-lg font-semibold text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="text-base">✓</span>
+                      {t.applied}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
           </motion.div>
         </div>
       )}

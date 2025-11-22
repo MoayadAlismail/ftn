@@ -5,6 +5,7 @@ import { Building2, ChevronDown, Settings, CreditCard, LogOut } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import LanguageSelector from "@/components/language-selector";
 
 interface EmployerProfileMenuProps {
   userName?: string;
@@ -72,6 +73,11 @@ export function EmployerProfileMenu({ userName, companyName, userEmail, onSignOu
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </Link>
+
+            <div className="px-3 py-2">
+              <div className="text-xs text-gray-500 mb-2">Language</div>
+              <LanguageSelector />
+            </div>
 
             <div className="border-t border-gray-100 my-1"></div>
 

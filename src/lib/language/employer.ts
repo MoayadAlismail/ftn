@@ -1,5 +1,27 @@
 export const employerTranslations = {
   en: {
+    // Employer Landing Page
+    landingHeroTitle: "Find Your Next Star Employee",
+    landingHeroSubtitle: "AI-powered talent matching that connects you with qualified candidates in seconds",
+    landingGetStarted: "Get Started",
+    landingSignIn: "Sign In",
+    landingAlreadyHaveAccount: "Already have an account?",
+    
+    // Landing Features
+    landingFeature1Title: "AI-Powered Matching",
+    landingFeature1Description: "Our intelligent system analyzes candidate profiles and matches them with your job requirements automatically",
+    landingFeature2Title: "Streamlined Hiring",
+    landingFeature2Description: "Post opportunities, review applications, and manage candidates all in one place",
+    landingFeature3Title: "Quality Candidates",
+    landingFeature3Description: "Access a pool of pre-screened, motivated candidates actively looking for opportunities",
+    landingWhyChooseUs: "Why Choose FTN?",
+    landingSaveTime: "Save Time",
+    landingSaveTimeDescription: "Stop sifting through hundreds of resumes. Let AI do the heavy lifting.",
+    landingBetterMatches: "Better Matches",
+    landingBetterMatchesDescription: "Find candidates that truly fit your requirements and company culture.",
+    landingEasyToUse: "Easy to Use",
+    landingEasyToUseDescription: "Simple, intuitive interface designed for busy recruiters.",
+    
     // Navigation
     navHome: "Home",
     navOpportunities: "Opportunities",
@@ -57,21 +79,14 @@ export const employerTranslations = {
     candidate: "candidate",
     candidates: "candidates",
     workStyleLabel: "Work Style",
-    invite: "Invite",
-    invited: "Invited",
     save: "Save",
     saved: "Saved",
-    messageToCandidate: "Message to candidate",
-    sendInvite: "Send Invite",
     cancel: "Cancel",
     
     // Toast Messages
     candidateSaved: "Candidate saved",
     unableToSaveCandidate: "Unable to save candidate",
-    pleaseEnterMessage: "Please enter a message",
     youMustBeSignedIn: "You must be signed in as an employer",
-    failedToSendInvite: "Failed to send invite",
-    inviteSent: "Invite sent",
     somethingWentWrong: "Something went wrong. Please try again.",
     pleaseDescribeCandidate: "Please describe your ideal candidate",
     noMatchingCandidates: "No matching candidates found. Try a different search.",
@@ -145,10 +160,11 @@ export const employerTranslations = {
     delete: "Delete",
 
     // Candidates Page
+    candidatesTitle: "Saved Candidates",
     candidatesAndInvitations: "Candidates & Invitations",
-    manageSavedCandidates: "Manage your saved candidates and track sent invitations",
+    manageSavedCandidates: "Manage your saved candidates",
     savedCandidatesTab: "Saved Candidates",
-    sentInvitationsTab: "Sent Invitations",
+    loadingCandidatesAndInvitations: "Loading candidates...",
     searchCandidatesPlaceholder: "Search by name, email, bio, location, or industry...",
     filterBy: "Filter by...",
     allCandidates: "All Candidates",
@@ -162,36 +178,13 @@ export const employerTranslations = {
     noCandidatesMatchSearch: "No candidates match your search",
     tryAdjustingSearch: "Try adjusting your search terms or filters.",
     
-    // Invitations Stats
-    totalSent: "Total Sent",
-    pending: "Pending",
-    accepted: "Accepted",
-    rejected: "Rejected",
-    
-    // Invitations Filters
-    searchInvitationsPlaceholder: "Search by talent name, email, or message...",
-    allStatuses: "All Statuses",
-    
-    // Invitations Empty States
-    noInvitationsSent: "No invitations sent yet",
-    noInvitationsMatchFilters: "No invitations match your filters",
-    startSendingInvitations: "Start sending invitations to talents to see them here.",
-    
-    // Invitation Card
-    sent: "Sent",
-    ago: "ago",
-    yourMessage: "Your Message:",
-    
     // Toast Messages - Candidates
     loginToViewSaved: "Please log in to view saved candidates",
     failedToLoadSavedCandidates: "Failed to load saved candidates",
     failedToLoadCandidateDetails: "Failed to load candidate details",
     errorLoadingCandidates: "An error occurred while loading candidates",
-    failedToLoadSentInvitations: "Failed to load sent invitations",
-    errorLoadingSentInvitations: "An error occurred while loading sent invitations",
     dataRefreshed: "Data refreshed successfully",
     candidateListExported: "Candidate list exported successfully",
-    loadingCandidatesAndInvitations: "Loading candidates and invitations...",
 
     // Settings Page
     settingsTitle: "Settings",
@@ -227,6 +220,28 @@ export const employerTranslations = {
     failedToSaveSettings: "Failed to save settings",
   },
   ar: {
+    // Employer Landing Page
+    landingHeroTitle: "اعثر على موظفك النجم التالي",
+    landingHeroSubtitle: "مطابقة المواهب المدعومة بالذكاء الاصطناعي التي تربطك بالمرشحين المؤهلين في ثوانٍ",
+    landingGetStarted: "ابدأ الآن",
+    landingSignIn: "تسجيل الدخول",
+    landingAlreadyHaveAccount: "هل لديك حساب بالفعل؟",
+    
+    // Landing Features
+    landingFeature1Title: "مطابقة بالذكاء الاصطناعي",
+    landingFeature1Description: "يقوم نظامنا الذكي بتحليل ملفات المرشحين ومطابقتها مع متطلبات وظيفتك تلقائياً",
+    landingFeature2Title: "توظيف مبسط",
+    landingFeature2Description: "انشر الفرص، راجع الطلبات، وأدر المرشحين في مكان واحد",
+    landingFeature3Title: "مرشحون ذوو جودة عالية",
+    landingFeature3Description: "الوصول إلى مجموعة من المرشحين المفحوصين مسبقاً والمتحمسين الذين يبحثون بنشاط عن فرص",
+    landingWhyChooseUs: "لماذا تختار فطن؟",
+    landingSaveTime: "وفر الوقت",
+    landingSaveTimeDescription: "توقف عن غربلة مئات السير الذاتية. دع الذكاء الاصطناعي يقوم بالعمل الشاق.",
+    landingBetterMatches: "مطابقات أفضل",
+    landingBetterMatchesDescription: "اعثر على المرشحين الذين يتناسبون حقاً مع متطلباتك وثقافة شركتك.",
+    landingEasyToUse: "سهل الاستخدام",
+    landingEasyToUseDescription: "واجهة بسيطة وسهلة مصممة للموظفين المشغولين.",
+    
     // Navigation
     navHome: "الرئيسية",
     navOpportunities: "الفرص",
@@ -284,21 +299,14 @@ export const employerTranslations = {
     candidate: "مرشح",
     candidates: "مرشحين",
     workStyleLabel: "نمط العمل",
-    invite: "دعوة",
-    invited: "تم إرسال الدعوة",
     save: "حفظ",
     saved: "تم الحفظ",
-    messageToCandidate: "رسالة إلى المرشح",
-    sendInvite: "إرسال دعوة",
     cancel: "إلغاء",
     
     // Toast Messages
     candidateSaved: "تم حفظ المرشح",
     unableToSaveCandidate: "تعذر حفظ المرشح",
-    pleaseEnterMessage: "يرجى إدخال رسالة",
     youMustBeSignedIn: "يجب أن تكون مسجلاً الدخول كصاحب عمل",
-    failedToSendInvite: "فشل إرسال الدعوة",
-    inviteSent: "تم إرسال الدعوة",
     somethingWentWrong: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     pleaseDescribeCandidate: "يرجى وصف المرشح المثالي لديك",
     noMatchingCandidates: "لم يتم العثور على مرشحين مطابقين. جرب بحث مختلف.",
@@ -372,10 +380,11 @@ export const employerTranslations = {
     delete: "حذف",
 
     // Candidates Page
+    candidatesTitle: "المرشحون المحفوظون",
     candidatesAndInvitations: "المرشحون والدعوات",
-    manageSavedCandidates: "إدارة المرشحين المحفوظين وتتبع الدعوات المرسلة",
+    manageSavedCandidates: "إدارة المرشحين المحفوظين",
     savedCandidatesTab: "المرشحون المحفوظون",
-    sentInvitationsTab: "الدعوات المرسلة",
+    loadingCandidatesAndInvitations: "تحميل المرشحين...",
     searchCandidatesPlaceholder: "ابحث بالاسم، البريد الإلكتروني، السيرة الذاتية، الموقع، أو الصناعة...",
     filterBy: "تصفية حسب...",
     allCandidates: "جميع المرشحين",
@@ -389,36 +398,13 @@ export const employerTranslations = {
     noCandidatesMatchSearch: "لا يوجد مرشحون مطابقون للبحث",
     tryAdjustingSearch: "حاول تعديل مصطلحات البحث أو الفلاتر.",
     
-    // Invitations Stats
-    totalSent: "إجمالي المرسل",
-    pending: "قيد الانتظار",
-    accepted: "مقبولة",
-    rejected: "مرفوضة",
-    
-    // Invitations Filters
-    searchInvitationsPlaceholder: "ابحث باسم الموهبة، البريد الإلكتروني، أو الرسالة...",
-    allStatuses: "جميع الحالات",
-    
-    // Invitations Empty States
-    noInvitationsSent: "لم يتم إرسال دعوات بعد",
-    noInvitationsMatchFilters: "لا توجد دعوات مطابقة للفلاتر",
-    startSendingInvitations: "ابدأ بإرسال الدعوات للمواهب لرؤيتها هنا.",
-    
-    // Invitation Card
-    sent: "تم الإرسال",
-    ago: "منذ",
-    yourMessage: "رسالتك:",
-    
     // Toast Messages - Candidates
     loginToViewSaved: "يرجى تسجيل الدخول لعرض المرشحين المحفوظين",
     failedToLoadSavedCandidates: "فشل تحميل المرشحين المحفوظين",
     failedToLoadCandidateDetails: "فشل تحميل تفاصيل المرشح",
     errorLoadingCandidates: "حدث خطأ أثناء تحميل المرشحين",
-    failedToLoadSentInvitations: "فشل تحميل الدعوات المرسلة",
-    errorLoadingSentInvitations: "حدث خطأ أثناء تحميل الدعوات المرسلة",
     dataRefreshed: "تم تحديث البيانات بنجاح",
     candidateListExported: "تم تصدير قائمة المرشحين بنجاح",
-    loadingCandidatesAndInvitations: "تحميل المرشحين والدعوات...",
 
     // Settings Page
     settingsTitle: "الإعدادات",

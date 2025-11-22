@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Building2, Clock, Users, Calendar, ChevronRight } from "lucide-react";
+import { MapPin, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import LoadingAnimation from "@/components/loadingAnimation";
 import OpportunityDetailModal from "@/components/opportunity-detail-modal";
@@ -25,118 +24,51 @@ interface Opportunity {
 
 const OpportunityCard = ({ 
   opportunity, 
-  index, 
   onViewDetails 
 }: { 
   opportunity: Opportunity; 
-  index: number;
   onViewDetails: (opportunity: Opportunity) => void;
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group"
+    <Card 
+      className="relative overflow-hidden hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75 cursor-pointer group"
+      onClick={() => onViewDetails(opportunity)}
     >
-      <Card 
-        className="p-6 hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-primary/30 bg-white/80 backdrop-blur-sm cursor-pointer"
-        onClick={() => onViewDetails(opportunity)}
-      >
+      <div className="p-6">
         <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1 flex items-start gap-3">
-              <CompanyLogo 
-                logoUrl={opportunity.company_logo_url}
-                companyName={opportunity.company_name}
-                size="md"
-              />
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
-                  {opportunity.title}
-                </h3>
-                <p className="text-gray-600 font-medium mt-1">{opportunity.company_name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">
-                {opportunity.workstyle}
-              </span>
+          {/* Header with Company Logo */}
+          <div className="flex items-start gap-3">
+            <CompanyLogo 
+              logoUrl={opportunity.company_logo_url}
+              companyName={opportunity.company_name}
+              size="md"
+              className="flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-primary">
+                {opportunity.title}
+              </h3>
+              <p className="text-sm text-gray-600 truncate">{opportunity.company_name}</p>
             </div>
           </div>
 
-          {/* Details */}
-          <div className="flex items-center gap-6 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <MapPin size={16} />
-              <span>{opportunity.location}</span>
+          {/* Location and Work Style */}
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={16} className="flex-shrink-0" />
+              <span className="truncate">{opportunity.location}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock size={16} />
-              <span>{opportunity.industry}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={16} />
-              <span>{new Date(opportunity.created_at).toLocaleDateString()}</span>
-            </div>
+            <span className="text-gray-400">•</span>
+            <span className="truncate">{opportunity.workstyle}</span>
           </div>
 
           {/* Description */}
-          <div className="space-y-3">
-            <p className={`text-gray-700 leading-relaxed ${isExpanded ? '' : 'line-clamp-2'}`}>
-              {opportunity.description}
-            </p>
-            
-            {opportunity.description.length > 150 && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1"
-              >
-                {isExpanded ? 'Show less' : 'Read more'}
-                <ChevronRight size={14} className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-              </button>
-            )}
-          </div>
-
-          {/* Skills */}
-          {opportunity.skills && opportunity.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {opportunity.skills.slice(0, 5).map((skill, i) => (
-                <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
-                  {skill}
-                </span>
-              ))}
-              {opportunity.skills.length > 5 && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
-                  +{opportunity.skills.length - 5} more
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Users size={16} />
-              <span>Apply now</span>
-            </div>
-            <Button 
-              size="sm" 
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewDetails(opportunity);
-              }}
-            >
-              View Details →
-            </Button>
-          </div>
+          <p className="text-gray-700 text-sm line-clamp-2 leading-relaxed">
+            {opportunity.description}
+          </p>
         </div>
-      </Card>
-    </motion.div>
+      </div>
+    </Card>
   );
 };
 
@@ -185,7 +117,7 @@ export default function OpportunitiesSection() {
 
   if (loading) {
     return (
-      <section className="py-20 bg-gray-50/50">
+      <section className="py-20 bg-gray-50 border-t border-border">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -205,7 +137,7 @@ export default function OpportunitiesSection() {
 
   if (error) {
     return (
-      <section className="py-20 bg-gray-50/50">
+      <section className="py-20 bg-gray-50 border-t border-border">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Latest Opportunities
@@ -217,41 +149,31 @@ export default function OpportunitiesSection() {
   }
 
   return (
-    <section className="py-20 bg-gray-50/50">
+    <section className="py-20 bg-gray-50 border-t border-border">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Latest Opportunities
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Discover amazing career opportunities from top companies. Upload your resume to get personalized matches.
           </p>
-        </motion.div>
+        </div>
 
         {/* Opportunities Grid */}
         {opportunities.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {opportunities.map((opportunity, index) => (
+            {opportunities.map((opportunity) => (
               <OpportunityCard
                 key={opportunity.id}
                 opportunity={opportunity}
-                index={index}
                 onViewDetails={handleViewDetails}
               />
             ))}
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
+          <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
               <Building2 size={24} className="text-gray-400" />
             </div>
@@ -261,21 +183,16 @@ export default function OpportunitiesSection() {
             <p className="text-gray-600">
               Check back soon for new opportunities from amazing companies.
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Load More Button */}
         {opportunities.length >= 20 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
+          <div className="text-center mt-12">
             <Button variant="outline" size="lg">
               Load More Opportunities
             </Button>
-          </motion.div>
+          </div>
         )}
 
         {/* Opportunity Detail Modal */}

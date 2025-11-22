@@ -59,16 +59,16 @@ export default function FAQ() {
 
         <div className="max-w-3xl mx-auto space-y-4">
           {faqs.map((faq, index) => (
-            <Card key={index} className="border-border overflow-hidden">
+            <Card key={index} className="overflow-hidden">
               <CardHeader 
-                className="cursor-pointer hover:bg-muted/50 transition-colors duration-200"
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => toggleFAQ(index)}
               >
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-foreground pr-4">
                     {faq.question}
                   </h3>
-                  <div className={`text-2xl transition-transform duration-300 ${
+                  <div className={`text-2xl ${
                     openIndex === index ? 'rotate-45' : 'rotate-0'
                   }`}>
                     +
@@ -76,15 +76,13 @@ export default function FAQ() {
                 </div>
               </CardHeader>
               
-              <div className={`transition-all duration-300 overflow-hidden ${
-                openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-              }`}>
+              {openIndex === index && (
                 <CardContent className="pt-0 pb-6">
                   <p className="text-muted-foreground leading-relaxed">
                     {faq.answer}
                   </p>
                 </CardContent>
-              </div>
+              )}
             </Card>
           ))}
         </div>
@@ -95,7 +93,7 @@ export default function FAQ() {
           </p>
           <a 
             href="#contact" 
-            className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-200"
+            className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             Contact Support
           </a>

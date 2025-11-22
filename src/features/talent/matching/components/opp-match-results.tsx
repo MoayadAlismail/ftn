@@ -131,7 +131,7 @@ export default function OppMatchResults({ opportunities = [], isLoading = false 
                     {opportunities.map((opp) => (
                         <motion.div key={opp.id} variants={itemVariants}>
                             <Card
-                                className="p-6 relative overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-primary/30"
+                                className="p-6 relative overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 hover:border-primary/30 transition-[transform,box-shadow,border-color] duration-75"
                                 onClick={() => handleViewDetails(opp)}
                             >
                                 <div className="flex justify-between items-start">

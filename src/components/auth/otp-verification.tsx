@@ -201,7 +201,7 @@ export function OtpVerification({
             {/* Verify Button */}
             <Button
               onClick={handleVerify}
-              className="w-full h-10 sm:h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium"
+              className="w-full h-10 sm:h-12 bg-primary hover:bg-primary/90 text-white font-medium"
               disabled={!isComplete || isLoading}
             >
               <AnimatePresence mode="wait">

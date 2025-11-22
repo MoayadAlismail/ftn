@@ -202,15 +202,15 @@ export default function ContactUs() {
             {t.followUs}
           </h3>
           <div className="flex justify-center space-x-6">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+            <a href="#" className="text-muted-foreground hover:text-primary">
               <span className="text-2xl">📘</span>
               <span className="sr-only">LinkedIn</span>
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+            <a href="#" className="text-muted-foreground hover:text-primary">
               <span className="text-2xl">🐦</span>
               <span className="sr-only">Twitter</span>
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+            <a href="#" className="text-muted-foreground hover:text-primary">
               <span className="text-2xl">📸</span>
               <span className="sr-only">Instagram</span>
             </a>

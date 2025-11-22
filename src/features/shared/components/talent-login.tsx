@@ -161,7 +161,7 @@ export default function TalentLogin({ next }: TalentLoginProps) {
 
               {/* Continue Button */}
               <Button
-                className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium"
                 onClick={next}
               >
                 Get Started
@@ -192,7 +192,7 @@ export default function TalentLogin({ next }: TalentLoginProps) {
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl max-w-sm">
               <div className="flex items-center justify-between">
                 <span className="text-gray-800 font-medium">Find your dream career with FTN.</span>
-                <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                     <path d="M7 14l3-3 3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>

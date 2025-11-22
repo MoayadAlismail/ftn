@@ -44,7 +44,7 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-muted/30">
+    <section className="py-20 bg-white border-t border-border">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -57,9 +57,9 @@ export default function Features() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="border-border hover:shadow-lg transition-shadow duration-300 group cursor-pointer">
+            <Card key={index}>
               <CardHeader className="text-center">
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-4xl mb-4">
                   {feature.icon}
                 </div>
                 <CardTitle className="text-xl font-semibold text-foreground">

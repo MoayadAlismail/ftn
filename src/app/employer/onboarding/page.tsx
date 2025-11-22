@@ -510,7 +510,7 @@ function EmployerOnboardingContent() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-12 py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="px-12 py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-[box-shadow,background-color] duration-75 disabled:opacity-70 disabled:cursor-not-allowed"
                 size="lg"
               >
                 {isSubmitting ? (

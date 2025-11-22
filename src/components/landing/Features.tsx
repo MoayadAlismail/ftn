@@ -57,9 +57,9 @@ export default function Features() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {features.map((feature, index) => (
-                        <Card key={index} className="border-border hover:shadow-lg transition-shadow duration-300 group cursor-pointer">
+                        <Card key={index} className="border-border hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75 group cursor-pointer">
                             <CardHeader className="text-center">
-                                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-75">
                                     {feature.icon}
                                 </div>
                                 <CardTitle className="text-xl font-semibold text-foreground">

@@ -586,7 +586,7 @@ function OpportunitiesPageContent() {
 
       {/* Applicants Modal - Mobile Optimized */}
       {isApplicantsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 p-3 sm:p-4">
           <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b">
               <div className="min-w-0 flex-1">

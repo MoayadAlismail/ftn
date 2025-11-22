@@ -148,7 +148,7 @@ export default function CandidateCard({
     if (compact) {
         return (
             <>
-                <Card className="hover:shadow-md transition-all duration-200 cursor-pointer" onClick={() => setProfileModalOpen(true)}>
+                <Card className="hover:shadow-md hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75 cursor-pointer" onClick={() => setProfileModalOpen(true)}>
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
@@ -219,7 +219,7 @@ export default function CandidateCard({
 
     return (
         <>
-            <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => setProfileModalOpen(true)}>
+            <Card className="hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75 cursor-pointer" onClick={() => setProfileModalOpen(true)}>
                 <CardContent className="p-6">
                     <div className="space-y-4">
                         {/* Header */}

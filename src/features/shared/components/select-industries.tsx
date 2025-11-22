@@ -85,7 +85,7 @@ export default function SelectIndustries({
               key={industry}
               onClick={() => toggleIndustry(industry)}
               className={cn(
-                "py-3 px-4 rounded-lg border text-center transition-all text-sm",
+                "py-3 px-4 rounded-lg border text-center transition-[border-color,background-color] duration-75 text-sm",
                 "hover:border-primary/40 hover:bg-primary/5",
                 isSelected
                   ? "border-primary bg-primary/10 text-primary"

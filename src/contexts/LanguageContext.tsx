@@ -15,13 +15,21 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
   const [isRTL, setIsRTL] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Load language from localStorage on mount
+  // Load language from localStorage on mount and sync with HTML attributes
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage === "ar" || savedLanguage === "en") {
-      setLanguageState(savedLanguage);
-      setIsRTL(savedLanguage === "ar");
+    const langToUse = (savedLanguage === "ar" || savedLanguage === "en") ? savedLanguage : "en";
+    
+    setLanguageState(langToUse);
+    setIsRTL(langToUse === "ar");
+    setMounted(true);
+    
+    // Ensure document direction is set correctly (sync with inline script)
+    if (typeof document !== "undefined") {
+      document.documentElement.dir = langToUse === "ar" ? "rtl" : "ltr";
+      document.documentElement.lang = langToUse;
     }
   }, []);
 

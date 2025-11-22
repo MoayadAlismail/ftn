@@ -1,5 +1,12 @@
 export const homeTranslations = {
   en: {
+    // Navbar
+    navHome: "Home",
+    navServices: "Services",
+    navFAQ: "FAQ",
+    navRecruiters: "Recruiters",
+    navSignIn: "Sign In",
+    
     // Navigation buttons
     recruiterLogin: "Recruiter? Login here ↗",
     recruiterLoginMobile: "Recruiter",
@@ -9,10 +16,10 @@ export const homeTranslations = {
     dashboardMobile: "Dashboard",
     
     // Hero section
-    heroTitle1: "Finally, career opportunities",
-    heroTitle2: "that deserve you.",
+    heroTitle1: "Career opportunities",
+    heroTitle2: "that deserve you",
     heroSubtitle1: "Easily apply to jobs, internships, bootcamps, hackathons",
-    heroSubtitle2: "that match your interests.",
+    heroSubtitle2: "from one place.",
     
     // Upload section
     uploadResume: "Upload your resume",
@@ -49,6 +56,13 @@ export const homeTranslations = {
     match: "Match",
   },
   ar: {
+    // Navbar
+    navHome: "الرئيسية",
+    navServices: "الخدمات",
+    navFAQ: "الأسئلة الشائعة",
+    navRecruiters: "الموظفون",
+    navSignIn: "تسجيل الدخول",
+    
     // Navigation buttons
     recruiterLogin: "موظف توظيف؟ تسجيل الدخول ↗",
     recruiterLoginMobile: "موظف",

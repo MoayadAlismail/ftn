@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from '@vercel/analytics/next';
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -11,6 +12,13 @@ import "./globals.css";
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin"],
+});
+
+const portada = localFont({
+  src: "../fonts/Portada_var.ttf",
+  variable: "--font-portada",
+  display: "block",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -95,13 +103,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="auto">
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const lang = localStorage.getItem('language') || 'en';
+                  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+                  document.documentElement.dir = dir;
+                  document.documentElement.lang = lang;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body
-        className={`${sora.variable} antialiased font-sans`}
+        className={`${sora.variable} ${portada.variable} antialiased font-sans`}
         suppressHydrationWarning={true}
       >
         <LanguageProvider>

@@ -24,7 +24,6 @@ import OpportunitiesPageSkeleton from "./loading";
 import LoadingAnimation from "@/components/loadingAnimation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import OpportunityDetailModal from "@/components/opportunity-detail-modal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { opportunitiesTranslations } from "@/lib/language/opportunities";
 
@@ -56,20 +55,76 @@ function TalentOpportunitiesContent() {
     const router = useRouter();
     const { language } = useLanguage();
     const t = opportunitiesTranslations[language];
-    const [opportunities, setOpportunities] = useState<ExtendedOpportunity[]>([]);
+
+    // Cache utility functions - defined early so we can use them before auth
+    const getCacheKey = (userId?: string) => {
+        // Try to get user ID from multiple sources
+        const id = userId || authUser?.id || localStorage.getItem('last_talent_user_id');
+        return id ? `talent_opportunities_${id}` : null;
+    };
+    
+    const saveToCache = (data: ExtendedOpportunity[], userId?: string) => {
+        try {
+            const key = getCacheKey(userId);
+            if (!key) return;
+            
+            sessionStorage.setItem(key, JSON.stringify({
+                opportunities: data,
+                timestamp: Date.now()
+            }));
+            
+            // Store user ID for quick access next time
+            if (userId || authUser?.id) {
+                localStorage.setItem('last_talent_user_id', userId || authUser!.id);
+            }
+        } catch (error) {
+            console.error("Error saving to cache:", error);
+        }
+    };
+
+    const loadFromCache = (userId?: string): ExtendedOpportunity[] | null => {
+        try {
+            const key = getCacheKey(userId);
+            if (!key) return null;
+            
+            const cached = sessionStorage.getItem(key);
+            if (cached) {
+                const { opportunities: cachedOpps } = JSON.parse(cached);
+                return cachedOpps;
+            }
+        } catch (error) {
+            console.error("Error loading from cache:", error);
+        }
+        return null;
+    };
+
+    const clearCache = (userId?: string) => {
+        try {
+            const key = getCacheKey(userId);
+            if (key) {
+                sessionStorage.removeItem(key);
+            }
+        } catch (error) {
+            console.error("Error clearing cache:", error);
+        }
+    };
+
+    // Try to load from cache immediately (even before auth resolves)
+    const cachedData = loadFromCache();
+    const hasCache = cachedData && cachedData.length > 0;
+
+    const [opportunities, setOpportunities] = useState<ExtendedOpportunity[]>(cachedData || []);
     const [filteredOpportunities, setFilteredOpportunities] = useState<ExtendedOpportunity[]>([]);
     const [filters, setFilters] = useState<FilterType>(DEFAULT_FILTERS);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!hasCache);
     const [loadingMore, setLoadingMore] = useState(false);
     const [feedMode, setFeedMode] = useState<FeedMode>("ai_recommended");
     const [showFilters, setShowFilters] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(0);
     const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
-    const [selectedOpportunity, setSelectedOpportunity] = useState<ExtendedOpportunity | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchInput, setSearchInput] = useState("");
-    const [aiMatchingStatus, setAiMatchingStatus] = useState<"idle" | "loading" | "ready">("idle");
+    const [aiMatchingStatus, setAiMatchingStatus] = useState<"idle" | "loading" | "ready">(hasCache ? "ready" : "idle");
     const [preloadedPages, setPreloadedPages] = useState<Set<number>>(new Set());
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -127,18 +182,28 @@ function TalentOpportunitiesContent() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [preloadNextPage, loadingMore]);
 
-    // Show loading while auth is resolving
-    if (isLoading) {
+    // Only show loading skeleton if auth is loading AND we don't have cached data
+    if (isLoading && !hasCache) {
         return <OpportunitiesPageSkeleton />;
     }
 
-    if (!authUser) {
+    if (!authUser && !hasCache) {
         return <OpportunitiesPageSkeleton />;
     }
 
     // Initialize AI recommendations and load opportunities
     useEffect(() => {
-        initializeAIRecommendations();
+        if (!authUser?.id) return;
+
+        // If we already loaded from cache during component initialization, just fetch fresh data silently
+        if (hasCache) {
+            // Fetch fresh data silently in background
+            initializeAIRecommendations(true);
+        } else {
+            // No cache, show loading animation and fetch normally
+            initializeAIRecommendations(false);
+        }
+        
         loadSavedOpportunities();
     }, [authUser]);
 
@@ -163,13 +228,15 @@ function TalentOpportunitiesContent() {
     // Apply filters and search
     useEffect(() => {
         applyFiltersAndSearch();
-    }, [filters, opportunities, searchInput]);
+    }, [filters, opportunities, searchInput, savedOpportunityIds]);
 
-    const initializeAIRecommendations = async () => {
+    const initializeAIRecommendations = async (silent: boolean = false) => {
         if (!authUser?.id) return;
 
-        setLoading(true);
-        setAiMatchingStatus("loading");
+        if (!silent) {
+            setLoading(true);
+            setAiMatchingStatus("loading");
+        }
 
         try {
             // First, check if user has embedding
@@ -183,20 +250,28 @@ function TalentOpportunitiesContent() {
 
             if (!talentData?.embedding) {
                 // User needs to go through AI matching first
-                toast.info(t.settingUpRecommendations);
+                if (!silent) {
+                    toast.info(t.settingUpRecommendations);
+                }
                 await processUserForAIMatching();
             }
 
             // Load AI-recommended opportunities
-            await loadAIRecommendations();
-            setAiMatchingStatus("ready");
+            await loadAIRecommendations(silent);
+            if (!silent) {
+                setAiMatchingStatus("ready");
+            }
         } catch (error) {
             console.error("Error initializing AI recommendations:", error);
-            setAiMatchingStatus("idle");
+            if (!silent) {
+                setAiMatchingStatus("idle");
+            }
             // Fallback to regular opportunities
-            await loadGeneralOpportunities();
+            await loadGeneralOpportunities(10, silent);
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
 
@@ -268,7 +343,7 @@ function TalentOpportunitiesContent() {
         }
     };
 
-    const loadAIRecommendations = async () => {
+    const loadAIRecommendations = async (silent: boolean = false) => {
         if (!authUser?.id) return;
 
         try {
@@ -301,11 +376,13 @@ function TalentOpportunitiesContent() {
             }));
 
             // Mix with some general opportunities for variety
-            const generalOpps = await loadGeneralOpportunities(5);
+            const generalOpps = await loadGeneralOpportunities(5, true);
             const mixed = interleaveOpportunities(transformedAI, generalOpps);
 
             if (page === 0) {
                 setOpportunities(mixed);
+                // Save to cache for instant loading next time
+                saveToCache(mixed, authUser.id);
             } else {
                 setOpportunities(prev => [...prev, ...mixed]);
             }
@@ -313,11 +390,11 @@ function TalentOpportunitiesContent() {
             setHasMore(aiOpportunities.length === 10);
         } catch (error) {
             console.error("Error loading AI recommendations:", error);
-            await loadGeneralOpportunities();
+            await loadGeneralOpportunities(10, silent);
         }
     };
 
-    const loadGeneralOpportunities = async (limit = 10) => {
+    const loadGeneralOpportunities = async (limit = 10, silent: boolean = false) => {
         try {
             const { data: opportunities, error } = await supabase
                 .from('opportunities')
@@ -328,7 +405,15 @@ function TalentOpportunitiesContent() {
                 .order('created_at', { ascending: false })
                 .range(page * limit, (page + 1) * limit - 1);
 
-            if (error) throw error;
+            if (error) {
+                console.error("Supabase error loading opportunities:", {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+                throw error;
+            }
 
             const transformed: ExtendedOpportunity[] = (opportunities || []).map(opp => ({
                 id: opp.id,
@@ -348,6 +433,10 @@ function TalentOpportunitiesContent() {
             if (limit === 10) {
                 if (page === 0) {
                     setOpportunities(transformed);
+                    // Save to cache for instant loading next time
+                    if (authUser?.id) {
+                        saveToCache(transformed, authUser.id);
+                    }
                 } else {
                     setOpportunities(prev => [...prev, ...transformed]);
                 }
@@ -355,8 +444,10 @@ function TalentOpportunitiesContent() {
 
             return transformed;
         } catch (error) {
-            console.error("Error loading general opportunities:", error);
-            toast.error(t.failedToLoadOpportunities);
+            console.error("Error loading general opportunities:", error instanceof Error ? error.message : String(error));
+            if (!silent) {
+                toast.error(t.failedToLoadOpportunities);
+            }
             return [];
         }
     };
@@ -398,18 +489,10 @@ function TalentOpportunitiesContent() {
         try {
             if (!authUser?.id) return;
 
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError || !talentData?.id) return;
-
             const { data: savedOpportunities, error } = await supabase
                 .from('saved_opportunities')
                 .select('opportunity_id')
-                .eq('talent_id', talentData.id);
+                .eq('talent_id', authUser.id);
 
             if (error) throw error;
 
@@ -513,26 +596,23 @@ function TalentOpportunitiesContent() {
                 return;
             }
 
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError || !talentData?.id) {
-                toast.error(t.talentProfileNotFound);
-                return;
-            }
-
             const { error } = await supabase
                 .from('saved_opportunities')
                 .insert({
-                    talent_id: talentData.id,
+                    talent_id: authUser.id,
                     opportunity_id: opportunityId,
                     saved_at: new Date().toISOString()
                 });
 
-            if (error) throw error;
+            if (error) {
+                // Check if it's a duplicate save error (unique constraint violation)
+                if (error.code === '23505') {
+                    toast.info('Opportunity already saved');
+                    return;
+                }
+                console.error("Error inserting saved opportunity:", error);
+                throw error;
+            }
 
             const newSavedIds = new Set(savedOpportunityIds);
             newSavedIds.add(opportunityId);
@@ -549,18 +629,10 @@ function TalentOpportunitiesContent() {
         try {
             if (!authUser?.id) return;
 
-            const { data: talentData, error: talentError } = await supabase
-                .from('talents')
-                .select('id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-
-            if (talentError || !talentData?.id) return;
-
             const { error } = await supabase
                 .from('saved_opportunities')
                 .delete()
-                .eq('talent_id', talentData.id)
+                .eq('talent_id', authUser.id)
                 .eq('opportunity_id', opportunityId);
 
             if (error) throw error;
@@ -577,24 +649,18 @@ function TalentOpportunitiesContent() {
     };
 
     const handleApplyToOpportunity = (opportunity: ExtendedOpportunity) => {
-        router.push(`/talent/apply/${opportunity.id}`);
-    };
-
-    const handleViewDetails = (opportunity: ExtendedOpportunity) => {
-        setSelectedOpportunity(opportunity);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedOpportunity(null);
+        // Navigate to opportunity details page instead of directly to apply
+        router.push(`/talent/opportunities/${opportunity.id}`);
     };
 
     const handleRefresh = async () => {
         setPage(0);
         setOpportunities([]);
+        setLoading(true);
         setAiMatchingStatus("loading");
-        await initializeAIRecommendations();
+        // Clear cache to force fresh data load with loading animation
+        clearCache(authUser?.id);
+        await initializeAIRecommendations(false);
         toast.success(t.feedRefreshed);
     };
 
@@ -747,24 +813,13 @@ function TalentOpportunitiesContent() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                         >
-                            <div className="relative">
-                                {opportunity.isAIRecommended && (
-                                    <div className="absolute -top-2 -right-2 z-10">
-                                        <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                                            <Sparkles className="h-3 w-3" />
-                                            {t.aiMatch}
-                                        </div>
-                                    </div>
-                                )}
-                                <OpportunityCard
-                                    opportunity={opportunity}
-                                    onSave={handleSaveOpportunity}
-                                    onUnsave={handleUnsaveOpportunity}
-                                    onApply={handleApplyToOpportunity}
-                                    onViewDetails={handleViewDetails}
-                                    compact={false}
-                                />
-                            </div>
+                            <OpportunityCard
+                                opportunity={opportunity}
+                                onSave={handleSaveOpportunity}
+                                onUnsave={handleUnsaveOpportunity}
+                                onApply={handleApplyToOpportunity}
+                                compact={false}
+                            />
                         </motion.div>
                     ))}
 
@@ -792,18 +847,6 @@ function TalentOpportunitiesContent() {
                 </div>
             )}
 
-            {/* Opportunity Detail Modal */}
-            <OpportunityDetailModal
-                opportunity={selectedOpportunity}
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onApply={async (opportunityId: string) => {
-                    const opportunity = opportunities.find(opp => opp.id === opportunityId);
-                    if (opportunity) {
-                        handleApplyToOpportunity(opportunity);
-                    }
-                }}
-            />
         </div>
     );
 }

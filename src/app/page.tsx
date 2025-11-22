@@ -7,6 +7,7 @@ import FAQ from "@/features/landing/FAQ";
 import Testimonials from "@/features/landing/Testimonials";
 import ContactUs from "@/features/landing/ContactUs";
 import LoadingAnimation from "@/components/loadingAnimation";
+import CircularNavbar from "@/components/circular-navbar";
 import { toast } from "sonner";
 
 function LandingContent() {
@@ -55,13 +56,26 @@ function LandingContent() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-stretch">
-      <HeroSection onGetStarted={handleGetStarted} />
-      <Features />
-      <Testimonials />
-      <FAQ />
-      <ContactUs />
-    </main>
+    <>
+      <CircularNavbar />
+      <main className="min-h-screen flex flex-col items-stretch">
+        <div id="hero">
+          <HeroSection onGetStarted={handleGetStarted} />
+        </div>
+        <div id="features">
+          <Features />
+        </div>
+        <div id="testimonials">
+          <Testimonials />
+        </div>
+        <div id="faq">
+          <FAQ />
+        </div>
+        <div id="contact">
+          <ContactUs />
+        </div>
+      </main>
+    </>
   );
 }
 

@@ -262,7 +262,7 @@ export default function TalentSignup() {
 
               {/* Sign Up Button */}
               <Button
-                className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium"
                 onClick={handleEmailSignup}
                 disabled={isLoading}
               >
@@ -275,7 +275,7 @@ export default function TalentSignup() {
                   Already have an account?{" "}
                   <Link
                     href="/auth/talent/login"
-                    className="text-gray-900 underline font-medium"
+                    className="text-primary underline font-medium"
                   >
                     Sign in
                   </Link>

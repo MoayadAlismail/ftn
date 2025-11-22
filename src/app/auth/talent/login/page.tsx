@@ -336,7 +336,7 @@ function TalentLoginContent() {
                   {/* Sign In Button */}
                   <Button
                     type="submit"
-                    className="w-full h-10 sm:h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-4 sm:mt-6"
+                    className="w-full h-10 sm:h-11 bg-primary hover:bg-primary/90 text-white font-medium mt-4 sm:mt-6"
                     disabled={isLoading}
                   >
                     {isLoading ? "Signing in..." : "Log in"}
@@ -347,7 +347,7 @@ function TalentLoginContent() {
                 <div className="text-center mt-4 sm:mt-6 space-y-2">
                   <p className="text-xs sm:text-sm text-gray-600">
                     Don't have an account?{" "}
-                    <Link href="/auth/talent/signup" className="text-gray-900 underline font-medium">
+                    <Link href="/auth/talent/signup" className="text-primary underline font-medium">
                       Create your account
                     </Link>
                   </p>

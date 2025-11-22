@@ -75,7 +75,7 @@ export default function Testimonials() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {testimonials.map((testimonial, index) => (
-                        <Card key={index} className="border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <Card key={index} className="border-border hover:shadow-lg hover:-translate-y-1 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75">
                             <CardContent className="p-6">
                                 <div className="flex items-center mb-4">
                                     <div className="text-3xl mr-3">

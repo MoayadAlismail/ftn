@@ -5,6 +5,7 @@ import { User, ChevronDown, Settings, CreditCard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import LanguageSelector from "@/components/language-selector";
 
 interface ProfileMenuProps {
   userName?: string;
@@ -80,6 +81,13 @@ export function ProfileMenu({ userName, userEmail, onSignOut }: ProfileMenuProps
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </button>
+
+            <div className="px-3 py-2">
+              <div className="text-xs text-gray-500 mb-2">Language</div>
+              <LanguageSelector />
+            </div>
+
+            <div className="border-t border-gray-100 my-1"></div>
 
             <button
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors w-full"

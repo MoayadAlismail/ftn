@@ -24,8 +24,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import OpportunityCard, { type Opportunity } from "@/features/talent/opportunities/components/opportunity-card";
-import OpportunityDetailModal from "@/components/opportunity-detail-modal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { applicationsTranslations } from "@/lib/language";
 
@@ -52,6 +52,7 @@ interface ApplicationStats {
 }
 
 export default function TalentApplicationsPage() {
+  const router = useRouter();
   const { user, authUser, isLoading } = useAuth();
   const { language } = useLanguage();
   const t = applicationsTranslations[language];
@@ -65,8 +66,6 @@ export default function TalentApplicationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<"applications" | "saved">("applications");
-  const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [savedOpportunityIds, setSavedOpportunityIds] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<ApplicationStats>({
     total: 0,
@@ -94,13 +93,14 @@ export default function TalentApplicationsPage() {
     setLoading(true);
     try {
       // Fetch applications with opportunity details
-      const { data: interests, error } = await supabase
-        .from("interests")
+      const { data: applications, error } = await supabase
+        .from("talent_applications")
         .select(`
           id,
-          user_id,
-          opp_id,
-          created_at,
+          talent_id,
+          opportunity_id,
+          applied_at,
+          status,
           opportunities (
             id,
             title,
@@ -112,8 +112,8 @@ export default function TalentApplicationsPage() {
             description
           )
         `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .eq("talent_id", user.id)
+        .order("applied_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching applications:", error);
@@ -121,9 +121,12 @@ export default function TalentApplicationsPage() {
         return;
       }
 
-      const applicationsData = interests?.map(interest => ({
-        ...interest,
-        opportunity: Array.isArray(interest.opportunities) ? interest.opportunities[0] : interest.opportunities
+      const applicationsData = applications?.map(app => ({
+        id: app.id,
+        user_id: app.talent_id,
+        opp_id: app.opportunity_id,
+        created_at: app.applied_at,
+        opportunity: Array.isArray(app.opportunities) ? app.opportunities[0] : app.opportunities
       })) || [];
 
       setApplications(applicationsData);
@@ -174,11 +177,32 @@ export default function TalentApplicationsPage() {
     
     setSavedLoading(true);
     try {
-      // First, get saved opportunity records with metadata
+      // First, get the talent ID from the talents table
+      const { data: talentData, error: talentError } = await supabase
+        .from('talents')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .maybeSingle();
+
+      if (talentError) {
+        console.error("Error fetching talent:", talentError);
+        setSavedLoading(false);
+        return;
+      }
+
+      if (!talentData?.id) {
+        // User doesn't have a talent profile yet
+        setSavedOpportunities([]);
+        setSavedOpportunityIds(new Set());
+        setSavedLoading(false);
+        return;
+      }
+
+      // Now get saved opportunity records with metadata using the talent ID
       const { data: savedRecords, error: savedError } = await supabase
         .from('saved_opportunities')
         .select('opportunity_id, saved_at, notes')
-        .eq('talent_id', authUser.id)
+        .eq('talent_id', talentData.id)
         .order('saved_at', { ascending: false });
 
       if (savedError) throw savedError;
@@ -274,10 +298,22 @@ export default function TalentApplicationsPage() {
         return;
       }
 
+      // Get talent ID first
+      const { data: talentData, error: talentError } = await supabase
+        .from('talents')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .maybeSingle();
+
+      if (talentError || !talentData?.id) {
+        toast.error(t.talentProfileNotFound || "Talent profile not found");
+        return;
+      }
+
       const { error } = await supabase
         .from('saved_opportunities')
         .insert({
-          talent_id: authUser.id,
+          talent_id: talentData.id,
           opportunity_id: opportunityId,
           saved_at: new Date().toISOString()
         });
@@ -304,10 +340,19 @@ export default function TalentApplicationsPage() {
     try {
       if (!authUser?.id) return;
 
+      // Get talent ID first
+      const { data: talentData, error: talentError } = await supabase
+        .from('talents')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .maybeSingle();
+
+      if (talentError || !talentData?.id) return;
+
       const { error } = await supabase
         .from('saved_opportunities')
         .delete()
-        .eq('talent_id', authUser.id)
+        .eq('talent_id', talentData.id)
         .eq('opportunity_id', opportunityId);
 
       if (error) throw error;
@@ -328,15 +373,6 @@ export default function TalentApplicationsPage() {
     }
   };
 
-  const handleViewDetails = (opportunity: Opportunity) => {
-    setSelectedOpportunity(opportunity);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedOpportunity(null);
-    setIsModalOpen(false);
-  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -523,7 +559,7 @@ export default function TalentApplicationsPage() {
           ) : (
             <div className="space-y-4">
               {filteredApplications.map((application) => (
-                <Card key={application.id} className="hover:shadow-md transition-shadow">
+                <Card key={application.id} className="hover:shadow-md hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75">
                   <CardContent className="p-4 md:p-6">
                     {/* Mobile Layout - Stack vertically */}
                     <div className="block md:hidden space-y-4">
@@ -747,8 +783,7 @@ export default function TalentApplicationsPage() {
                   opportunity={opportunity}
                   onSave={handleSaveOpportunity}
                   onUnsave={handleUnsaveOpportunity}
-                  onApply={(opp) => window.open(`/talent/apply/${opp.id}`, '_blank')}
-                  onViewDetails={handleViewDetails}
+                  onApply={(opp) => router.push(`/talent/opportunities/${opp.id}`)}
                   compact={false}
                 />
               ))}
@@ -757,15 +792,6 @@ export default function TalentApplicationsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Opportunity Detail Modal */}
-      <OpportunityDetailModal
-        opportunity={selectedOpportunity}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onApply={async (opportunityId: string) => {
-          window.open(`/talent/apply/${opportunityId}`, '_blank');
-        }}
-      />
     </div>
   );
 }

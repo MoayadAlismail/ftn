@@ -357,7 +357,7 @@ export default function TalentApplicationPage() {
                             </div>
 
                             <div className="flex flex-wrap gap-1">
-                                {opportunity.skills.slice(0, 4).map((skill, index) => (
+                                {opportunity.skills?.slice(0, 4).map((skill, index) => (
                                     <Badge key={index} variant="outline" className="text-xs">
                                         {skill}
                                     </Badge>

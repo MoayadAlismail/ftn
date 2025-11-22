@@ -65,7 +65,7 @@ export function OpportunityCard({
     };
 
     return (
-        <Card className="w-full hover:shadow-md transition-shadow duration-200">
+        <Card className="w-full hover:shadow-md hover:-translate-y-0.5 hover:border-gray-400 transition-[transform,box-shadow,border-color] duration-75">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -120,7 +120,7 @@ export function OpportunityCard({
                         </Button>
                     </div>
 
-                    <div className={`transition-all duration-300 ease-in-out ${isDescriptionExpanded ? 'max-h-96 opacity-100' : 'max-h-20 opacity-90'
+                    <div className={`transition-[max-height,opacity] duration-150 ${isDescriptionExpanded ? 'max-h-96 opacity-100' : 'max-h-20 opacity-90'
                         } overflow-hidden`}>
                         <p className="text-sm text-gray-600 leading-relaxed">
                             {opportunity.description}

@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { LayoutDashboard, TableOfContents, Users, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { EmployerProfileMenu } from "@/components/employer-profile-menu";
-import LanguageSelector from "@/components/language-selector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { employerTranslations } from "@/lib/language";
 import { supabase } from "@/lib/supabase/client";
@@ -81,7 +80,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
                   key={item.id}
                   href={item.href || "#"}
                   prefetch={true}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${isActive
                     ? "text-gray-900 bg-gray-100"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                     }`}
@@ -97,7 +96,6 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
 
           {/* Desktop user section */}
           <div className="hidden lg:flex items-center gap-2">
-            <LanguageSelector />
             <EmployerProfileMenu 
               userName={user?.user_metadata?.full_name}
               companyName={user?.user_metadata?.company_name}
@@ -129,7 +127,7 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
                     href={item.href || "#"}
                     prefetch={true}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors relative ${
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium relative ${
                       isActive
                         ? 'bg-primary/10 text-primary'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -143,15 +141,12 @@ export default function EmployerLayout({ children }: { children: ReactNode }) {
               
               {/* Mobile user info and sign out */}
               <div className="pt-4 mt-4 border-t border-gray-200 px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <EmployerProfileMenu 
-                    userName={user?.user_metadata?.full_name}
-                    companyName={user?.user_metadata?.company_name}
-                    userEmail={user?.email}
-                    onSignOut={handleSignOut}
-                  />
-                  <LanguageSelector />
-                </div>
+                <EmployerProfileMenu 
+                  userName={user?.user_metadata?.full_name}
+                  companyName={user?.user_metadata?.company_name}
+                  userEmail={user?.email}
+                  onSignOut={handleSignOut}
+                />
               </div>
             </div>
           </div>

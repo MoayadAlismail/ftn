@@ -3,13 +3,11 @@ import ProtectedRoute from '@/features/auth/ProtectedRoute'
 import { Button } from '@/components/ui/button';
 import { Role } from '@/constants/enums'
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Home, Mail, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
+import { User, Home, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { useState } from 'react';
 import { ProfileMenu } from '@/components/profile-menu';
-import LanguageSelector from '@/components/language-selector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { talentTranslations } from '@/lib/language';
 
@@ -18,54 +16,15 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
   const { language } = useLanguage();
   const t = talentTranslations[language];
   const pathname = usePathname();
-  const [pendingInvitations, setPendingInvitations] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Fetch pending invitations count
-  useEffect(() => {
-    const fetchPendingInvitations = async () => {
-      if (!user?.id) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("invites")
-          .select("id")
-          .eq("talent_id", user.id)
-          .eq("status", "pending");
-
-        if (!error && data) {
-          setPendingInvitations(data.length);
-        }
-      } catch (error) {
-        console.error("Error fetching pending invitations:", error);
-      }
-    };
-
-    fetchPendingInvitations();
-
-    // Set up real-time subscription for invitations
-    const subscription = supabase
-      .channel('invitations')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'invites',
-          filter: `talent_id=eq.${user?.id}`
-        },
-        () => {
-          fetchPendingInvitations();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [user]);
-
-  const navigationItems = [
+  const navigationItems: Array<{
+    href: string;
+    icon: typeof Home;
+    label: string;
+    description?: string;
+    badge?: number;
+  }> = [
     {
       href: "/talent/opportunities",
       icon: Home,
@@ -76,12 +35,6 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
       href: "/talent/applications",
       icon: FileText,
       label: t.navApplications
-    },
-    {
-      href: "/talent/invitations",
-      icon: Mail,
-      label: t.navInvitations,
-      badge: pendingInvitations > 0 ? pendingInvitations : undefined
     },
     {
       href: "/talent/services",
@@ -116,7 +69,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                   key={item.href}
                   href={item.href}
                   prefetch={true}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative ${pathname === item.href
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium relative ${pathname === item.href
                     ? 'bg-primary/10 text-primary'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
@@ -134,11 +87,6 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
 
             {/* Right side - User info and mobile menu */}
             <div className="flex items-center gap-2">
-              {/* Desktop Language Selector */}
-              <div className="hidden lg:block">
-                <LanguageSelector />
-              </div>
-              
               {/* Desktop Profile Dropdown */}
               <div className="hidden lg:block">
                 <ProfileMenu 
@@ -171,7 +119,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                     href={item.href}
                     prefetch={true}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors relative ${pathname === item.href
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium relative ${pathname === item.href
                       ? 'bg-primary/10 text-primary'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                       }`}
@@ -200,7 +148,7 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                     <Link
                       href="/talent/profile"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer"
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 cursor-pointer"
                     >
                       <User size={18} />
                       <span>{t.personalInfo}</span>
@@ -213,20 +161,12 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                     
                     <div className="mx-2 my-2 border-t border-gray-200"></div>
                     
-                    <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      {t.settings}
-                    </div>
-                    
-                    <div className="px-3 py-2 mx-2">
-                      <LanguageSelector />
-                    </div>
-                    
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
                         signOut();
                       }}
-                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 transition-colors cursor-pointer w-full"
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg mx-2 cursor-pointer w-full"
                     >
                       <LogOut size={18} />
                       <span>{t.signOut}</span>

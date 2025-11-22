@@ -208,7 +208,7 @@ export default function EmployerLogin() {
                   {/* Sign In Button */}
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-medium mt-6"
+                    className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium mt-6"
                     disabled={isLoading}
                   >
                     {isLoading ? "Sending code..." : "Send verification code"}
@@ -219,7 +219,7 @@ export default function EmployerLogin() {
                 <div className="text-center mt-6 space-y-2">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{" "}
-                    <Link href="/auth/employer/signup" className="text-gray-900 underline font-medium">
+                    <Link href="/auth/employer/signup" className="text-primary underline font-medium">
                       Create your account
                     </Link>
                   </p>
