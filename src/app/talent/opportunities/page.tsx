@@ -289,38 +289,54 @@ function TalentOpportunitiesContent() {
 
             if (userData.embedding) return; // Already processed
 
-            // Download and process resume
-            const { data: resumeData, error: resumeError } = await supabase.storage
-                .from("resumes")
-                .download(userData.resume_url);
+            let resumeText = "";
 
-            if (resumeError) throw resumeError;
+            // Try to download and process resume if it exists
+            if (userData.resume_url) {
+                try {
+                    const { data: resumeData, error: resumeError } = await supabase.storage
+                        .from("resumes")
+                        .download(userData.resume_url);
 
-            const resumeFile = new File(
-                [resumeData],
-                userData.resume_url.split("/").pop() || "resume.pdf",
-                { type: "application/pdf" }
-            );
+                    if (!resumeError && resumeData) {
+                        const resumeFile = new File(
+                            [resumeData],
+                            userData.resume_url.split("/").pop() || "resume.pdf",
+                            { type: "application/pdf" }
+                        );
 
-            const formData = new FormData();
-            formData.append("file", resumeFile);
+                        const formData = new FormData();
+                        formData.append("file", resumeFile);
 
-            const extractRes = await fetch("/api/extract-resume", {
-                method: "POST",
-                body: formData,
-            });
+                        const extractRes = await fetch("/api/extract-resume", {
+                            method: "POST",
+                            body: formData,
+                        });
 
-            if (!extractRes.ok) throw new Error("Failed to extract resume");
+                        if (extractRes.ok) {
+                            resumeText = await extractRes.json();
+                        }
+                    }
+                } catch (resumeError) {
+                    console.warn("Could not process resume, continuing with profile data only:", resumeError);
+                }
+            }
 
-            const extractedData = await extractRes.json();
-
+            // Build text from available data (with or without resume)
             const allText = [
-                extractedData,
-                userData.bio,
+                resumeText,
+                userData.full_name || "",
+                userData.bio || "",
                 userData.work_style_pref?.join(", ") || "",
                 userData.industry_pref?.join(", ") || "",
                 userData.location_pref || "",
-            ].join(" ");
+                userData.skills?.join(", ") || "",
+            ].filter(Boolean).join(" ");
+
+            // Ensure we have at least some text to generate embedding
+            if (!allText.trim()) {
+                throw new Error("No profile data available to generate embedding");
+            }
 
             const embeddingRes = await fetch("/api/get-embedding", {
                 method: "POST",
@@ -336,6 +352,8 @@ function TalentOpportunitiesContent() {
                 .from("talents")
                 .update({ embedding: embeddingData.embeddings[0].values })
                 .eq("id", userData.id);
+
+            console.log("✅ Successfully generated embedding for user");
 
         } catch (error) {
             console.error("Error processing user for AI matching:", error);

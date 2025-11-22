@@ -6,13 +6,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { User, Home, FileText, Menu, X, Settings, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProfileMenu } from '@/components/profile-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { talentTranslations } from '@/lib/language';
+import { useTalentProfile } from '@/hooks/useTalentProfile';
 
 export default function TalentLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
+  const { profile } = useTalentProfile();
   const { language } = useLanguage();
   const t = talentTranslations[language];
   const pathname = usePathname();
@@ -90,8 +92,8 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
               {/* Desktop Profile Dropdown */}
               <div className="hidden lg:block">
                 <ProfileMenu 
-                  userName={user?.user_metadata.name}
-                  userEmail={user?.email}
+                  userName={profile?.full_name || user?.user_metadata?.name || "User"}
+                  userEmail={profile?.email || user?.email}
                   onSignOut={signOut}
                 />
               </div>
@@ -139,8 +141,8 @@ export default function TalentLayout({ children }: { children: React.ReactNode }
                   <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-700 mx-2 bg-gray-50 rounded-lg">
                     <User size={18} className="text-gray-600" />
                     <div className="flex-1">
-                      <p className="font-medium">{user?.user_metadata.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <p className="font-medium">{profile?.full_name || user?.user_metadata?.name || "User"}</p>
+                      <p className="text-xs text-gray-500">{profile?.email || user?.email}</p>
                     </div>
                   </div>
                   
