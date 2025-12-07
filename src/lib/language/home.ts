@@ -1,4 +1,4 @@
-giexport const homeTranslations = {
+export const homeTranslations = {
   en: {
     // Navbar
     navHome: "Home",
